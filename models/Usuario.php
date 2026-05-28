@@ -93,7 +93,7 @@ class Usuario
 
             // Si la tx falla, se hace un rollback
             $this->db->rollback();
-            var_dump($th->getMessage());
+            error_log($th->getMessage());
             return false;
         }
     }

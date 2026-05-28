@@ -4,6 +4,7 @@ session_start();
 require '../config/db.php';
 require_once '../models/Usuario.php';
 
+// Instanciar la clase Usuario
 $usuario = new Usuario($pdo);
 
 // Verificar si viene de post
@@ -35,7 +36,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
             $destino = match ($resultado['rol']) {
                 'paciente' => '../views/panel.php',
                 'medico' => '../views/portal_medico.php',
-                'admin' => '../views/dashboard.php',
+                'admin' => '../views/dashboardAdmin.php',
                 default => '../views/inicio.php',
             };
             header("Location: $destino");
