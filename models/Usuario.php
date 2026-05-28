@@ -33,14 +33,68 @@ class Usuario
 
             if ($usuario && password_verify($password, $usuario['password'])) {
                 return $usuario;
-            }else {
+            } else {
                 return false;
             }
-
         } catch (\Throwable $th) {
             error_log($th->getMessage());
             return false;
         }
     }
 
+    // Metodo para registrar un usuario
+    public function registrar($datos)
+    {
+        $passwordHasheada = password_hash($datos['password'], PASSWORD_DEFAULT);
+
+        try {
+
+            // Inicio de Transaccion
+
+            $this->db->beginTransaction();
+
+            // Insertar en la tabla usuario con rol de paciente por default
+
+            $sql1 = "INSERT INTO Paciente (nombre, apellido, email, dni, fecha_nac, telefono)
+                    VALUES (:nombre, :apellido, :email, :dni, :fecha_nac, :telefono)";
+            $stmt1 = $this->db->prepare($sql1);
+            $stmt1->execute([
+                ':nombre'    => $datos['nombre'],
+                ':apellido'  => $datos['apellido'],
+                ':email'     => $datos['email'],
+                ':dni'       => $datos['dni'],
+                ':fecha_nac' => $datos['fecha_nac'],
+                ':telefono'  => $datos['telefono']
+            ]);
+
+            // Obtengo el id del usuario que acabo de insertar
+            $idPaciente = $this->db->lastInsertId();
+
+            // Insertar en la tabla de paciente el usuario que acabo de insertar
+
+
+            $sql2 = "INSERT INTO Usuario (nombre, apellido, email, password, id_paciente)
+                    VALUES (:nombre, :apellido, :email, :password, :id_paciente)";
+            $stmt2 = $this->db->prepare($sql2);
+
+            // se carga un array con todos los parametros
+            $stmt2->execute([
+                ':nombre' => $datos['nombre'],
+                ':apellido' => $datos['apellido'],
+                ':email' => $datos['email'],
+                ':password' => $passwordHasheada,
+                ':id_paciente' => $idPaciente
+            ]);
+
+            // Commit de la transaccion
+            $this->db->commit();
+            return true;
+        } catch (\Throwable $th) {
+
+            // Si la tx falla, se hace un rollback
+            $this->db->rollback();
+            var_dump($th->getMessage());
+            return false;
+        }
+    }
 }
