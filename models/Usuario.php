@@ -5,15 +5,15 @@
 class Usuario
 {
     // db contiene pdo para todos los metodos de la clase
-    private $db;
+    private \PDO $db;
 
-    public function __construct($pdo)
+    public function __construct(\PDO $pdo)
     {
         $this->db = $pdo;
     }
 
     // Metodo para verificar un login y devuelve un array con id, nombre, email y rol
-    public function login($email, $password)
+    public function login(string $email, string $password)
     {
         try {
 
@@ -43,7 +43,7 @@ class Usuario
     }
 
     // Metodo para registrar un usuario
-    public function registrar($datos)
+    public function registrar(array $datos)
     {
         $passwordHasheada = password_hash($datos['password'], PASSWORD_DEFAULT);
 
@@ -93,6 +93,39 @@ class Usuario
 
             // Si la tx falla, se hace un rollback
             $this->db->rollback();
+            error_log($th->getMessage());
+            return false;
+        }
+    }
+
+    // Metodo para traer todos los usuarios y unida con la tabla de Rol
+    public function getAll()
+    {
+        $sql = "SELECT * FROM vista_usuarios";
+
+        $stmt = $this->db->prepare($sql);
+        $stmt->execute();
+        $todosUsuarios = $stmt->fetchAll();
+        return $todosUsuarios;
+    }
+
+    // Metodo que sirve para cambiar el rol de un usuario x 
+    public function cambiarRol(int $idUsuario, int $idRol)
+    {
+        try {
+            $sql = "UPDATE Usuario 
+                SET id_rol = :id_rol 
+                WHERE id_usuario = :id_usuario";
+
+            $stmt = $this->db->prepare($sql);
+
+            $stmt->execute([
+                ':id_rol' => $idRol,
+                ':id_usuario' => $idUsuario
+            ]);
+
+            return true;
+        } catch (\Throwable $th) {
             error_log($th->getMessage());
             return false;
         }

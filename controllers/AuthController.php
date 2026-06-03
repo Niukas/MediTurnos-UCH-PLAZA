@@ -8,7 +8,7 @@ require_once '../models/Usuario.php';
 $usuario = new Usuario($pdo);
 
 // Verificar si viene de post
-if ($_SERVER['REQUEST_METHOD'] == 'POST') {
+if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
     // Guardar en una variable el tipo de formulario que llegó
     $accion = $_POST['accion'] ?? '';

@@ -5,9 +5,9 @@
 class Stats
 {
 
-    private $db;
+    private \PDO $db;
 
-    public function __construct($pdo)
+    public function __construct(\PDO $pdo)
     {
         $this->db = $pdo;
     }
