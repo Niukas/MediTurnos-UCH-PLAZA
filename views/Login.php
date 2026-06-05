@@ -1,20 +1,28 @@
 <!DOCTYPE html>
 <html lang="es">
+
 <head>
     <meta charset="UTF-8">
     <title>Login — MediTurnos</title>
 </head>
+
 <body>
 
     <h2>Iniciar sesión</h2>
 
-<?php if (isset($_GET['error'])): ?>
-    <p style="color:red">Hubo un error en el registro, intentá de nuevo.</p>
-<?php endif; ?>
+    <?php
+    $mensajes = [
+        'errorLogin' => ['color' => 'red',   'texto' => 'Usuario o contraseña incorrectos.'],
+        'error'      => ['color' => 'red',   'texto' => 'Hubo un error en el registro, intentá de nuevo.'],
+        'registro'   => ['color' => 'green', 'texto' => 'Cuenta creada correctamente. Ya podés iniciar sesión.'],
+    ];
 
-    <?php if (isset($_GET['registro'])): ?>
-    <p style="color:green">Cuenta creada correctamente. Ya podés iniciar sesión.</p>
-    <?php endif; ?>
+    foreach ($mensajes as $key => $msg):
+        if (isset($_GET[$key])): ?>
+            <p style="color:<?= $msg['color'] ?>"><?= $msg['texto'] ?></p>
+    <?php endif;
+    endforeach;
+    ?>
 
     <form method="POST" action="../controllers/AuthController.php">
         <input type="hidden" name="accion" value="login">
@@ -24,4 +32,5 @@
     </form>
 
 </body>
+
 </html>

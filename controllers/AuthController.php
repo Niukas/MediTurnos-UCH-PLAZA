@@ -42,8 +42,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             header("Location: $destino");
             exit;
         } else {
-            $error = "Email o contraseña incorrectos.";
-            header("Location: ../views/Login.php");
+            header("Location: ../views/Login.php?errorLogin");
         }
     }
 
