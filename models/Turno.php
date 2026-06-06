@@ -126,4 +126,58 @@ class Turno
             return false;
         }
     }
+
+    // Metodo de creacion de un turno
+    public function crear(array $datos)
+    {
+        try {
+            $this->db->beginTransaction();
+
+            // Bloquea las filas mientras verifica — ningún otro puede leer hasta que se haga commit
+            $sqlCheck = "SELECT COUNT(*) FROM Turno 
+                     WHERE matricula = :matricula
+                     AND fecha = :fecha
+                     AND hora_inicio = :hora_inicio
+                     AND estado != 'cancelado'
+                     FOR UPDATE";
+
+            $stmtCheck = $this->db->prepare($sqlCheck);
+            $stmtCheck->execute([
+                ':matricula'   => $datos['matricula'],
+                ':fecha'       => $datos['fecha'],
+                ':hora_inicio' => $datos['hora_inicio']
+            ]);
+
+            if ($stmtCheck->fetchColumn() > 0) {
+                $this->db->rollBack();
+                return false;
+            }
+
+            // Si no existe, hace el INSERT
+            $sql = "INSERT INTO Turno (fecha, hora_inicio, estado, observacion, 
+                id_paciente, matricula, id_especialidad, id_consultorio, id_plan, nro_afiliado)
+                VALUES (:fecha, :hora_inicio, 'pendiente', :observacion,
+                :id_paciente, :matricula, :id_especialidad, :id_consultorio, :id_plan, :nro_afiliado)";
+
+            $stmt = $this->db->prepare($sql);
+            $stmt->execute([
+                ':fecha'           => $datos['fecha'],
+                ':hora_inicio'     => $datos['hora_inicio'],
+                ':observacion'     => $datos['observacion'] ?? null,
+                ':id_paciente'     => $datos['id_paciente'],
+                ':matricula'       => $datos['matricula'],
+                ':id_especialidad' => $datos['id_especialidad'],
+                ':id_consultorio'  => $datos['id_consultorio'],
+                ':id_plan'         => $datos['id_plan'],
+                ':nro_afiliado'    => $datos['nro_afiliado']
+            ]);
+
+            $this->db->commit();
+            return true;
+        } catch (\Throwable $th) {
+            $this->db->rollBack();
+            error_log($th->getMessage());
+            return false;
+        }
+    }
 }

@@ -8,7 +8,7 @@ class Especialidad {
     }
 
     public function getAll(){
-        $sql = "SELECT id_especialidad, nombre FROM Especialidad ORDER BY nombre ASC";
+        $sql = "SELECT id_especialidad, nombre, duracion_turno_min FROM Especialidad ORDER BY nombre ASC";
 
         $stmt = $this->db->prepare($sql);
         $stmt->execute();
