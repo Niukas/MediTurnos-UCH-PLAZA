@@ -98,6 +98,15 @@ class Usuario
         }
     }
 
+    // Metodo que selecciona el id de paciente segun el usuario que esta logueado
+    public function getIdPaciente(int $id_usuario)
+    {
+        $sql  = "SELECT id_paciente FROM Usuario WHERE id_usuario = :id_usuario";
+        $stmt = $this->db->prepare($sql);
+        $stmt->execute([':id_usuario' => $id_usuario]);
+        return $stmt->fetchColumn();
+    }
+
     // Metodo para traer todos los usuarios y unida con la tabla de Rol
     public function getAll()
     {

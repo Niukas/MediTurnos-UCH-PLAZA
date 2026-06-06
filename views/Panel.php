@@ -1,7 +1,6 @@
-<?php 
-define('SECCION', 'turnos');
-require '../controllers/AdminController.php';
-require 'layout/menuAdmin.php';
+<?php
+define('SECCION', 'misTurnos');
+require '../controllers/PacienteController.php';
 ?>
 
 <!DOCTYPE html>
@@ -9,45 +8,40 @@ require 'layout/menuAdmin.php';
 
 <head>
     <meta charset="UTF-8">
-    <title>Turnos — MediTurnos</title>
+    <title>Mis turnos — MediTurnos</title>
 </head>
 
 <body>
 
-    <h1>Gestión de turnos</h1>
+    <h1>Mis turnos</h1>
+
+    <!-- MENSAJES -->
+    <?php
+    $mensajes = [
+        'exitoso' => ['color' => 'green', 'texto' => 'Turno cancelado correctamente.'],
+        'error'   => ['color' => 'red',   'texto' => 'Hubo un error al cancelar el turno.'],
+    ];
+    $registro = $_GET['registro'] ?? null;
+    if ($registro && isset($mensajes[$registro])): ?>
+        <p style="color:<?= $mensajes[$registro]['color'] ?>"><?= $mensajes[$registro]['texto'] ?></p>
+    <?php endif; ?>
+
+    <?php require '../views/layout/menuPaciente.php'; ?>
 
     <!-- FILTROS -->
-    <form method="GET" action="">
-
-        <!-- Filtro período -->
-        <span>Período:</span>
-        <?php
-        $periodos = ['dia' => 'Hoy', 'semana' => 'Semana', 'mes' => 'Mes', 'todos' => 'Todos'];
-        foreach ($periodos as $valor => $label):
-        ?>
-            <a href="?periodo=<?= $valor ?>&especialidad=<?= $especialidadFiltro ?>">
-                <?php if ($periodo === $valor): ?>
-                    <strong><?= $label ?></strong>
-                <?php else: ?>
-                    <?= $label ?>
-                <?php endif; ?>
-            </a>
-        <?php endforeach; ?>
-
-        <!-- Filtro especialidad -->
-        <select name="especialidad" onchange="this.form.submit()">
-            <option value="">Todas las especialidades</option>
-            <?php foreach ($listadoEspecialidad as $e): ?>
-                <option value="<?= $e['nombre'] ?>"
-                    <?= $especialidad === $e['nombre'] ? 'selected' : '' ?>>
-                    <?= $e['nombre'] ?>
-                </option>
-            <?php endforeach; ?>
-        </select>
-
-        <input type="hidden" name="periodo" value="<?= $periodo ?>">
-
-    </form>
+    <span>Período:</span>
+    <?php
+    $periodos = ['dia' => 'Hoy', 'semana' => 'Semana', 'mes' => 'Mes', 'todos' => 'Todos'];
+    foreach ($periodos as $valor => $label):
+    ?>
+        <a href="?periodo=<?= $valor ?>&especialidad=<?= $especialidadFiltro ?>">
+            <?php if ($periodo === $valor): ?>
+                <strong><?= $label ?></strong>
+            <?php else: ?>
+                <?= $label ?>
+            <?php endif; ?>
+        </a>
+    <?php endforeach; ?>
 
     <p>Total: <?= $totalTurnos ?> turnos | Página <?= $paginaActual ?> de <?= $totalPaginas ?></p>
 
@@ -68,9 +62,9 @@ require 'layout/menuAdmin.php';
                     <th>#</th>
                     <th>Fecha</th>
                     <th>Hora</th>
-                    <th>Paciente</th>
                     <th>Médico</th>
-                    <th>Estado / Acción</th>
+                    <th>Estado</th>
+                    <th>Acción</th>
                 </tr>
             </thead>
             <tbody>
@@ -79,24 +73,18 @@ require 'layout/menuAdmin.php';
                         <td><?= $t['id_turno'] ?></td>
                         <td><?= $t['fecha'] ?></td>
                         <td><?= $t['hora_inicio'] ?></td>
-                        <td><?= $t['paciente_nombre'] . ' ' . $t['paciente_apellido'] ?></td>
                         <td><?= $t['medico_nombre'] . ' ' . $t['medico_apellido'] ?></td>
+                        <td><?= ucfirst($t['estado']) ?></td>
                         <td>
-                            <form method="POST" action="dashboardAdminTurnos.php">
-                                <input type="hidden" name="accion" value="cambiarEstado">
-                                <input type="hidden" name="id_turno" value="<?= $t['id_turno'] ?>">
-                                <select name="estado">
-                                    <?php
-                                    $estados = ['pendiente', 'confirmado', 'cancelado', 'realizado'];
-                                    foreach ($estados as $e):
-                                    ?>
-                                        <option value="<?= $e ?>" <?= $t['estado'] === $e ? 'selected' : '' ?>>
-                                            <?= ucfirst($e) ?>
-                                        </option>
-                                    <?php endforeach; ?>
-                                </select>
-                                <button type="submit">Guardar</button>
-                            </form>
+                            <?php if ($t['estado'] === 'pendiente' || $t['estado'] === 'confirmado'): ?>
+                                <form method="POST" action="../controllers/PacienteController.php">
+                                    <input type="hidden" name="accion" value="cancelarTurno">
+                                    <input type="hidden" name="id_turno" value="<?= $t['id_turno'] ?>">
+                                    <button type="submit">Cancelar</button>
+                                </form>
+                            <?php else: ?>
+                                —
+                            <?php endif; ?>
                         </td>
                     </tr>
                 <?php endforeach; ?>
@@ -112,7 +100,6 @@ require 'layout/menuAdmin.php';
         <?php endif; ?>
 
         <?php
-        // Mostrar solo 5 páginas alrededor de la actual
         $inicio = max(1, $paginaActual - 2);
         $fin    = min($totalPaginas, $paginaActual + 2);
         ?>
