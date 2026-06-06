@@ -49,9 +49,9 @@ class Turno
         if ($periodo === 'dia') {
             $where[] = "fecha = CURDATE()";
         } elseif ($periodo === 'semana') {
-            $where[] = "fecha BETWEEN DATE_SUB(CURDATE(), INTERVAL 7 DAY) AND CURDATE()";
+            $where[] = "YEARWEEK(fecha, 1) = YEARWEEK(CURDATE(), 1)";
         } elseif ($periodo === 'mes') {
-            $where[] = "fecha BETWEEN DATE_SUB(CURDATE(), INTERVAL 30 DAY) AND CURDATE()";
+            $where[] = "MONTH(fecha) = MONTH(CURDATE()) AND YEAR(fecha) = YEAR(CURDATE())";
         }
 
         $sqlWhere = count($where) > 0 ? 'WHERE ' . implode(' AND ', $where) : '';
@@ -89,9 +89,9 @@ class Turno
         if ($periodo === 'dia') {
             $where[] = "fecha = CURDATE()";
         } elseif ($periodo === 'semana') {
-            $where[] = "fecha BETWEEN DATE_SUB(CURDATE(), INTERVAL 7 DAY) AND CURDATE()";
+            $where[] = "YEARWEEK(fecha, 1) = YEARWEEK(CURDATE(), 1)";
         } elseif ($periodo === 'mes') {
-            $where[] = "fecha BETWEEN DATE_SUB(CURDATE(), INTERVAL 30 DAY) AND CURDATE()";
+            $where[] = "MONTH(fecha) = MONTH(CURDATE()) AND YEAR(fecha) = YEAR(CURDATE())";
         }
 
         $sqlWhere = count($where) > 0 ? 'WHERE ' . implode(' AND ', $where) : '';
@@ -128,56 +128,37 @@ class Turno
     }
 
     // Metodo de creacion de un turno
-    public function crear(array $datos)
-    {
-        try {
-            $this->db->beginTransaction();
+    public function crear(array $datos) {
+    try {
+        $this->db->beginTransaction();
 
-            // Bloquea las filas mientras verifica — ningún otro puede leer hasta que se haga commit
-            $sqlCheck = "SELECT COUNT(*) FROM Turno 
-                     WHERE matricula = :matricula
-                     AND fecha = :fecha
-                     AND hora_inicio = :hora_inicio
-                     AND estado != 'cancelado'
-                     FOR UPDATE";
+        $sql = "CALL sp_crear_turno(
+                    :fecha, :hora_inicio, :id_paciente, :matricula,
+                    :id_especialidad, :id_consultorio, :id_plan,
+                    :nro_afiliado, :observacion, @resultado)";
 
-            $stmtCheck = $this->db->prepare($sqlCheck);
-            $stmtCheck->execute([
-                ':matricula'   => $datos['matricula'],
-                ':fecha'       => $datos['fecha'],
-                ':hora_inicio' => $datos['hora_inicio']
-            ]);
+        $stmt = $this->db->prepare($sql);
+        $stmt->execute([
+            ':fecha'           => $datos['fecha'],
+            ':hora_inicio'     => $datos['hora_inicio'],
+            ':id_paciente'     => $datos['id_paciente'],
+            ':matricula'       => $datos['matricula'],
+            ':id_especialidad' => $datos['id_especialidad'],
+            ':id_consultorio'  => $datos['id_consultorio'],
+            ':id_plan'         => $datos['id_plan'],
+            ':nro_afiliado'    => $datos['nro_afiliado'],
+            ':observacion'     => $datos['observacion'] ?? null
+        ]);
 
-            if ($stmtCheck->fetchColumn() > 0) {
-                $this->db->rollBack();
-                return false;
-            }
+        $resultado = $this->db->query("SELECT @resultado AS resultado")->fetch();
+        
+        $this->db->commit();
+        return $resultado['resultado'] == 1;
 
-            // Si no existe, hace el INSERT
-            $sql = "INSERT INTO Turno (fecha, hora_inicio, estado, observacion, 
-                id_paciente, matricula, id_especialidad, id_consultorio, id_plan, nro_afiliado)
-                VALUES (:fecha, :hora_inicio, 'pendiente', :observacion,
-                :id_paciente, :matricula, :id_especialidad, :id_consultorio, :id_plan, :nro_afiliado)";
-
-            $stmt = $this->db->prepare($sql);
-            $stmt->execute([
-                ':fecha'           => $datos['fecha'],
-                ':hora_inicio'     => $datos['hora_inicio'],
-                ':observacion'     => $datos['observacion'] ?? null,
-                ':id_paciente'     => $datos['id_paciente'],
-                ':matricula'       => $datos['matricula'],
-                ':id_especialidad' => $datos['id_especialidad'],
-                ':id_consultorio'  => $datos['id_consultorio'],
-                ':id_plan'         => $datos['id_plan'],
-                ':nro_afiliado'    => $datos['nro_afiliado']
-            ]);
-
-            $this->db->commit();
-            return true;
-        } catch (\Throwable $th) {
-            $this->db->rollBack();
-            error_log($th->getMessage());
-            return false;
-        }
+    } catch (\Throwable $th) {
+        $this->db->rollBack();
+        error_log($th->getMessage());
+        return false;
     }
+}
 }

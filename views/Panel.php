@@ -77,7 +77,7 @@ require '../controllers/PacienteController.php';
                         <td><?= ucfirst($t['estado']) ?></td>
                         <td>
                             <?php if ($t['estado'] === 'pendiente' || $t['estado'] === 'confirmado'): ?>
-                                <form method="POST" action="../controllers/PacienteController.php">
+                                <form method="POST" action="Panel.php">
                                     <input type="hidden" name="accion" value="cancelarTurno">
                                     <input type="hidden" name="id_turno" value="<?= $t['id_turno'] ?>">
                                     <button type="submit">Cancelar</button>
