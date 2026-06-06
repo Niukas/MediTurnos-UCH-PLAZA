@@ -1,5 +1,7 @@
 <?php
-require '../controllers/AdminController.php'; ?>
+define('SECCION', 'stats');
+require '../controllers/AdminController.php'; 
+?>
 <!DOCTYPE html>
 <html lang="es">
 

@@ -1,4 +1,5 @@
 <?php
+define('SECCION', 'medicos');
 require '../controllers/AdminController.php';
 require 'layout/menuAdmin.php';
 ?>

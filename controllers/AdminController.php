@@ -14,6 +14,7 @@ require_once '../models/Rol.php';
 require_once '../models/Usuario.php';
 require_once '../models/Medico.php';
 require_once '../models/Especialidad.php';
+require_once '../models/Turno.php';
 
 // Instanciar las clases
 $stats = new Stats($pdo);
@@ -21,25 +22,38 @@ $rol = new Rol($pdo);
 $usuario = new Usuario($pdo);
 $medico = new Medico($pdo);
 $especialidad = new Especialidad($pdo);
+$turno = new Turno($pdo);
 
 $listadoRoles = $rol->getAll();
 
 // llamado a metodos de estadisticas
 
-$pacientesTotales = $stats->getTotalPacientes();
-
-$medicosTotales = $stats->getTotalMedicos();
-
-$turnosHoy = $stats->getTurnosHoy();
-
-$turnosPorEstado = $stats->getTurnosPorEstado();
-
-$listadoUsuarios = $usuario->getAll();
+if (SECCION === 'stats') {
+    $pacientesTotales = $stats->getTotalPacientes();
+    $medicosTotales   = $stats->getTotalMedicos();
+    $turnosHoy        = $stats->getTurnosHoy();
+    $turnosPorEstado  = $stats->getTurnosPorEstado();
+    $listadoUsuarios  = $usuario->getAll();
+}
 
 // dashboard Medicos
 
-$listadoMedicos = $medico->getAll();
-$listadoEspecialidad = $especialidad->getAll();
+if (SECCION === 'medicos') {
+    $listadoMedicos      = $medico->getAll();
+    $listadoEspecialidad = $especialidad->getAll();
+}
+
+// Dashboard de turnos
+
+if (SECCION === 'turnos') {
+    $listadoEspecialidad = $especialidad->getAll();
+    $especialidadFiltro = $_GET['especialidad'] ?? null;
+    $periodo            = $_GET['periodo']      ?? 'todos';
+    $paginaActual       = isset($_GET['pagina']) ? (int)$_GET['pagina'] : 1;
+    $totalTurnos        = $turno->getTotalByFiltros($especialidadFiltro, $periodo);
+    $totalPaginas       = ceil($totalTurnos / 20);
+    $listadoTurnos      = $turno->getByFiltros($especialidadFiltro, $periodo, $paginaActual);
+}
 
 // Accion de formularios
 
@@ -58,7 +72,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         if ($resultado) {
             header("Location: ../views/dashboardAdmin.php?registro=exitoso");
             exit;
-        }else {
+        } else {
             header("Location: ../views/dashboardAdmin.php?registro=error");
             exit;
         }
@@ -86,5 +100,19 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         }
     }
 
+    // Form que actualiza el estado de un turno en la db
+    if ($accion === 'cambiarEstado') {
+        $idTurno = (int)$_POST['id_turno'];
+        $estado  = $_POST['estado'];
+
+        $resultado = $turno->cambiarEstado($idTurno, $estado);
+
+        if ($resultado) {
+            header('Location: ../views/dashboardAdminTurnos.php?registro=exitoso');
+            exit;
+        } else {
+            header('Location: ../views/dashboardAdminTurnos.php?registro=error');
+            exit;
+        }
+    }
 }
-?>
