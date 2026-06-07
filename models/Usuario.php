@@ -139,4 +139,12 @@ class Usuario
             return false;
         }
     }
+
+    public function getMatricula(int $id_usuario)
+    {
+        $sql  = "SELECT matricula FROM Usuario WHERE id_usuario = :id_usuario";
+        $stmt = $this->db->prepare($sql);
+        $stmt->execute([':id_usuario' => $id_usuario]);
+        return $stmt->fetchColumn();
+    }
 }

@@ -35,7 +35,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             // Redireccion segun el ROL
             $destino = match ($resultado['rol']) {
                 'paciente' => '../views/Panel.php',
-                'medico' => '../views/portal_medico.php',
+                'medico' => '../views/PanelMedico.php',
                 'admin' => '../views/dashboardAdmin.php',
                 default => '../views/inicio.php',
             };

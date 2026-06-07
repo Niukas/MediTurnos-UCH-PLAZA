@@ -128,37 +128,99 @@ class Turno
     }
 
     // Metodo de creacion de un turno
-    public function crear(array $datos) {
-    try {
-        $this->db->beginTransaction();
+    public function crear(array $datos)
+    {
+        try {
+            $this->db->beginTransaction();
 
-        $sql = "CALL sp_crear_turno(
+            $sql = "CALL sp_crear_turno(
                     :fecha, :hora_inicio, :id_paciente, :matricula,
                     :id_especialidad, :id_consultorio, :id_plan,
                     :nro_afiliado, :observacion, @resultado)";
 
-        $stmt = $this->db->prepare($sql);
-        $stmt->execute([
-            ':fecha'           => $datos['fecha'],
-            ':hora_inicio'     => $datos['hora_inicio'],
-            ':id_paciente'     => $datos['id_paciente'],
-            ':matricula'       => $datos['matricula'],
-            ':id_especialidad' => $datos['id_especialidad'],
-            ':id_consultorio'  => $datos['id_consultorio'],
-            ':id_plan'         => $datos['id_plan'],
-            ':nro_afiliado'    => $datos['nro_afiliado'],
-            ':observacion'     => $datos['observacion'] ?? null
-        ]);
+            $stmt = $this->db->prepare($sql);
+            $stmt->execute([
+                ':fecha'           => $datos['fecha'],
+                ':hora_inicio'     => $datos['hora_inicio'],
+                ':id_paciente'     => $datos['id_paciente'],
+                ':matricula'       => $datos['matricula'],
+                ':id_especialidad' => $datos['id_especialidad'],
+                ':id_consultorio'  => $datos['id_consultorio'],
+                ':id_plan'         => $datos['id_plan'],
+                ':nro_afiliado'    => $datos['nro_afiliado'],
+                ':observacion'     => $datos['observacion'] ?? null
+            ]);
 
-        $resultado = $this->db->query("SELECT @resultado AS resultado")->fetch();
-        
-        $this->db->commit();
-        return $resultado['resultado'] == 1;
+            $resultado = $this->db->query("SELECT @resultado AS resultado")->fetch();
 
-    } catch (\Throwable $th) {
-        $this->db->rollBack();
-        error_log($th->getMessage());
-        return false;
+            $this->db->commit();
+            return $resultado['resultado'] == 1;
+        } catch (\Throwable $th) {
+            $this->db->rollBack();
+            error_log($th->getMessage());
+            return false;
+        }
     }
-}
+
+    
+    public function getByFiltrosMedico($matricula, $especialidad = null, $periodo = 'todos', $pagina = 1, $porPagina = 20)
+    {
+        $where   = ["matricula = :matricula"];
+        $params  = [':matricula' => $matricula];
+
+        if ($especialidad) {
+            $where[] = "especialidad = :especialidad";
+            $params[':especialidad'] = $especialidad;
+        }
+
+        if ($periodo === 'dia') {
+            $where[] = "fecha = CURDATE()";
+        } elseif ($periodo === 'semana') {
+            $where[] = "YEARWEEK(fecha, 1) = YEARWEEK(CURDATE(), 1)";
+        } elseif ($periodo === 'mes') {
+            $where[] = "MONTH(fecha) = MONTH(CURDATE()) AND YEAR(fecha) = YEAR(CURDATE())";
+        }
+
+        $sqlWhere = 'WHERE ' . implode(' AND ', $where);
+        $offset   = ($pagina - 1) * $porPagina;
+        $sql      = "SELECT * FROM vista_turnos $sqlWhere LIMIT :limite OFFSET :offset";
+
+        $stmt = $this->db->prepare($sql);
+        foreach ($params as $key => $value) {
+            $stmt->bindValue($key, $value);
+        }
+        $stmt->bindValue(':limite', $porPagina, PDO::PARAM_INT);
+        $stmt->bindValue(':offset', $offset,    PDO::PARAM_INT);
+        $stmt->execute();
+        return $stmt->fetchAll();
+    }
+
+    public function getTotalByFiltrosMedico($matricula, $especialidad = null, $periodo = 'todos')
+    {
+        $where  = ["matricula = :matricula"];
+        $params = [':matricula' => $matricula];
+
+        if ($especialidad) {
+            $where[] = "especialidad = :especialidad";
+            $params[':especialidad'] = $especialidad;
+        }
+
+        if ($periodo === 'dia') {
+            $where[] = "fecha = CURDATE()";
+        } elseif ($periodo === 'semana') {
+            $where[] = "YEARWEEK(fecha, 1) = YEARWEEK(CURDATE(), 1)";
+        } elseif ($periodo === 'mes') {
+            $where[] = "MONTH(fecha) = MONTH(CURDATE()) AND YEAR(fecha) = YEAR(CURDATE())";
+        }
+
+        $sqlWhere = 'WHERE ' . implode(' AND ', $where);
+        $sql      = "SELECT COUNT(*) FROM vista_turnos $sqlWhere";
+
+        $stmt = $this->db->prepare($sql);
+        foreach ($params as $key => $value) {
+            $stmt->bindValue($key, $value);
+        }
+        $stmt->execute();
+        return $stmt->fetchColumn();
+    }
 }
