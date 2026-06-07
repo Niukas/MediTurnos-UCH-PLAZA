@@ -36,6 +36,15 @@ if (SECCION === 'stats') {
     $medicosTotales   = $stats->getTotalMedicos();
     $turnosHoy        = $stats->getTurnosHoy();
     $turnosPorEstado  = $stats->getTurnosPorEstado();
+    $medicoConMasTurnos = $stats->getMedicoMasTurnos();
+    $listadoObraSocialTurnos = $stats->getTurnosPorObraSocial();
+    $especialidadDemandada = $stats->getEspecialidadMasDemandada();
+    $pacientesSinTurno = $stats->getPacientesSinTurnos();
+}
+
+// Dashboard Usuarios
+
+if (SECCION === 'usuarios') {
     $listadoUsuarios  = $usuario->getAll();
 }
 

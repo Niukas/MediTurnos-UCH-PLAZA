@@ -1,7 +1,7 @@
 <?php 
 define('SECCION', 'sacarTurno');
 require '../controllers/PacienteController.php';
-require 'layout/menuPaciente.php';
+require 'layout/menuPaciente.php'; 
 ?>
 
 <!DOCTYPE html>
@@ -58,9 +58,7 @@ require 'layout/menuPaciente.php';
                         <tr>
                             <td><?= $m['nombre'] . ' ' . $m['apellido'] ?></td>
                             <td>
-                                <button type="submit" name="matricula" value="<?= $m['matricula'] ?>">
-                                    Elegir
-                                </button>
+                                <button type="submit" name="matricula" value="<?= $m['matricula'] ?>">Elegir</button>
                             </td>
                         </tr>
                     <?php endforeach; ?>
@@ -83,9 +81,7 @@ require 'layout/menuPaciente.php';
             <table border="1">
                 <thead>
                     <tr>
-                        <th>Día</th>
-                        <th>Hora inicio</th>
-                        <th>Hora fin</th>
+                        <th>Hora</th>
                         <th>Consultorio</th>
                         <th>Seleccionar</th>
                     </tr>
@@ -93,9 +89,7 @@ require 'layout/menuPaciente.php';
                 <tbody>
                     <?php foreach ($listadoHorarios as $h): ?>
                         <tr>
-                            <td><?= $h['dia_semana'] ?></td>
                             <td><?= $h['hora_inicio'] ?></td>
-                            <td><?= $h['hora_fin'] ?></td>
                             <td>Nº <?= $h['consultorio_nro'] ?> · Piso <?= $h['piso'] ?></td>
                             <td>
                                 <form method="GET" action="">
@@ -103,7 +97,7 @@ require 'layout/menuPaciente.php';
                                     <input type="hidden" name="matricula" value="<?= $_GET['matricula'] ?>">
                                     <input type="hidden" name="fecha" value="<?= $_GET['fecha'] ?>">
                                     <input type="hidden" name="hora_inicio" value="<?= $h['hora_inicio'] ?>">
-                                    <input type="hidden" name="id_consultorio" value="<?= $h['id_consultorio'] ?? '' ?>">
+                                    <input type="hidden" name="id_consultorio" value="<?= $h['id_consultorio'] ?>">
                                     <button type="submit">Elegir</button>
                                 </form>
                             </td>
@@ -119,7 +113,7 @@ require 'layout/menuPaciente.php';
     <!-- PASO 4 — CONFIRMAR TURNO -->
     <?php if (isset($_GET['hora_inicio'])): ?>
         <h2>Paso 4 — Confirmá tu turno</h2>
-        <form method="POST" action="sacarTurno.php">
+        <form method="POST" action="SacarTurno.php">
             <input type="hidden" name="accion" value="crearTurno">
             <input type="hidden" name="fecha" value="<?= $_GET['fecha'] ?>">
             <input type="hidden" name="hora_inicio" value="<?= $_GET['hora_inicio'] ?>">

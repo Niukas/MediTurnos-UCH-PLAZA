@@ -88,4 +88,59 @@ class Stats
             return false;
         }
     }
+
+    // Metodo que trae el médico con más turnos — devuelve un array con nombre, apellido y total_turnos
+    public function getMedicoMasTurnos()
+    {
+        $sql = "SELECT m.nombre, m.apellido, COUNT(t.id_turno) AS total_turnos
+            FROM Medico m
+            JOIN Turno t ON m.matricula = t.matricula
+            GROUP BY m.matricula
+            ORDER BY total_turnos DESC
+            LIMIT 1";
+        $stmt = $this->db->prepare($sql);
+        $stmt->execute();
+        return $stmt->fetch();
+    }
+
+    // Metodo que trae el listado de obras sociales ordenadas por cantidad de turnos — devuelve array de arrays
+    public function getTurnosPorObraSocial()
+    {
+        $sql = "SELECT os.nombre AS obra_social, COUNT(t.id_turno) AS total_turnos
+            FROM Turno t
+            JOIN Plan_OS p ON t.id_plan = p.id_plan
+            JOIN Obra_Social os ON p.id_obra_social = os.id_obra_social
+            GROUP BY os.id_obra_social
+            ORDER BY total_turnos DESC";
+        $stmt = $this->db->prepare($sql);
+        $stmt->execute();
+        return $stmt->fetchAll();
+    }
+
+    // Metodo que trae la especialidad más solicitada — devuelve un array con nombre y total_turnos
+    public function getEspecialidadMasDemandada()
+    {
+        $sql = "SELECT e.nombre, COUNT(t.id_turno) AS total_turnos
+            FROM Especialidad e
+            JOIN Turno t ON e.id_especialidad = t.id_especialidad
+            GROUP BY e.id_especialidad
+            ORDER BY total_turnos DESC
+            LIMIT 1";
+        $stmt = $this->db->prepare($sql);
+        $stmt->execute();
+        return $stmt->fetch();
+    }
+
+    // Metodo que trae la cantidad de pacientes que nunca tuvieron un turno no cancelado — devuelve un número
+    public function getPacientesSinTurnos()
+    {
+        $sql = "SELECT COUNT(*) FROM Paciente
+            WHERE id_paciente NOT IN (
+                SELECT DISTINCT id_paciente FROM Turno
+                WHERE estado != 'cancelado'
+            )";
+        $stmt = $this->db->prepare($sql);
+        $stmt->execute();
+        return $stmt->fetchColumn();
+    }
 }

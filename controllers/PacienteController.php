@@ -39,17 +39,24 @@ if (SECCION === 'misTurnos') {
 if (SECCION === 'sacarTurno') {
     $listadoEspecialidades = $especialidad->getAll();
     $listadoPlanes         = $paciente->getByPaciente($idPaciente);
+    $listadoMedicos        = [];
+    $listadoHorarios       = [];
 
     if (isset($_GET['id_especialidad'])) {
         $listadoMedicos = $medico->getByEspecialidad((int)$_GET['id_especialidad']);
     }
 
     if (isset($_GET['matricula'], $_GET['fecha'], $_GET['id_especialidad'])) {
-        $listadoHorarios = $horario->getDisponibles(
-            $_GET['matricula'],
-            (int)$_GET['id_especialidad'],
-            $_GET['fecha']
-        );
+        $espData = $especialidad->getById((int)$_GET['id_especialidad']);
+        if ($espData) {
+            $duracionMin     = $espData['duracion_turno_min'];
+            $listadoHorarios = $horario->getDisponibles(
+                $_GET['matricula'],
+                (int)$_GET['id_especialidad'],
+                $_GET['fecha'],
+                $duracionMin
+            );
+        }
     }
 
     if ($_SERVER['REQUEST_METHOD'] === 'POST') {

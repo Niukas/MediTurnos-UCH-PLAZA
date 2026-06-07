@@ -1,41 +1,39 @@
 <?php
 define('SECCION', 'stats');
-require '../controllers/AdminController.php'; 
+require '../controllers/AdminController.php';
+require 'layout/menuAdmin.php';
 ?>
+
 <!DOCTYPE html>
 <html lang="es">
 
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Dashboard Admin — MediTurnos</title>
+    <title>Dashboard — MediTurnos</title>
 </head>
 
 <body>
 
+    <h1>Dashboard</h1>
+
     <!-- MENSAJES -->
     <?php
     $mensajes = [
-        'exitoso' => ['color' => 'green', 'texto' => 'Rol actualizado correctamente.'],
-        'error'   => ['color' => 'red',   'texto' => 'Hubo un error al actualizar el rol.'],
+        'exitoso' => ['color' => 'green', 'texto' => 'Operación realizada correctamente.'],
+        'error'   => ['color' => 'red',   'texto' => 'Hubo un error.'],
     ];
-
     $registro = $_GET['registro'] ?? null;
-
     if ($registro && isset($mensajes[$registro])): ?>
         <p style="color:<?= $mensajes[$registro]['color'] ?>"><?= $mensajes[$registro]['texto'] ?></p>
     <?php endif; ?>
 
-    <!-- NAV -->
-    <?php require '../views/layout/menuAdmin.php'; ?>
-
     <!-- STATS GENERALES -->
-    <h2>Stats generales</h2>
+    <h2>Resumen general</h2>
     <ul>
-        <li>Pacientes: <?= $pacientesTotales ?></li>
-        <li>Médicos: <?= $medicosTotales ?></li>
+        <li>Pacientes registrados: <?= $pacientesTotales ?></li>
+        <li>Médicos activos: <?= $medicosTotales ?></li>
         <li>Turnos hoy: <?= $turnosHoy ?></li>
-        <li>Usuarios en el sistema: <?= count($listadoUsuarios) ?></li>
+        <li>Pacientes sin turnos: <?= $pacientesSinTurno ?></li>
     </ul>
 
     <!-- TURNOS POR ESTADO -->
@@ -46,40 +44,28 @@ require '../controllers/AdminController.php';
         <?php endforeach; ?>
     </ul>
 
-    <!-- TABLA USUARIOS -->
-    <h2>Gestión de usuarios</h2>
+    <!-- MÉDICO CON MÁS TURNOS -->
+    <h2>Médico con más turnos</h2>
+    <p><?= $medicoConMasTurnos['nombre'] . ' ' . $medicoConMasTurnos['apellido'] ?> — <?= $medicoConMasTurnos['total_turnos'] ?> turnos</p>
+
+    <!-- ESPECIALIDAD MÁS DEMANDADA -->
+    <h2>Especialidad más demandada</h2>
+    <p><?= $especialidadDemandada['nombre'] ?> — <?= $especialidadDemandada['total_turnos'] ?> turnos</p>
+
+    <!-- TURNOS POR OBRA SOCIAL -->
+    <h2>Turnos por obra social</h2>
     <table border="1">
         <thead>
             <tr>
-                <th>#</th>
-                <th>Nombre</th>
-                <th>Email</th>
-                <th>Rol actual</th>
-                <th>Cambiar rol</th>
+                <th>Obra Social</th>
+                <th>Total turnos</th>
             </tr>
         </thead>
         <tbody>
-            <?php foreach ($listadoUsuarios as $u): ?>
+            <?php foreach ($listadoObraSocialTurnos as $os): ?>
                 <tr>
-                    <td><?= $u['id_usuario'] ?></td>
-                    <td><?= $u['nombre'] . ' ' . $u['apellido'] ?></td>
-                    <td><?= $u['email'] ?></td>
-                    <td><?= ucfirst($u['rol']) ?></td>
-                    <td>
-                        <form method="POST" action="../controllers/AdminController.php">
-                            <input type="hidden" name="accion" value="cambiarRol">
-                            <input type="hidden" name="id_Usuario" value="<?= $u['id_usuario'] ?>">
-                            <select name="id_rol">
-                                <?php foreach ($listadoRoles as $rol): ?>
-                                    <option value="<?= $rol['id_rol'] ?>"
-                                        <?= $rol['id_rol'] == $u['id_rol'] ? 'selected' : '' ?>>
-                                        <?= ucfirst($rol['nombre']) ?>
-                                    </option>
-                                <?php endforeach; ?>
-                            </select>
-                            <button type="submit">Guardar</button>
-                        </form>
-                    </td>
+                    <td><?= $os['obra_social'] ?></td>
+                    <td><?= $os['total_turnos'] ?></td>
                 </tr>
             <?php endforeach; ?>
         </tbody>
