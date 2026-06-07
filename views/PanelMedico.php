@@ -78,6 +78,7 @@ require 'layout/menuMedico.php';
                                 <form method="POST" action="panelMedico.php">
                                     <input type="hidden" name="accion" value="cambiarEstado">
                                     <input type="hidden" name="id_turno" value="<?= $t['id_turno'] ?>">
+                                    <textarea name="observacion" placeholder="Observación..."><?= $t['observacion'] ?></textarea>
                                     <select name="estado">
                                         <?php foreach (['pendiente', 'confirmado', 'realizado'] as $e): ?>
                                             <option value="<?= $e ?>" <?= $t['estado'] === $e ? 'selected' : '' ?>>

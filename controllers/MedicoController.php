@@ -30,7 +30,9 @@ if (SECCION === 'misTurnos') {
     if ($accion === 'cambiarEstado') {
         $idTurno   = (int)$_POST['id_turno'];
         $estado    = $_POST['estado'];
+        $observacion = $_POST['observacion'] ?? null;
         $resultado = $turno->cambiarEstado($idTurno, $estado);
+        $resultado = $turno->actualizarEstadoObservacion($idTurno, $estado, $observacion);
 
         if ($resultado) {
             header('Location: ../views/panelMedico.php?registro=exitoso');

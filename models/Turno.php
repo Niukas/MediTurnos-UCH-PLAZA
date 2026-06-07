@@ -162,7 +162,7 @@ class Turno
         }
     }
 
-    
+
     public function getByFiltrosMedico($matricula, $especialidad = null, $periodo = 'todos', $pagina = 1, $porPagina = 20)
     {
         $where   = ["matricula = :matricula"];
@@ -222,5 +222,25 @@ class Turno
         }
         $stmt->execute();
         return $stmt->fetchColumn();
+    }
+
+    public function actualizarEstadoObservacion(int $id_turno, string $estado, ?string $observacion)
+    {
+        try {
+            $sql = "UPDATE Turno 
+                SET estado = :estado, observacion = :observacion
+                WHERE id_turno = :id_turno";
+
+            $stmt = $this->db->prepare($sql);
+            $stmt->execute([
+                ':estado'      => $estado,
+                ':observacion' => $observacion,
+                ':id_turno'    => $id_turno
+            ]);
+            return true;
+        } catch (\Throwable $th) {
+            error_log($th->getMessage());
+            return false;
+        }
     }
 }
