@@ -1,10 +1,18 @@
+<?php
+session_start();
+$logueado = isset($_SESSION['usuario_id']);
+$rol = $_SESSION['usuario_rol'] ?? null;
+?>
+
 <!DOCTYPE html>
 <html lang="es">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>MediTurnos</title>
 </head>
+
 <body>
 
     <h1>MediTurnos</h1>
@@ -26,9 +34,13 @@
         <li>Traumatología</li>
     </ul>
 
-    <a href="views/buscar.php">Buscar turno</a>
+    <?php if ($logueado && $rol === 'paciente'): ?>
+        <a href="../views/SacarTurno.php">Buscar turno</a>
+    <?php else: ?>
+        <a href="../views/Login.php">Buscar turno</a>
+    <?php endif; ?>
 
-    <a href="views/medicos.php">Ver médicos</a>
+    <a href="../views/Medicos.php">Ver médicos</a>
 
 </body>
 </html>
