@@ -2,6 +2,7 @@
 define('SECCION', 'misTurnos');
 require '../controllers/MedicoController.php';
 require 'layout/menuMedico.php';
+require '../config/helpers.php';
 ?>
 
 <!DOCTYPE html>
@@ -53,7 +54,7 @@ require 'layout/menuMedico.php';
     ?>
 
     <?php foreach ($turnosPorEspecialidad as $nombreEspecialidad => $turnos): ?>
-        <h2><?= $nombreEspecialidad ?> (<?= count($turnos) ?>)</h2>
+        <h2><?= h($nombreEspecialidad) ?> (<?= count($turnos) ?>)</h2>
         <table border="1">
             <thead>
                 <tr>
@@ -71,7 +72,7 @@ require 'layout/menuMedico.php';
                         <td><?= $t['id_turno'] ?></td>
                         <td><?= $t['fecha'] ?></td>
                         <td><?= $t['hora_inicio'] ?></td>
-                        <td><?= $t['paciente_nombre'] . ' ' . $t['paciente_apellido'] ?></td>
+                        <td><?= h($t['paciente_nombre']) . ' ' . h($t['paciente_apellido']) ?></td>
                         <td><?= ucfirst($t['estado']) ?></td>
                         <td>
                             <?php if ($t['estado'] !== 'cancelado'): ?>

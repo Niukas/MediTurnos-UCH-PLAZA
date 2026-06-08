@@ -1,16 +1,26 @@
 <!DOCTYPE html>
 <html lang="es">
+
 <head>
     <meta charset="UTF-8">
     <title>Registro — MediTurnos</title>
 </head>
+
 <body>
 
     <h2>Registrarse</h2>
 
-<?php if (isset($_GET['error'])): ?>
-    <p style="color:red">Hubo un error en el registro, intentá de nuevo.</p>
-<?php endif; ?>
+    <?php
+    $errores = [
+        'campos_vacios'  => 'Completá todos los campos obligatorios.',
+        'email_invalido' => 'El email no tiene un formato válido.',
+        'password_corta' => 'La contraseña debe tener al menos 6 caracteres.',
+        'dni_invalido'   => 'El DNI ingresado no es válido.',
+    ];
+    $error = $_GET['error'] ?? null;
+    if ($error && isset($errores[$error])): ?>
+        <p style="color:red"><?= $errores[$error] ?></p>
+    <?php endif; ?>
 
     <form method="POST" action="../controllers/AuthController.php">
         <input type="hidden" name="accion" value="registrar">
@@ -25,4 +35,5 @@
     </form>
 
 </body>
+
 </html>

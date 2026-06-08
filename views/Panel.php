@@ -1,6 +1,7 @@
 <?php
 define('SECCION', 'misTurnos');
 require '../controllers/PacienteController.php';
+require '../config/helpers.php';
 ?>
 
 <!DOCTYPE html>
@@ -55,7 +56,7 @@ require '../controllers/PacienteController.php';
 
     <?php foreach ($turnosPorEspecialidad as $nombreEspecialidad => $turnos): ?>
 
-        <h2><?= $nombreEspecialidad ?> (<?= count($turnos) ?>)</h2>
+        <h2><?= h($nombreEspecialidad) ?> (<?= count($turnos) ?>)</h2>
         <table border="1">
             <thead>
                 <tr>
@@ -73,7 +74,7 @@ require '../controllers/PacienteController.php';
                         <td><?= $t['id_turno'] ?></td>
                         <td><?= $t['fecha'] ?></td>
                         <td><?= $t['hora_inicio'] ?></td>
-                        <td><?= $t['medico_nombre'] . ' ' . $t['medico_apellido'] ?></td>
+                        <td><?= h($t['medico_nombre']) . ' ' . h($t['medico_apellido']) ?></td>
                         <td><?= ucfirst($t['estado']) ?></td>
                         <td>
                             <?php if ($t['estado'] === 'pendiente' || $t['estado'] === 'confirmado'): ?>

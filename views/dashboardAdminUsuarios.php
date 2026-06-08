@@ -1,6 +1,7 @@
 <?php
 define('SECCION', 'usuarios');
 require '../controllers/AdminController.php'; 
+require '../config/helpers.php';
 ?>
 <!DOCTYPE html>
 <html lang="es">
@@ -45,8 +46,8 @@ require '../controllers/AdminController.php';
             <?php foreach ($listadoUsuarios as $u): ?>
                 <tr>
                     <td><?= $u['id_usuario'] ?></td>
-                    <td><?= $u['nombre'] . ' ' . $u['apellido'] ?></td>
-                    <td><?= $u['email'] ?></td>
+                    <td><?= h($u['nombre']) . ' ' . h($u['apellido']) ?></td>
+                    <td><?= h($u['email']) ?></td>
                     <td><?= ucfirst($u['rol']) ?></td>
                     <td>
                         <form method="POST" action="../controllers/AdminController.php">

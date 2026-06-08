@@ -27,9 +27,9 @@ $paciente     = new Paciente($pdo);
 $idPaciente = $usuario->getIdPaciente($_SESSION['usuario_id']);
 
 if (SECCION === 'misTurnos') {
-    $especialidadFiltro = $_GET['especialidad'] ?? null;
-    $periodo            = $_GET['periodo']      ?? 'todos';
-    $paginaActual       = isset($_GET['pagina']) ? (int)$_GET['pagina'] : 1;
+    $especialidadFiltro = filter_var($_GET['especialidad'] ?? null, FILTER_SANITIZE_SPECIAL_CHARS) ?: null;
+    $periodo            = filter_var($_GET['periodo']      ?? 'todos', FILTER_SANITIZE_SPECIAL_CHARS);
+    $paginaActual       = filter_var($_GET['pagina']       ?? 1, FILTER_SANITIZE_NUMBER_INT);
     $totalTurnos        = $turno->getTotalByFiltros($especialidadFiltro, $periodo, $idPaciente);
     $totalPaginas       = ceil($totalTurnos / 20);
     $listadoTurnos      = $turno->getByFiltros($especialidadFiltro, $periodo, $paginaActual, 20, $idPaciente);
@@ -42,20 +42,19 @@ if (SECCION === 'sacarTurno') {
     $listadoMedicos        = [];
     $listadoHorarios       = [];
 
-    if (isset($_GET['id_especialidad'])) {
-        $listadoMedicos = $medico->getByEspecialidad((int)$_GET['id_especialidad']);
+    $idEspecialidad = filter_var($_GET['id_especialidad'] ?? null, FILTER_SANITIZE_NUMBER_INT) ?: null;
+    $matricula      = filter_var($_GET['matricula']       ?? null, FILTER_SANITIZE_SPECIAL_CHARS) ?: null;
+    $fecha          = filter_var($_GET['fecha']           ?? null, FILTER_SANITIZE_SPECIAL_CHARS) ?: null;
+
+    if ($idEspecialidad) {
+        $listadoMedicos = $medico->getByEspecialidad($idEspecialidad);
     }
 
-    if (isset($_GET['matricula'], $_GET['fecha'], $_GET['id_especialidad'])) {
-        $espData = $especialidad->getById((int)$_GET['id_especialidad']);
+    if ($matricula && $fecha && $idEspecialidad) {
+        $espData = $especialidad->getById($idEspecialidad);
         if ($espData) {
             $duracionMin     = $espData['duracion_turno_min'];
-            $listadoHorarios = $horario->getDisponibles(
-                $_GET['matricula'],
-                (int)$_GET['id_especialidad'],
-                $_GET['fecha'],
-                $duracionMin
-            );
+            $listadoHorarios = $horario->getDisponibles($matricula, $idEspecialidad, $fecha, $duracionMin);
         }
     }
 
@@ -64,15 +63,15 @@ if (SECCION === 'sacarTurno') {
 
         if ($accion === 'crearTurno') {
             $datos = [
-                'fecha'           => $_POST['fecha'],
-                'hora_inicio'     => $_POST['hora_inicio'],
-                'observacion'     => $_POST['observacion'] ?? null,
-                'id_paciente'     => $idPaciente,
-                'matricula'       => $_POST['matricula'],
-                'id_especialidad' => $_POST['id_especialidad'],
-                'id_consultorio'  => $_POST['id_consultorio'],
-                'id_plan'         => $_POST['id_plan'],
-                'nro_afiliado'    => $_POST['nro_afiliado']
+                'fecha'           => filter_var($_POST['fecha']           ?? '', FILTER_SANITIZE_SPECIAL_CHARS),
+                'hora_inicio'     => filter_var($_POST['hora_inicio']     ?? '', FILTER_SANITIZE_SPECIAL_CHARS),
+                'id_paciente'     => filter_var($idPaciente,                    FILTER_SANITIZE_NUMBER_INT),
+                'matricula'       => filter_var($_POST['matricula']       ?? '', FILTER_SANITIZE_SPECIAL_CHARS),
+                'id_especialidad' => filter_var($_POST['id_especialidad'] ?? 0,  FILTER_SANITIZE_NUMBER_INT),
+                'id_consultorio'  => filter_var($_POST['id_consultorio']  ?? 0,  FILTER_SANITIZE_NUMBER_INT),
+                'id_plan'         => filter_var($_POST['id_plan']         ?? 0,  FILTER_SANITIZE_NUMBER_INT),
+                'nro_afiliado'    => filter_var($_POST['nro_afiliado']    ?? '', FILTER_SANITIZE_SPECIAL_CHARS),
+                'observacion'     => filter_var($_POST['observacion']     ?? '', FILTER_SANITIZE_SPECIAL_CHARS) ?: null,
             ];
 
             $resultado = $turno->crear($datos);
@@ -92,7 +91,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $accion = $_POST['accion'] ?? '';
 
     if ($accion === 'cancelarTurno') {
-        $idTurno   = (int)$_POST['id_turno'];
+        $idTurno = filter_var($_POST['id_turno'] ?? 0, FILTER_SANITIZE_NUMBER_INT);
         $resultado = $turno->cambiarEstado($idTurno, 'cancelado');
 
         if ($resultado) {

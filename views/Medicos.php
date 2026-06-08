@@ -1,4 +1,7 @@
-<?php require '../controllers/MedicosPublicController.php'; ?>
+<?php 
+require '../controllers/MedicosPublicController.php';
+require '../config/helpers.php';
+?>
 
 <!DOCTYPE html>
 <html lang="es">
@@ -17,7 +20,7 @@
         <?php foreach ($listadoEspecialidad as $e): ?>
             <option value="<?= $e['id_especialidad'] ?>"
                 <?= isset($_GET['especialidad']) && $_GET['especialidad'] == $e['id_especialidad'] ? 'selected' : '' ?>>
-                <?= $e['nombre'] ?>
+                <?= h($e['nombre']) ?>
             </option>
         <?php endforeach; ?>
     </select>
@@ -35,8 +38,8 @@
     <tbody>
         <?php foreach ($listadoMedicos as $m): ?>
         <tr>
-            <td><?= $m['nombre'] . ' ' . $m['apellido'] ?></td>
-            <td><?= $m['especialidades'] ?></td>
+            <td><?= h($m['nombre']) . ' ' . h($m['apellido']) ?></td>
+            <td><?= h($m['especialidades']) ?></td>
             <td><?= $m['horarios'] ?></td>
         </tr>
         <?php endforeach; ?>

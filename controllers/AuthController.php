@@ -16,8 +16,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     // Logica del Login
     if ($accion === 'login') {
 
-        $email = $_POST['email'];
-        $password = $_POST['password'];
+        $email    = filter_var($_POST['email']    ?? '', FILTER_SANITIZE_EMAIL);
+        $password = filter_var($_POST['password'] ?? '', FILTER_SANITIZE_SPECIAL_CHARS);
 
         // Guardo los valores de la consulta que se realiza por un metodo de la clase por medio del modelo
         $resultado = $usuario->login($email, $password);
@@ -49,7 +49,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     // ----------------
     // Logica de logout
     if ($accion === 'logout') {
-        
+
         // Vacio todos los datos de la variable session
         session_unset();
 
@@ -63,24 +63,44 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
         // Recibimos los datos del post y lo guardo en un array
         $datos = [
-            'nombre' => $_POST['nombre'],
-            'apellido' => $_POST['apellido'],
-            'dni' => $_POST['dni'],
-            'fecha_nac' => $_POST['fecha_nac'],
-            'telefono' => $_POST['telefono'],
-            'email' => $_POST['email'],
-            'password' => $_POST['password']
-            ];
-        
+            'nombre'    => filter_var($_POST['nombre']    ?? '', FILTER_SANITIZE_SPECIAL_CHARS),
+            'apellido'  => filter_var($_POST['apellido']  ?? '', FILTER_SANITIZE_SPECIAL_CHARS),
+            'dni'       => filter_var($_POST['dni']       ?? '', FILTER_SANITIZE_NUMBER_INT),
+            'fecha_nac' => filter_var($_POST['fecha_nac'] ?? '', FILTER_SANITIZE_SPECIAL_CHARS),
+            'telefono'  => filter_var($_POST['telefono']  ?? '', FILTER_SANITIZE_SPECIAL_CHARS),
+            'email'     => filter_var($_POST['email']     ?? '', FILTER_SANITIZE_EMAIL),
+            'password'  => filter_var($_POST['password']  ?? '', FILTER_SANITIZE_SPECIAL_CHARS),
+        ];
+
+        // Validaciones
+        if (empty($datos['nombre']) || empty($datos['apellido']) || empty($datos['email']) || empty($datos['password'])) {
+            header('Location: ../views/registro.php?error=campos_vacios');
+            exit;
+        }
+
+        if (!filter_var($datos['email'], FILTER_VALIDATE_EMAIL)) {
+            header('Location: ../views/registro.php?error=email_invalido');
+            exit;
+        }
+
+        if (strlen($datos['password']) <= 6) {
+            header('Location: ../views/registro.php?error=password_corta');
+            exit;
+        }
+
+        if (empty($datos['dni'])) {
+            header('Location: ../views/registro.php?error=dni_invalido');
+            exit;
+        }
+
         $resultado = $usuario->registrar($datos);
 
         if ($resultado) {
             header('Location: ../views/Login.php?registro=exitoso');
             exit;
-        }else {
+        } else {
             header('Location: ../views/Login.php?error=1');
             exit;
         }
     }
-
 }

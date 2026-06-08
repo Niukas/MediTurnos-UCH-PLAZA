@@ -2,6 +2,7 @@
 define('SECCION', 'turnos');
 require '../controllers/AdminController.php';
 require 'layout/menuAdmin.php';
+require '../config/helpers.php';
 ?>
 
 <!DOCTYPE html>
@@ -38,9 +39,9 @@ require 'layout/menuAdmin.php';
         <select name="especialidad" onchange="this.form.submit()">
             <option value="">Todas las especialidades</option>
             <?php foreach ($listadoEspecialidad as $e): ?>
-                <option value="<?= $e['nombre'] ?>"
+                <option value="<?= h($e['nombre']) ?>"
                     <?= $especialidad === $e['nombre'] ? 'selected' : '' ?>>
-                    <?= $e['nombre'] ?>
+                    <?= h($e['nombre']) ?>
                 </option>
             <?php endforeach; ?>
         </select>
@@ -79,8 +80,8 @@ require 'layout/menuAdmin.php';
                         <td><?= $t['id_turno'] ?></td>
                         <td><?= $t['fecha'] ?></td>
                         <td><?= $t['hora_inicio'] ?></td>
-                        <td><?= $t['paciente_nombre'] . ' ' . $t['paciente_apellido'] ?></td>
-                        <td><?= $t['medico_nombre'] . ' ' . $t['medico_apellido'] ?></td>
+                        <td><?= h($t['paciente_nombre']) . ' ' . h($t['paciente_apellido']) ?></td>
+                        <td><?= h($t['medico_nombre']) . ' ' . h($t['medico_apellido']) ?></td>
                         <td>
                             <form method="POST" action="dashboardAdminTurnos.php">
                                 <input type="hidden" name="accion" value="cambiarEstado">

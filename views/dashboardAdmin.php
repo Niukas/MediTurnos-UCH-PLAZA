@@ -2,6 +2,7 @@
 define('SECCION', 'stats');
 require '../controllers/AdminController.php';
 require 'layout/menuAdmin.php';
+require '../config/helpers.php';
 ?>
 
 <!DOCTYPE html>
@@ -46,11 +47,11 @@ require 'layout/menuAdmin.php';
 
     <!-- MÉDICO CON MÁS TURNOS -->
     <h2>Médico con más turnos</h2>
-    <p><?= $medicoConMasTurnos['nombre'] . ' ' . $medicoConMasTurnos['apellido'] ?> — <?= $medicoConMasTurnos['total_turnos'] ?> turnos</p>
+    <p><?= h($medicoConMasTurnos['nombre']) . ' ' . h($medicoConMasTurnos['apellido']) ?> — <?= $medicoConMasTurnos['total_turnos'] ?> turnos</p>
 
     <!-- ESPECIALIDAD MÁS DEMANDADA -->
     <h2>Especialidad más demandada</h2>
-    <p><?= $especialidadDemandada['nombre'] ?> — <?= $especialidadDemandada['total_turnos'] ?> turnos</p>
+    <p><?= h($especialidadDemandada['nombre']) ?> — <?= h($especialidadDemandada['total_turnos']) ?> turnos</p>
 
     <!-- TURNOS POR OBRA SOCIAL -->
     <h2>Turnos por obra social</h2>
@@ -64,7 +65,7 @@ require 'layout/menuAdmin.php';
         <tbody>
             <?php foreach ($listadoObraSocialTurnos as $os): ?>
                 <tr>
-                    <td><?= $os['obra_social'] ?></td>
+                    <td><?= h($os['obra_social']) ?></td>
                     <td><?= $os['total_turnos'] ?></td>
                 </tr>
             <?php endforeach; ?>

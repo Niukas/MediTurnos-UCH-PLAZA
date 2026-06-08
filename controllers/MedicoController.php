@@ -19,8 +19,8 @@ $turno   = new Turno($pdo);
 $matriculaMedico = $usuario->getMatricula($_SESSION['usuario_id']);
 
 if (SECCION === 'misTurnos') {
-    $periodo      = $_GET['periodo'] ?? 'dia'; // por defecto muestra hoy
-    $paginaActual = isset($_GET['pagina']) ? (int)$_GET['pagina'] : 1;
+    $periodo      = filter_var($_GET['periodo'] ?? 'dia', FILTER_SANITIZE_SPECIAL_CHARS);
+    $paginaActual = filter_var($_GET['pagina']  ?? 1, FILTER_SANITIZE_NUMBER_INT);
     $totalTurnos  = $turno->getTotalByFiltrosMedico($matriculaMedico, null, $periodo);
     $totalPaginas = ceil($totalTurnos / 20);
     $listadoTurnos = $turno->getByFiltrosMedico($matriculaMedico, null, $periodo, $paginaActual);
@@ -28,9 +28,9 @@ if (SECCION === 'misTurnos') {
     $accion = $_POST['accion'] ?? '';
 
     if ($accion === 'cambiarEstado') {
-        $idTurno   = (int)$_POST['id_turno'];
-        $estado    = $_POST['estado'];
-        $observacion = $_POST['observacion'] ?? null;
+        $idTurno     = filter_var($_POST['id_turno']     ?? 0,  FILTER_SANITIZE_NUMBER_INT);
+        $estado      = filter_var($_POST['estado']       ?? '', FILTER_SANITIZE_SPECIAL_CHARS);
+        $observacion = filter_var($_POST['observacion']  ?? '', FILTER_SANITIZE_SPECIAL_CHARS) ?: null;
         $resultado = $turno->cambiarEstado($idTurno, $estado);
         $resultado = $turno->actualizarEstadoObservacion($idTurno, $estado, $observacion);
 

@@ -2,6 +2,7 @@
 define('SECCION', 'sacarTurno');
 require '../controllers/PacienteController.php';
 require 'layout/menuPaciente.php'; 
+require '../config/helpers.php';
 ?>
 
 <!DOCTYPE html>
@@ -35,7 +36,7 @@ require 'layout/menuPaciente.php';
             <?php foreach ($listadoEspecialidades as $e): ?>
                 <option value="<?= $e['id_especialidad'] ?>"
                     <?= isset($_GET['id_especialidad']) && $_GET['id_especialidad'] == $e['id_especialidad'] ? 'selected' : '' ?>>
-                    <?= $e['nombre'] ?> (<?= $e['duracion_turno_min'] ?> min)
+                    <?= h($e['nombre']) ?> (<?= $e['duracion_turno_min'] ?> min)
                 </option>
             <?php endforeach; ?>
         </select>
@@ -56,7 +57,7 @@ require 'layout/menuPaciente.php';
                 <tbody>
                     <?php foreach ($listadoMedicos as $m): ?>
                         <tr>
-                            <td><?= $m['nombre'] . ' ' . $m['apellido'] ?></td>
+                            <td><?= h($m['nombre']) . ' ' . h($m['apellido']) ?></td>
                             <td>
                                 <button type="submit" name="matricula" value="<?= $m['matricula'] ?>">Elegir</button>
                             </td>
@@ -131,8 +132,8 @@ require 'layout/menuPaciente.php';
                 <option value="">Seleccioná un plan</option>
                 <?php foreach ($listadoPlanes as $pl): ?>
                     <option value="<?= $pl['id_plan'] ?>"
-                        data-afiliado="<?= $pl['nro_afiliado'] ?>">
-                        <?= $pl['obra_social'] ?> — <?= $pl['nombre_plan'] ?>
+                        data-afiliado="<?= h($pl['nro_afiliado']) ?>">
+                        <?= h($pl['obra_social']) ?> — <?= h($pl['nombre_plan']) ?>
                         (<?= $pl['porcentaje_cobertura'] ?>% cobertura)
                     </option>
                 <?php endforeach; ?>

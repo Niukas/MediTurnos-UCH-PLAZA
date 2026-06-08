@@ -2,6 +2,7 @@
 define('SECCION', 'medicos');
 require '../controllers/AdminController.php';
 require 'layout/menuAdmin.php';
+require '../config/helpers.php';
 ?>
 
 <!DOCTYPE html>
@@ -39,7 +40,7 @@ require 'layout/menuAdmin.php';
         <select name="id_especialidad" required>
             <option value="">Seleccioná una especialidad</option>
             <?php foreach ($listadoEspecialidad as $e): ?>
-                <option value="<?= $e['id_especialidad'] ?>"><?= $e['nombre'] ?></option>
+                <option value="<?= h($e['id_especialidad']) ?>"><?= h($e['nombre']) ?></option>
             <?php endforeach; ?>
         </select>
         <button type="submit">Agregar médico</button>
@@ -62,11 +63,11 @@ require 'layout/menuAdmin.php';
         <tbody>
             <?php foreach ($listadoMedicos as $m): ?>
                 <tr>
-                    <td><?= $m['matricula'] ?></td>
-                    <td><?= $m['nombre'] . ' ' . $m['apellido'] ?></td>
-                    <td><?= $m['email'] ?></td>
-                    <td><?= $m['telefono'] ?></td>
-                    <td><?= $m['especialidades'] ?></td>
+                    <td><?= h($m['matricula']) ?></td>
+                    <td><?= h($m['nombre']) . ' ' . h($m['apellido']) ?></td>
+                    <td><?= h($m['email']) ?></td>
+                    <td><?= h($m['telefono']) ?></td>
+                    <td><?= h($m['especialidades']) ?></td>
                 </tr>
             <?php endforeach; ?>
         </tbody>

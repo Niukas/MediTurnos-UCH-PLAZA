@@ -59,9 +59,9 @@ if (SECCION === 'medicos') {
 
 if (SECCION === 'turnos') {
     $listadoEspecialidad = $especialidad->getAll();
-    $especialidadFiltro = $_GET['especialidad'] ?? null;
-    $periodo            = $_GET['periodo']      ?? 'todos';
-    $paginaActual       = isset($_GET['pagina']) ? (int)$_GET['pagina'] : 1;
+    $especialidadFiltro = filter_var($_GET['especialidad'] ?? null, FILTER_SANITIZE_SPECIAL_CHARS) ?: null;
+    $periodo            = filter_var($_GET['periodo']      ?? 'todos', FILTER_SANITIZE_SPECIAL_CHARS);
+    $paginaActual       = filter_var($_GET['pagina']       ?? 1, FILTER_SANITIZE_NUMBER_INT);
     $totalTurnos        = $turno->getTotalByFiltros($especialidadFiltro, $periodo);
     $totalPaginas       = ceil($totalTurnos / 20);
     $listadoTurnos      = $turno->getByFiltros($especialidadFiltro, $periodo, $paginaActual);
@@ -76,8 +76,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     // Form de cambiar roles de usuario dentro de dashboardAdmin.php
     if ($accion === 'cambiarRol') {
 
-        $idUsuario = $_POST['id_Usuario'];
-        $idRol = $_POST['id_rol'];
+        $idUsuario = filter_var($_POST['id_Usuario'] ?? 0, FILTER_SANITIZE_NUMBER_INT);
+        $idRol     = filter_var($_POST['id_rol']     ?? 0, FILTER_SANITIZE_NUMBER_INT);
 
         $resultado = $usuario->cambiarRol($idUsuario, $idRol);
 
@@ -92,13 +92,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
     // Form de crear un medico dentro de medicosAdminDashboard.php
     if ($accion === 'crearMedico') {
+
         $datos = [
-            'matricula'       => $_POST['matricula'],
-            'nombre'          => $_POST['nombre'],
-            'apellido'        => $_POST['apellido'],
-            'telefono'        => $_POST['telefono'],
-            'email'           => $_POST['email'],
-            'id_especialidad' => $_POST['id_especialidad']
+            'matricula'       => filter_var($_POST['matricula']       ?? '', FILTER_SANITIZE_SPECIAL_CHARS),
+            'nombre'          => filter_var($_POST['nombre']          ?? '', FILTER_SANITIZE_SPECIAL_CHARS),
+            'apellido'        => filter_var($_POST['apellido']        ?? '', FILTER_SANITIZE_SPECIAL_CHARS),
+            'telefono'        => filter_var($_POST['telefono']        ?? '', FILTER_SANITIZE_SPECIAL_CHARS),
+            'email'           => filter_var($_POST['email']           ?? '', FILTER_SANITIZE_EMAIL),
+            'id_especialidad' => filter_var($_POST['id_especialidad'] ?? 0,  FILTER_SANITIZE_NUMBER_INT),
         ];
 
         $resultado = $medico->crearMedico($datos);
@@ -114,8 +115,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
     // Form que actualiza el estado de un turno en la db
     if ($accion === 'cambiarEstado') {
-        $idTurno = (int)$_POST['id_turno'];
-        $estado  = $_POST['estado'];
+
+        $idTurno = filter_var($_POST['id_turno'] ?? 0, FILTER_SANITIZE_NUMBER_INT);
+        $estado  = filter_var($_POST['estado']   ?? '', FILTER_SANITIZE_SPECIAL_CHARS);
 
         $resultado = $turno->cambiarEstado($idTurno, $estado);
 
