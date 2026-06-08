@@ -12,6 +12,26 @@ class Usuario
         $this->db = $pdo;
     }
 
+    // Metodo para traer todos los usuarios y unida con la tabla de Rol
+    public function getAll($pagina = 1, $porPagina = 20)
+    {
+        $offset = ($pagina - 1) * $porPagina;
+        $sql = "SELECT * FROM vista_usuarios LIMIT :limite OFFSET :offset";
+        $stmt = $this->db->prepare($sql);
+        $stmt->bindValue(':limite', $porPagina, PDO::PARAM_INT);
+        $stmt->bindValue(':offset', $offset,    PDO::PARAM_INT);
+        $stmt->execute();
+        return $stmt->fetchAll();
+    }
+
+    public function getTotalUsuarios()
+    {
+        $sql  = "SELECT COUNT(*) FROM Usuario";
+        $stmt = $this->db->prepare($sql);
+        $stmt->execute();
+        return $stmt->fetchColumn();
+    }
+
     // Metodo para verificar un login y devuelve un array con id, nombre, email y rol
     public function login(string $email, string $password)
     {
@@ -107,15 +127,40 @@ class Usuario
         return $stmt->fetchColumn();
     }
 
-    // Metodo para traer todos los usuarios y unida con la tabla de Rol
-    public function getAll()
+    // Eliminar usuario
+    public function eliminar(int $id_usuario)
     {
-        $sql = "SELECT * FROM vista_usuarios";
+        try {
+            $sql  = "DELETE FROM Usuario WHERE id_usuario = :id_usuario";
+            $stmt = $this->db->prepare($sql);
+            $stmt->execute([':id_usuario' => $id_usuario]);
+            return true;
+        } catch (\Throwable $th) {
+            error_log($th->getMessage());
+            return false;
+        }
+    }
 
-        $stmt = $this->db->prepare($sql);
-        $stmt->execute();
-        $todosUsuarios = $stmt->fetchAll();
-        return $todosUsuarios;
+    // Editar usuario
+    public function editar(array $datos)
+    {
+        try {
+            $sql = "UPDATE Usuario 
+                SET nombre = :nombre, apellido = :apellido, email = :email
+                WHERE id_usuario = :id_usuario";
+
+            $stmt = $this->db->prepare($sql);
+            $stmt->execute([
+                ':nombre'     => $datos['nombre'],
+                ':apellido'   => $datos['apellido'],
+                ':email'      => $datos['email'],
+                ':id_usuario' => $datos['id_usuario']
+            ]);
+            return true;
+        } catch (\Throwable $th) {
+            error_log($th->getMessage());
+            return false;
+        }
     }
 
     // Metodo que sirve para cambiar el rol de un usuario x 

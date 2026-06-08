@@ -57,8 +57,47 @@ class Medico
         }
     }
 
+    // Editar médico
+    public function editar(array $datos)
+    {
+        try {
+            $sql = "UPDATE Medico 
+                SET nombre = :nombre, apellido = :apellido, 
+                    telefono = :telefono, email = :email
+                WHERE matricula = :matricula";
+
+            $stmt = $this->db->prepare($sql);
+            $stmt->execute([
+                ':nombre'    => $datos['nombre'],
+                ':apellido'  => $datos['apellido'],
+                ':telefono'  => $datos['telefono'],
+                ':email'     => $datos['email'],
+                ':matricula' => $datos['matricula']
+            ]);
+            return true;
+        } catch (\Throwable $th) {
+            error_log($th->getMessage());
+            return false;
+        }
+    }
+
+    // Eliminar médico
+    public function eliminar(string $matricula)
+    {
+        try {
+            $sql  = "DELETE FROM Medico WHERE matricula = :matricula";
+            $stmt = $this->db->prepare($sql);
+            $stmt->execute([':matricula' => $matricula]);
+            return true;
+        } catch (\Throwable $th) {
+            error_log($th->getMessage());
+            return false;
+        }
+    }
+
     // Metodo que trae medico segun la especialidad
-    public function getByEspecialidad(int $idEspecialidad){
+    public function getByEspecialidad(int $idEspecialidad)
+    {
         $sql = "SELECT m.matricula, m.nombre, m.apellido
                 FROM Medico m
                 JOIN Medico_Especialidad me ON m.matricula = me.matricula

@@ -46,6 +46,10 @@ if (SECCION === 'stats') {
 
 if (SECCION === 'usuarios') {
     $listadoUsuarios  = $usuario->getAll();
+    $paginaActual  = filter_var($_GET['pagina'] ?? 1, FILTER_SANITIZE_NUMBER_INT);
+    $totalUsuarios = $usuario->getTotalUsuarios();
+    $totalPaginas  = ceil($totalUsuarios / 20);
+    $listadoUsuarios = $usuario->getAll($paginaActual);
 }
 
 // dashboard Medicos
@@ -82,7 +86,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $resultado = $usuario->cambiarRol($idUsuario, $idRol);
 
         if ($resultado) {
-            header("Location: ../views/dashboardAdmin.php?registro=exitoso");
+            header('Location: ../views/dashboardAdminUsuarios.php?registro=rol_actualizado');
             exit;
         } else {
             header("Location: ../views/dashboardAdmin.php?registro=error");
@@ -105,10 +109,77 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $resultado = $medico->crearMedico($datos);
 
         if ($resultado) {
-            header('Location: ../views/dashboardAdminMedicos.php?registro=exitoso');
+            header('Location: ../views/dashboardAdminMedicos.php?registro=creado');
             exit;
         } else {
             header('Location: ../views/dashboardAdminMedicos.php?registro=error');
+            exit;
+        }
+    }
+
+    // Eliminar médico
+    if ($accion === 'eliminarMedico') {
+        $matricula = filter_var($_POST['matricula'] ?? '', FILTER_SANITIZE_SPECIAL_CHARS);
+        $resultado = $medico->eliminar($matricula);
+
+        if ($resultado) {
+            header('Location: ../views/dashboardAdminMedicos.php?registro=eliminado');
+            exit;
+        } else {
+            header('Location: ../views/dashboardAdminMedicos.php?registro=error');
+            exit;
+        }
+    }
+
+    // Editar médico
+    if ($accion === 'editarMedico') {
+        $datos = [
+            'matricula' => filter_var($_POST['matricula'] ?? '', FILTER_SANITIZE_SPECIAL_CHARS),
+            'nombre'    => filter_var($_POST['nombre']    ?? '', FILTER_SANITIZE_SPECIAL_CHARS),
+            'apellido'  => filter_var($_POST['apellido']  ?? '', FILTER_SANITIZE_SPECIAL_CHARS),
+            'telefono'  => filter_var($_POST['telefono']  ?? '', FILTER_SANITIZE_SPECIAL_CHARS),
+            'email'     => filter_var($_POST['email']     ?? '', FILTER_SANITIZE_EMAIL),
+        ];
+        $resultado = $medico->editar($datos);
+
+        if ($resultado) {
+            header('Location: ../views/dashboardAdminMedicos.php?registro=editado');
+            exit;
+        } else {
+            header('Location: ../views/dashboardAdminMedicos.php?registro=error');
+            exit;
+        }
+    }
+
+    // Eliminar usuario
+    if ($accion === 'eliminarUsuario') {
+        $idUsuario = filter_var($_POST['id_usuario'] ?? 0, FILTER_SANITIZE_NUMBER_INT);
+        $resultado = $usuario->eliminar($idUsuario);
+
+        if ($resultado) {
+            header('Location: ../views/dashboardAdminUsuarios.php?registro=eliminado');
+            exit;
+        } else {
+            header('Location: ../views/dashboardAdminUsuarios.php?registro=error');
+            exit;
+        }
+    }
+
+    // Editar usuario
+    if ($accion === 'editarUsuario') {
+        $datos = [
+            'id_usuario' => filter_var($_POST['id_usuario'] ?? 0,  FILTER_SANITIZE_NUMBER_INT),
+            'nombre'     => filter_var($_POST['nombre']     ?? '', FILTER_SANITIZE_SPECIAL_CHARS),
+            'apellido'   => filter_var($_POST['apellido']   ?? '', FILTER_SANITIZE_SPECIAL_CHARS),
+            'email'      => filter_var($_POST['email']      ?? '', FILTER_SANITIZE_EMAIL),
+        ];
+        $resultado = $usuario->editar($datos);
+
+        if ($resultado) {
+            header('Location: ../views/dashboardAdminUsuarios.php?registro=editado');
+            exit;
+        } else {
+            header('Location: ../views/dashboardAdminUsuarios.php?registro=error');
             exit;
         }
     }
