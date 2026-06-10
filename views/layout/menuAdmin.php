@@ -1,11 +1,21 @@
-<nav>
-    <span>MediTurnos — Admin | Hola, <?= $_SESSION['usuario_nombre'] ?></span>
-    <a href="dashboardAdmin.php">Stats</a>
-    <a href="dashboardAdminUsuarios.php">Usuarios</a>
-    <a href="dashboardAdminMedicos.php">Médicos</a>
-    <a href="dashboardAdminTurnos.php">Turnos</a>
-    <form method="POST" action="../controllers/AuthController.php">
-        <input type="hidden" name="accion" value="logout">
-        <button type="submit">Cerrar sesión</button>
-    </form>
+<nav class="bg-white border-b border-lightblue/50 px-6 sm:px-10 h-16 flex items-center justify-between sticky top-0 z-[100]">
+    <div class="flex items-center gap-2 font-serif text-charcoal text-xl">
+        <a href="dashboardAdmin.php" class="flex items-center gap-2 hover:opacity-80 transition-opacity text-charcoal decoration-none">
+            <span class="text-slate text-2xl">✚</span> MediTurnos
+        </a>
+        <span class="font-sans text-sm font-medium text-slate ml-3 border-l border-gray-200 pl-3 hidden sm:inline-block">Admin | Hola, <?= $_SESSION['usuario_nombre'] ?></span>
+    </div>
+    <div class="flex items-center gap-4 sm:gap-6">
+        <a href="dashboardAdmin.php" class="text-[0.85rem] font-medium text-slate uppercase tracking-wider hover:text-charcoal transition-colors hidden md:inline-block">Stats</a>
+        <a href="dashboardAdminUsuarios.php" class="text-[0.85rem] font-medium text-slate uppercase tracking-wider hover:text-charcoal transition-colors hidden md:inline-block">Usuarios</a>
+        <a href="dashboardAdminMedicos.php" class="text-[0.85rem] font-medium text-slate uppercase tracking-wider hover:text-charcoal transition-colors hidden md:inline-block">Médicos</a>
+        <a href="dashboardAdminTurnos.php" class="text-[0.85rem] font-medium text-slate uppercase tracking-wider hover:text-charcoal transition-colors hidden md:inline-block">Turnos</a>
+
+        <form method="POST" action="../controllers/AuthController.php" class="m-0">
+            <input type="hidden" name="accion" value="logout">
+            <button type="submit" class="bg-charcoal hover:bg-slate text-white px-4 sm:px-5 py-2 rounded-md font-sans text-[0.85rem] font-semibold tracking-wide transition-colors sm:ml-2">
+                Cerrar sesión
+            </button>
+        </form>
+    </div>
 </nav>

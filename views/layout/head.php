@@ -1,0 +1,81 @@
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title><?= $titulo ?? 'MediTurnos — Plataforma Médica' ?></title>
+
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22 fill=%22%232F4550%22>✚</text></svg>">
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:opsz,wght@9..40,400;500;700&family=DM+Serif+Display&display=swap" rel="stylesheet">
+
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        charcoal: '#2F4550',
+                        /* Texto oscuro principal */
+                        slate: '#586F7C',
+                        /* Textos secundarios y bordes */
+                        lightblue: '#B8DBD9',
+                        /* Acentos y botones claros */
+                        ghost: '#F4F4F9',
+                        /* Fondos grises súper claros */
+                    },
+                    fontFamily: {
+                        sans: ['"DM Sans"', 'sans-serif'],
+                        serif: ['"DM Serif Display"', 'serif'],
+                    }
+                }
+            }
+        }
+    </script>
+
+    <style>
+        /* Animación de entrada suave para las tarjetas */
+        .animate-fadeIn {
+            animation: fadeIn 0.4s ease-out forwards;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* Ocultar flechitas de los inputs numéricos (opcional pero queda más limpio) */
+        input[type="number"]::-webkit-inner-spin-button,
+        input[type="number"]::-webkit-outer-spin-button {
+            -webkit-appearance: none;
+            margin: 0;
+        }
+
+        /* Estilos Custom para Flatpickr en head.php */
+        .flatpickr-months .flatpickr-month {
+            color: #2F4550 !important;
+        }
+
+        span.flatpickr-weekday {
+            color: #586F7C !important;
+            font-weight: 700;
+        }
+
+        .flatpickr-day.selected {
+            background: #2F4550 !important;
+            border-color: #2F4550 !important;
+            color: #fff !important;
+        }
+
+        .flatpickr-day.today {
+            border-color: #B8DBD9 !important;
+        }
+    </style>
+</head>
