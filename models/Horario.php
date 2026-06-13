@@ -26,6 +26,13 @@ class Horario
 
             if (!$diaSemanaES) return [];
 
+            // Verificar si esta bloqueado
+            $sqlBloqueo = "SELECT COUNT(*) FROM Bloqueo_Horario 
+               WHERE matricula = :matricula AND fecha = :fecha";
+            $stmtBloqueo = $this->db->prepare($sqlBloqueo);
+            $stmtBloqueo->execute([':matricula' => $matricula, ':fecha' => $fecha]);
+            if ($stmtBloqueo->fetchColumn() > 0) return [];
+
             $sql = "SELECT h.hora_inicio, h.hora_fin, h.id_consultorio,
                        c.numero AS consultorio_nro, c.piso
                 FROM Horario_Atencion h
@@ -83,5 +90,58 @@ class Horario
             error_log($th->getMessage());
             return [];
         }
+    }
+
+    // Metodo para bloquear un dia en especifico
+    public function bloquearDia(string $matricula, string $fecha, ?string $motivo = null)
+    {
+        try {
+            // Verificar si ya existe un bloqueo para esa fecha
+            $sqlCheck = "SELECT COUNT(*) FROM Bloqueo_Horario 
+                     WHERE matricula = :matricula AND fecha = :fecha";
+            $stmtCheck = $this->db->prepare($sqlCheck);
+            $stmtCheck->execute([':matricula' => $matricula, ':fecha' => $fecha]);
+            if ($stmtCheck->fetchColumn() > 0) return false;
+
+            $sql = "INSERT INTO Bloqueo_Horario (matricula, fecha, motivo)
+                VALUES (:matricula, :fecha, :motivo)";
+            $stmt = $this->db->prepare($sql);
+            $stmt->execute([
+                ':matricula' => $matricula,
+                ':fecha'     => $fecha,
+                ':motivo'    => $motivo
+            ]);
+            return true;
+        } catch (\Throwable $th) {
+            error_log($th->getMessage());
+            return false;
+        }
+    }
+
+    // Metodo para desbloquear el Dia ya bloqueado
+    public function desbloquearDia(string $matricula, string $fecha)
+    {
+        try {
+            $sql = "DELETE FROM Bloqueo_Horario 
+                WHERE matricula = :matricula AND fecha = :fecha";
+            $stmt = $this->db->prepare($sql);
+            $stmt->execute([':matricula' => $matricula, ':fecha' => $fecha]);
+            return true;
+        } catch (\Throwable $th) {
+            error_log($th->getMessage());
+            return false;
+        }
+    }
+
+    // Metodo para traer todos los bloqueos existentes
+    public function getBloqueos(string $matricula)
+    {
+        $sql = "SELECT * FROM Bloqueo_Horario 
+            WHERE matricula = :matricula 
+            AND fecha >= CURDATE()
+            ORDER BY fecha ASC";
+        $stmt = $this->db->prepare($sql);
+        $stmt->execute([':matricula' => $matricula]);
+        return $stmt->fetchAll();
     }
 }

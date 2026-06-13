@@ -9,6 +9,11 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=DM+Sans:opsz,wght@9..40,400;500;700&family=DM+Serif+Display&display=swap" rel="stylesheet">
 
+    <!-- Flatpickr -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+    <script src="https://cdn.jsdelivr.net/npm/flatpickr/dist/l10n/es.js"></script>
+
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
         tailwind.config = {
@@ -16,13 +21,9 @@
                 extend: {
                     colors: {
                         charcoal: '#2F4550',
-                        /* Texto oscuro principal */
                         slate: '#586F7C',
-                        /* Textos secundarios y bordes */
                         lightblue: '#B8DBD9',
-                        /* Acentos y botones claros */
                         ghost: '#F4F4F9',
-                        /* Fondos grises súper claros */
                     },
                     fontFamily: {
                         sans: ['"DM Sans"', 'sans-serif'],
@@ -34,7 +35,6 @@
     </script>
 
     <style>
-        /* Animación de entrada suave para las tarjetas */
         .animate-fadeIn {
             animation: fadeIn 0.4s ease-out forwards;
         }
@@ -51,14 +51,12 @@
             }
         }
 
-        /* Ocultar flechitas de los inputs numéricos (opcional pero queda más limpio) */
         input[type="number"]::-webkit-inner-spin-button,
         input[type="number"]::-webkit-outer-spin-button {
             -webkit-appearance: none;
             margin: 0;
         }
 
-        /* Estilos Custom para Flatpickr en head.php */
         .flatpickr-months .flatpickr-month {
             color: #2F4550 !important;
         }
@@ -76,6 +74,11 @@
 
         .flatpickr-day.today {
             border-color: #B8DBD9 !important;
+        }
+
+        .flatpickr-day.flatpickr-disabled {
+            color: #ccc !important;
+            background: transparent !important;
         }
     </style>
 </head>
