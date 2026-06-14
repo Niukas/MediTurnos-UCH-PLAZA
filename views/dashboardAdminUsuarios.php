@@ -47,15 +47,47 @@ $titulo = 'Gestión de Usuarios — MediTurnos';
             </div>
         <?php endif; ?>
 
-        <div class="bg-white rounded-2xl border border-gray-200/80 overflow-hidden shadow-sm">
-            <div class="bg-ghost/60 px-6 py-4 border-b border-gray-100 flex items-center justify-between">
+        <form method="GET" action="" class="mb-6">
+            <div class="flex gap-3">
+                <div class="relative flex-1">
+                    <div class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none text-slate">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
+                        </svg>
+                    </div>
+                    <input type="text" name="busqueda" value="<?= h($_GET['busqueda'] ?? '') ?>"
+                        placeholder="Buscar usuario por nombre, apellido o email..."
+                        class="w-full pl-11 pr-4 py-3 bg-white border border-gray-200 rounded-xl text-sm text-charcoal placeholder-gray-400 focus:outline-none focus:border-slate focus:ring-2 focus:ring-slate/10 transition-all shadow-sm">
+                </div>
+                <button type="submit"
+                    class="bg-charcoal hover:bg-slate text-white px-6 py-3 rounded-xl text-sm font-bold transition-all shadow-md hover:shadow-lg flex items-center gap-2 shrink-0">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
+                    </svg>
+                    Buscar
+                </button>
+
+                <?php if (!empty($_GET['busqueda'])): ?>
+                    <a href="dashboardAdminUsuarios.php" class="bg-white border border-gray-200 hover:border-charcoal text-slate hover:text-charcoal px-6 py-3 rounded-xl text-sm font-bold transition-all shadow-sm flex items-center gap-2 shrink-0">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                        </svg>
+                        Limpiar
+                    </a>
+                <?php endif; ?>
+            </div>
+        </form>
+
+        <div class="bg-white rounded-2xl border border-gray-200/80 shadow-sm relative">
+
+            <div class="bg-ghost/60 px-6 py-4 border-b border-gray-100 flex items-center justify-between rounded-t-2xl">
                 <h2 class="font-serif text-lg text-charcoal tracking-tight">Cuentas Registradas</h2>
                 <span class="bg-white border border-gray-200 text-charcoal text-[0.65rem] font-bold px-3 py-1 rounded-full shadow-sm uppercase tracking-wider">
                     Página <?= $paginaActual ?> / <?= $totalPaginas ?>
                 </span>
             </div>
 
-            <div class="overflow-x-auto">
+            <div class="w-full overflow-visible rounded-b-2xl">
                 <table class="w-full text-left border-collapse">
                     <thead>
                         <tr class="border-b border-gray-100">
@@ -66,7 +98,7 @@ $titulo = 'Gestión de Usuarios — MediTurnos';
                             <th class="py-3.5 px-6 text-[0.65rem] font-bold text-slate uppercase tracking-widest bg-white text-right">Acciones</th>
                         </tr>
                     </thead>
-                    <tbody class="divide-y divide-gray-50 bg-white">
+                    <tbody class="divide-y divide-gray-50 bg-white rounded-b-2xl">
                         <?php foreach ($listadoUsuarios as $u): ?>
                             <tr class="hover:bg-ghost/30 transition-colors group">
 
@@ -76,11 +108,11 @@ $titulo = 'Gestión de Usuarios — MediTurnos';
 
                                 <td class="py-4 px-6 align-middle">
                                     <div class="flex items-center gap-3">
-                                        <div class="w-9 h-9 rounded-full bg-gradient-to-tr from-charcoal to-slate text-white flex items-center justify-center font-bold text-xs uppercase shadow-sm">
+                                        <div class="w-9 h-9 rounded-full bg-gradient-to-tr from-charcoal to-slate text-white flex items-center justify-center font-bold text-xs uppercase shadow-sm shrink-0">
                                             <?= substr(h($u['nombre']), 0, 1) . substr(h($u['apellido']), 0, 1) ?>
                                         </div>
                                         <div>
-                                            <div class="text-sm font-bold text-charcoal"><?= h($u['nombre']) . ' ' . h($u['apellido']) ?></div>
+                                            <div class="text-sm font-bold text-charcoal whitespace-nowrap"><?= h($u['nombre']) . ' ' . h($u['apellido']) ?></div>
                                             <div class="text-xs text-slate mt-0.5"><?= h($u['email']) ?></div>
                                         </div>
                                     </div>
@@ -94,17 +126,17 @@ $titulo = 'Gestión de Usuarios — MediTurnos';
                                         default    => 'bg-ghost text-slate border-gray-200'
                                     };
                                     ?>
-                                    <span class="inline-flex items-center px-2.5 py-0.5 rounded text-[0.65rem] font-bold uppercase tracking-wider border <?= $rolStyle ?>">
+                                    <span class="inline-flex items-center px-2.5 py-0.5 rounded text-[0.65rem] font-bold uppercase tracking-wider border <?= $rolStyle ?> whitespace-nowrap">
                                         <?= h($u['rol']) ?>
                                     </span>
                                 </td>
 
-                                <td class="py-4 px-6 align-middle">
+                                <td class="py-4 px-6 align-middle whitespace-nowrap">
                                     <form method="POST" action="dashboardAdminUsuarios.php" class="m-0 flex items-center gap-2">
                                         <input type="hidden" name="accion" value="cambiarRol">
                                         <input type="hidden" name="id_Usuario" value="<?= $u['id_usuario'] ?>">
 
-                                        <div class="relative">
+                                        <div class="relative shrink-0">
                                             <select name="id_rol" class="pl-3 pr-8 py-1.5 bg-ghost border border-gray-200 rounded-lg text-xs font-bold text-charcoal focus:outline-none focus:border-slate appearance-none cursor-pointer transition-colors shadow-sm">
                                                 <?php foreach ($listadoRoles as $rol): ?>
                                                     <option value="<?= $rol['id_rol'] ?>" <?= $rol['id_rol'] == $u['id_rol'] ? 'selected' : '' ?>>
@@ -119,7 +151,7 @@ $titulo = 'Gestión de Usuarios — MediTurnos';
                                             </div>
                                         </div>
 
-                                        <button type="submit" class="bg-white border border-gray-200 text-charcoal hover:bg-charcoal hover:text-white w-7 h-7 rounded-lg flex items-center justify-center transition-all shadow-sm" title="Confirmar cambio de privilegios">
+                                        <button type="submit" class="bg-white border border-gray-200 text-charcoal hover:bg-charcoal hover:text-white w-7 h-7 rounded-lg flex items-center justify-center transition-all shadow-sm shrink-0" title="Confirmar cambio de privilegios">
                                             <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
                                             </svg>
@@ -127,28 +159,30 @@ $titulo = 'Gestión de Usuarios — MediTurnos';
                                     </form>
                                 </td>
 
-                                <td class="py-4 px-6 align-middle text-right relative">
-                                    <div class="flex gap-2 justify-end">
+                                <td class="py-4 px-6 align-middle text-right relative whitespace-nowrap">
+
+                                    <div class="flex gap-2 justify-end shrink-0">
                                         <button type="button" onclick="document.getElementById('editar-<?= $u['id_usuario'] ?>').style.display = document.getElementById('editar-<?= $u['id_usuario'] ?>').style.display === 'none' ? 'block' : 'none'"
-                                            class="bg-white border border-gray-200 text-slate hover:border-charcoal hover:text-charcoal px-3 py-1.5 rounded-lg text-xs font-bold transition-all shadow-sm">
+                                            class="bg-white border border-gray-200 text-slate hover:border-charcoal hover:text-charcoal px-3 py-1.5 rounded-lg text-xs font-bold transition-all shadow-sm shrink-0">
                                             Editar
                                         </button>
 
-                                        <form method="POST" action="dashboardAdminUsuarios.php" class="m-0"
+                                        <form method="POST" action="dashboardAdminUsuarios.php" class="m-0 shrink-0"
                                             onsubmit="return confirm('ALERTA CRÍTICA: ¿Seguro que deseas eliminar permanentemente esta cuenta de usuario? Se revocarán todos los accesos.')">
                                             <input type="hidden" name="accion" value="eliminarUsuario">
                                             <input type="hidden" name="id_usuario" value="<?= $u['id_usuario'] ?>">
-                                            <button type="submit" class="bg-rose-50 border border-rose-200 text-rose-600 hover:bg-rose-100 hover:text-rose-800 px-3 py-1.5 rounded-lg text-xs font-bold transition-all shadow-sm">
+                                            <button type="submit" class="bg-rose-50 border border-rose-200 text-rose-600 hover:bg-rose-100 hover:text-rose-800 px-3 py-1.5 rounded-lg text-xs font-bold transition-all shadow-sm shrink-0">
                                                 Eliminar
                                             </button>
                                         </form>
                                     </div>
 
-                                    <div id="editar-<?= $u['id_usuario'] ?>" style="display:none" class="absolute right-6 top-14 w-72 bg-white rounded-2xl shadow-[0_10px_40px_rgba(0,0,0,0.1)] border border-gray-200 z-50 p-5 text-left animate-fadeIn before:content-[''] before:absolute before:-top-2 before:right-14 before:w-4 before:h-4 before:bg-white before:border-l before:border-t before:border-gray-200 before:rotate-45">
+                                    <div id="editar-<?= $u['id_usuario'] ?>" style="display:none" class="absolute right-6 top-14 w-72 bg-white rounded-2xl shadow-[0_10px_40px_rgba(0,0,0,0.15)] border border-gray-200 z-[9999] p-5 text-left animate-fadeIn before:content-[''] before:absolute before:-top-2 before:right-14 before:w-4 before:h-4 before:bg-white before:border-l before:border-t before:border-gray-200 before:rotate-45">
                                         <h4 class="font-serif text-sm text-charcoal mb-3">Modificar Credenciales</h4>
                                         <form method="POST" action="dashboardAdminUsuarios.php" class="space-y-3 m-0">
                                             <input type="hidden" name="accion" value="editarUsuario">
                                             <input type="hidden" name="id_usuario" value="<?= $u['id_usuario'] ?>">
+                                            <input type="hidden" name="busqueda" value="<?= h($_GET['busqueda'] ?? '') ?>">
 
                                             <div>
                                                 <label class="block text-[0.6rem] font-bold text-slate uppercase mb-1">Nombre</label>

@@ -25,4 +25,42 @@ class Paciente
         $stmt->execute([':id_paciente' => $id_paciente]);
         return $stmt->fetchAll();
     }
+
+    // Metodo para buscar por nombre, apellido o dni
+    public function buscar(string $busqueda)
+    {
+        $sql = "SELECT p.*, u.email
+            FROM Paciente p
+            LEFT JOIN Usuario u ON u.id_paciente = p.id_paciente
+            WHERE p.nombre   LIKE :busqueda
+            OR p.apellido    LIKE :busqueda
+            OR p.dni         LIKE :busqueda
+            ORDER BY p.apellido ASC";
+
+        $stmt = $this->db->prepare($sql);
+        $stmt->execute([':busqueda' => '%' . $busqueda . '%']);
+        return $stmt->fetchAll();
+    }
+
+    // Metodo para editar un paciente 
+    public function editar(array $datos) {
+    try {
+        $sql = "UPDATE Paciente 
+                SET nombre = :nombre, apellido = :apellido,
+                    telefono = :telefono, email = :email
+                WHERE id_paciente = :id_paciente";
+        $stmt = $this->db->prepare($sql);
+        $stmt->execute([
+            ':nombre'      => $datos['nombre'],
+            ':apellido'    => $datos['apellido'],
+            ':telefono'    => $datos['telefono'],
+            ':email'       => $datos['email'],
+            ':id_paciente' => $datos['id_paciente'],
+        ]);
+        return true;
+    } catch (\Throwable $th) {
+        error_log($th->getMessage());
+        return false;
+    }
+}
 }

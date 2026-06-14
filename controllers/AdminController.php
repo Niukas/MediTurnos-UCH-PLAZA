@@ -18,6 +18,7 @@ require_once '../models/Usuario.php';
 require_once '../models/Medico.php';
 require_once '../models/Especialidad.php';
 require_once '../models/Turno.php';
+require_once '../models/Paciente.php';
 
 // Instanciar las clases
 $stats = new Stats($pdo);
@@ -26,12 +27,13 @@ $usuario = new Usuario($pdo);
 $medico = new Medico($pdo);
 $especialidad = new Especialidad($pdo);
 $turno = new Turno($pdo);
+$paciente = new Paciente($pdo);
 
 $listadoRoles = $rol->getAll();
 
 // llamado a metodos de estadisticas
 
-if (SECCION === 'stats') {
+if (defined('SECCION') && SECCION === 'stats') {
     $pacientesTotales = $stats->getTotalPacientes();
     $medicosTotales   = $stats->getTotalMedicos();
     $turnosHoy        = $stats->getTurnosHoy();
@@ -44,24 +46,33 @@ if (SECCION === 'stats') {
 
 // Dashboard Usuarios
 
-if (SECCION === 'usuarios') {
-    $listadoUsuarios  = $usuario->getAll();
-    $paginaActual  = filter_var($_GET['pagina'] ?? 1, FILTER_SANITIZE_NUMBER_INT);
-    $totalUsuarios = $usuario->getTotalUsuarios();
-    $totalPaginas  = ceil($totalUsuarios / 20);
-    $listadoUsuarios = $usuario->getAll($paginaActual);
+if (defined('SECCION') && SECCION === 'usuarios') {
+    $busqueda = filter_var($_GET['busqueda'] ?? '', FILTER_SANITIZE_SPECIAL_CHARS);
+
+    if (!empty($busqueda)) {
+        // Modo búsqueda: mostramos solo las coincidencias
+        $listadoUsuarios = $usuario->buscar($busqueda);
+        $totalPaginas = 1;
+        $paginaActual = 1;
+    } else {
+        // Flujo normal: mostramos todos paginados
+        $paginaActual  = filter_var($_GET['pagina'] ?? 1, FILTER_SANITIZE_NUMBER_INT);
+        $totalUsuarios = $usuario->getTotalUsuarios();
+        $totalPaginas  = ceil($totalUsuarios / 20);
+        $listadoUsuarios = $usuario->getAll($paginaActual);
+    }
 }
 
 // dashboard Medicos
 
-if (SECCION === 'medicos') {
+if (defined('SECCION') && SECCION === 'medicos') {
     $listadoMedicos      = $medico->getAll();
     $listadoEspecialidad = $especialidad->getAll();
 }
 
 // Dashboard de turnos
 
-if (SECCION === 'turnos') {
+if (defined('SECCION') && SECCION === 'turnos') {
     $listadoEspecialidad = $especialidad->getAll();
     $especialidadFiltro = filter_var($_GET['especialidad'] ?? null, FILTER_SANITIZE_SPECIAL_CHARS) ?: null;
     $periodo            = filter_var($_GET['periodo']      ?? 'todos', FILTER_SANITIZE_SPECIAL_CHARS);
@@ -69,6 +80,24 @@ if (SECCION === 'turnos') {
     $totalTurnos        = $turno->getTotalByFiltros($especialidadFiltro, $periodo);
     $totalPaginas       = ceil($totalTurnos / 20);
     $listadoTurnos      = $turno->getByFiltros($especialidadFiltro, $periodo, $paginaActual);
+}
+
+// Buscar Pacientes
+
+if (defined('SECCION') && SECCION === 'buscarPaciente') {
+    $busqueda      = filter_var($_GET['busqueda'] ?? '', FILTER_SANITIZE_SPECIAL_CHARS);
+    $resultados    = [];
+
+    if (!empty($busqueda)) {
+        $resultados = $paciente->buscar($busqueda);
+    }
+
+    // Si se seleccionó un paciente específico — cargás sus turnos
+    $turnosPaciente = [];
+    $idPacienteVer  = filter_var($_GET['id_paciente'] ?? null, FILTER_SANITIZE_NUMBER_INT) ?: null;
+    if ($idPacienteVer) {
+        $turnosPaciente = $turno->getByFiltros(null, 'todos', 1, 100, $idPacienteVer);
+    }
 }
 
 // Accion de formularios
@@ -199,5 +228,25 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             header('Location: ../views/dashboardAdminTurnos.php?registro=error');
             exit;
         }
+    }
+
+    // POST — Editar paciente
+    if ($accion === 'editarPaciente') {
+        $datos = [
+            'id_paciente' => filter_var($_POST['id_paciente'] ?? 0,  FILTER_SANITIZE_NUMBER_INT),
+            'nombre'      => filter_var($_POST['nombre']      ?? '', FILTER_SANITIZE_SPECIAL_CHARS),
+            'apellido'    => filter_var($_POST['apellido']    ?? '', FILTER_SANITIZE_SPECIAL_CHARS),
+            'telefono'    => filter_var($_POST['telefono']    ?? '', FILTER_SANITIZE_SPECIAL_CHARS),
+            'email'       => filter_var($_POST['email']       ?? '', FILTER_SANITIZE_EMAIL),
+        ];
+        $resultado = $paciente->editar($datos);
+        $redirect  = $_POST['busqueda'] ?? '';
+
+        if ($resultado) {
+            header("Location: ../views/buscarPacienteAdmin.php?busqueda=$redirect&registro=editado");
+        } else {
+            header("Location: ../views/buscarPacienteAdmin.php?busqueda=$redirect&registro=error");
+        }
+        exit;
     }
 }

@@ -192,4 +192,20 @@ class Usuario
         $stmt->execute([':id_usuario' => $id_usuario]);
         return $stmt->fetchColumn();
     }
+
+    // Método para buscar usuarios por nombre, apellido, email o nombre completo
+    public function buscar(string $busqueda)
+    {
+        $sql = "SELECT * FROM vista_usuarios 
+                WHERE nombre LIKE :busqueda 
+                OR apellido LIKE :busqueda 
+                OR email LIKE :busqueda 
+                OR CONCAT(nombre, ' ', apellido) LIKE :busqueda
+                OR CONCAT(apellido, ' ', nombre) LIKE :busqueda
+                ORDER BY apellido ASC";
+
+        $stmt = $this->db->prepare($sql);
+        $stmt->execute([':busqueda' => '%' . $busqueda . '%']);
+        return $stmt->fetchAll();
+    }
 }

@@ -163,10 +163,15 @@ class Turno
     }
 
 
-    public function getByFiltrosMedico($matricula, $especialidad = null, $periodo = 'todos', $pagina = 1, $porPagina = 20)
+    public function getByFiltrosMedico(string $matricula, $especialidad = null, $periodo = 'todos', $pagina = 1, $porPagina = 20, $id_paciente = null)
     {
         $where   = ["matricula = :matricula"];
         $params  = [':matricula' => $matricula];
+
+        if ($id_paciente) {
+            $where[] = "id_paciente = :id_paciente";
+            $params[':id_paciente'] = $id_paciente;
+        }
 
         if ($especialidad) {
             $where[] = "especialidad = :especialidad";
