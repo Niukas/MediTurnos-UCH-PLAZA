@@ -144,4 +144,79 @@ class Horario
         $stmt->execute([':matricula' => $matricula]);
         return $stmt->fetchAll();
     }
+
+    // Método para traer la agenda regular (horarios de atención) de un médico
+    public function getHorariosMedico(string $matricula)
+    {
+        $sql = "SELECT h.*, e.nombre AS especialidad, c.numero AS consultorio_nro 
+                FROM Horario_Atencion h
+                JOIN Especialidad e ON h.id_especialidad = e.id_especialidad
+                JOIN Consultorio c ON h.id_consultorio = c.id_consultorio
+                WHERE h.matricula = :matricula
+                ORDER BY FIELD(h.dia_semana, 'Lunes', 'Martes', 'Miercoles', 'Jueves', 'Viernes', 'Sabado'), h.hora_inicio ASC";
+
+        $stmt = $this->db->prepare($sql);
+        $stmt->execute([':matricula' => $matricula]);
+        return $stmt->fetchAll();
+    }
+
+    // Método para agregar un nuevo bloque de horario de atención (Con validación de superposición)
+    public function agregarHorario(array $datos)
+    {
+        try {
+            // Verificamos si ya existe un horario que se superponga ese mismo día
+            // La fórmula de superposición es: (InicioA < FinB) AND (FinA > InicioB)
+            $sqlCheck = "SELECT COUNT(*) FROM Horario_Atencion 
+                         WHERE matricula = :matricula 
+                         AND dia_semana = :dia_semana 
+                         AND (hora_inicio < :hora_fin AND hora_fin > :hora_inicio)";
+                         
+            $stmtCheck = $this->db->prepare($sqlCheck);
+            $stmtCheck->execute([
+                ':matricula'   => $datos['matricula'],
+                ':dia_semana'  => $datos['dia_semana'],
+                ':hora_inicio' => $datos['hora_inicio'],
+                ':hora_fin'    => $datos['hora_fin']
+            ]);
+
+            // Si encuentra al menos 1 registro que se pise, aborta y avisa
+            if ($stmtCheck->fetchColumn() > 0) {
+                return 'superpuesto';
+            }
+
+            // Si no hay choques de horario, lo insertamos
+            $sql = "INSERT INTO Horario_Atencion 
+                    (matricula, id_especialidad, dia_semana, hora_inicio, hora_fin, id_consultorio)
+                    VALUES (:matricula, :id_especialidad, :dia_semana, :hora_inicio, :hora_fin, :id_consultorio)";
+                    
+            $stmt = $this->db->prepare($sql);
+            $stmt->execute([
+                ':matricula'       => $datos['matricula'],
+                ':id_especialidad' => $datos['id_especialidad'],
+                ':dia_semana'      => $datos['dia_semana'],
+                ':hora_inicio'     => $datos['hora_inicio'],
+                ':hora_fin'        => $datos['hora_fin'],
+                ':id_consultorio'  => $datos['id_consultorio']
+            ]);
+            return true;
+            
+        } catch (\Throwable $th) {
+            error_log($th->getMessage());
+            return false;
+        }
+    }
+
+    // Método para eliminar un bloque de horario de atención
+    public function eliminarHorario(int $id_horario)
+    {
+        try {
+            $sql = "DELETE FROM Horario_Atencion WHERE id_horario = :id_horario";
+            $stmt = $this->db->prepare($sql);
+            $stmt->execute([':id_horario' => $id_horario]);
+            return true;
+        } catch (\Throwable $th) {
+            error_log($th->getMessage());
+            return false;
+        }
+    }
 }

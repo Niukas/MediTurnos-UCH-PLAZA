@@ -80,5 +80,15 @@
             color: #ccc !important;
             background: transparent !important;
         }
+
+
+        body svg {
+            visibility: hidden;
+        }
+
+        svg[class*="w-"],
+        svg[class*="h-"] {
+            visibility: visible !important;
+        }
     </style>
 </head>

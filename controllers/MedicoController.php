@@ -80,6 +80,53 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             exit;
         }
     }
+
+    // AGREGAR NUEVO HORARIO DE ATENCIÓN
+    if ($accion === 'agregarHorario') {
+        $horaInicio = filter_var($_POST['hora_inicio'] ?? '', FILTER_SANITIZE_SPECIAL_CHARS);
+        $horaFin    = filter_var($_POST['hora_fin'] ?? '', FILTER_SANITIZE_SPECIAL_CHARS);
+
+        // VALIDACIÓN LÓGICA: Que no estén vacías y que el fin sea después del inicio
+        if (empty($horaInicio) || empty($horaFin) || $horaInicio >= $horaFin) {
+            header('Location: ../views/configurarHorarios.php?registro=error_hora');
+            exit;
+        }
+
+        $datos = [
+            'matricula'       => $matriculaMedico,
+            'id_especialidad' => filter_var($_POST['id_especialidad'] ?? 0, FILTER_SANITIZE_NUMBER_INT),
+            'dia_semana'      => filter_var($_POST['dia_semana'] ?? '', FILTER_SANITIZE_SPECIAL_CHARS),
+            'hora_inicio'     => $horaInicio,
+            'hora_fin'        => $horaFin,
+            'id_consultorio'  => filter_var($_POST['id_consultorio'] ?? 0, FILTER_SANITIZE_NUMBER_INT)
+        ];
+
+        $resultado = $horario->agregarHorario($datos);
+
+        if ($resultado === true) {
+            header('Location: ../views/configurarHorarios.php?registro=agregado');
+        } elseif ($resultado === 'superpuesto') {
+            header('Location: ../views/configurarHorarios.php?registro=error_superpuesto');
+        } else {
+            header('Location: ../views/configurarHorarios.php?registro=error');
+        }
+        exit;
+    }
+
+    // ELIMINAR HORARIO DE ATENCIÓN
+    if ($accion === 'eliminarHorario') {
+        // El (int) fuerza a que PHP trate el dato estrictamente como número, evitando fallos en PDO
+        $idHorario = (int) filter_var($_POST['id_horario'] ?? 0, FILTER_SANITIZE_NUMBER_INT);
+
+        $resultado = $horario->eliminarHorario($idHorario);
+
+        if ($resultado) {
+            header('Location: ../views/configurarHorarios.php?registro=eliminado');
+        } else {
+            header('Location: ../views/configurarHorarios.php?registro=error');
+        }
+        exit;
+    }
 }
 
 if (SECCION === 'misTurnos') {
@@ -102,4 +149,24 @@ if (SECCION === 'buscarPaciente') {
     if ($idPacienteVer) {
         $turnosPaciente = $turno->getByFiltrosMedico($matriculaMedico, null, 'todos', 1, 100, $idPacienteVer);
     }
+}
+
+if (SECCION === 'configurarHorarios') {
+
+    // Traer la agenda actual que ya tiene configurada el médico
+    $misHorarios = $horario->getHorariosMedico($matriculaMedico);
+
+    // Traer SÓLO las especialidades de este médico (para el select del form)
+    $sqlEsp = "SELECT e.id_especialidad, e.nombre 
+               FROM Medico_Especialidad me
+               JOIN Especialidad e ON me.id_especialidad = e.id_especialidad
+               WHERE me.matricula = :matricula";
+    $stmtEsp = $pdo->prepare($sqlEsp);
+    $stmtEsp->execute([':matricula' => $matriculaMedico]);
+    $misEspecialidades = $stmtEsp->fetchAll();
+
+    // Traer todos los consultorios de la clínica (para el select del form)
+    $sqlCons = "SELECT id_consultorio, numero, piso FROM Consultorio ORDER BY numero ASC";
+    $stmtCons = $pdo->query($sqlCons);
+    $listadoConsultorios = $stmtCons->fetchAll();
 }
