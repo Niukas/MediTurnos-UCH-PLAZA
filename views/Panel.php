@@ -160,20 +160,44 @@ $titulo = 'Mis turnos — MediTurnos';
                                             </td>
 
                                             <td class="py-4 px-6 text-right">
-                                                <?php if ($t['estado'] === 'pendiente' || $t['estado'] === 'confirmado'): ?>
-                                                    <form method="POST" action="Panel.php" class="inline-block m-0" onsubmit="return confirm('¿Estás seguro que querés cancelar este turno? Esta acción no se puede deshacer.')">
-                                                        <input type="hidden" name="accion" value="cancelarTurno">
-                                                        <input type="hidden" name="id_turno" value="<?= $t['id_turno'] ?>">
-                                                        <button type="submit" class="bg-white border border-gray-200 text-slate hover:border-red-200 hover:bg-red-50 hover:text-red-600 px-3 py-1.5 rounded-lg text-xs font-bold transition-all shadow-sm flex items-center gap-1.5 ml-auto group-hover:shadow">
-                                                            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
-                                                            </svg>
-                                                            Cancelar
-                                                        </button>
-                                                    </form>
-                                                <?php else: ?>
-                                                    <span class="text-gray-300 font-bold block text-center mr-6">—</span>
-                                                <?php endif; ?>
+                                                <div class="flex items-center justify-end gap-2">
+
+                                                    <?php if (isset($t['estado_pago']) && $t['estado_pago'] === 'pendiente' && $t['estado'] !== 'cancelado'): ?>
+                                                        <form method="POST" action="../controllers/PacienteController.php" class="inline-block m-0">
+                                                            <input type="hidden" name="accion" value="prepararPago">
+                                                            <input type="hidden" name="id_turno" value="<?= $t['id_turno'] ?>">
+                                                            <button type="submit" class="bg-charcoal border border-charcoal text-white hover:bg-slate hover:border-slate px-3 py-1.5 rounded-lg text-xs font-bold transition-all shadow-sm flex items-center gap-1.5 cursor-pointer">
+                                                                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z"></path>
+                                                                </svg>
+                                                                Pagar
+                                                            </button>
+                                                        </form>
+
+                                                    <?php elseif (isset($t['estado_pago']) && $t['estado_pago'] === 'pagado'): ?>
+                                                        <span class="inline-flex items-center px-2 py-1 rounded-md text-[0.65rem] font-bold text-green-700 bg-green-50 border border-green-200 uppercase tracking-widest">
+                                                            Abonado
+                                                        </span>
+                                                    <?php endif; ?>
+
+                                                    <?php if ($t['estado'] === 'pendiente' || $t['estado'] === 'confirmado'): ?>
+                                                        <form method="POST" action="../controllers/PacienteController.php" class="inline-block m-0" onsubmit="return confirm('¿Estás seguro que querés cancelar este turno? Esta acción no se puede deshacer.')">
+                                                            <input type="hidden" name="accion" value="cancelarTurno">
+                                                            <input type="hidden" name="id_turno" value="<?= $t['id_turno'] ?>">
+                                                            <button type="submit" class="bg-white border border-gray-200 text-slate hover:border-red-200 hover:bg-red-50 hover:text-red-600 px-3 py-1.5 rounded-lg text-xs font-bold transition-all shadow-sm flex items-center gap-1.5 group-hover:shadow">
+                                                                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                                                                </svg>
+                                                                Cancelar
+                                                            </button>
+                                                        </form>
+                                                    <?php endif; ?>
+
+                                                    <?php if (!($t['estado'] === 'pendiente' || $t['estado'] === 'confirmado') && (!isset($t['estado_pago']) || $t['estado_pago'] === 'pendiente')): ?>
+                                                        <span class="text-gray-300 font-bold block text-center mr-2">—</span>
+                                                    <?php endif; ?>
+
+                                                </div>
                                             </td>
                                         </tr>
                                     <?php endforeach; ?>

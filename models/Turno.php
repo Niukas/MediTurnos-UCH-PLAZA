@@ -134,9 +134,9 @@ class Turno
             $this->db->beginTransaction();
 
             $sql = "CALL sp_crear_turno(
-                    :fecha, :hora_inicio, :id_paciente, :matricula,
-                    :id_especialidad, :id_consultorio, :id_plan,
-                    :nro_afiliado, :observacion, @resultado)";
+        :fecha, :hora_inicio, :id_paciente, :matricula,
+        :id_especialidad, :id_consultorio, :id_plan,
+        :nro_afiliado, :observacion, @resultado, @p_id_turno)";
 
             $stmt = $this->db->prepare($sql);
             $stmt->execute([
@@ -151,10 +151,14 @@ class Turno
                 ':observacion'     => $datos['observacion'] ?? null
             ]);
 
-            $resultado = $this->db->query("SELECT @resultado AS resultado")->fetch();
+            $resultado = $this->db->query("SELECT @resultado AS resultado, @p_id_turno AS id_turno")->fetch();
 
             $this->db->commit();
-            return $resultado['resultado'] == 1;
+
+            if ($resultado['resultado'] == 1) {
+                return $resultado['id_turno']; // devuelve el id
+            }
+            return false;
         } catch (\Throwable $th) {
             $this->db->rollBack();
             error_log($th->getMessage());
@@ -247,5 +251,12 @@ class Turno
             error_log($th->getMessage());
             return false;
         }
+    }
+
+    public function getById(int $id_turno) {
+        $sql = "SELECT * FROM Turno WHERE id_turno = :id_turno";
+        $stmt = $this->db->prepare($sql); 
+        $stmt->execute([':id_turno' => $id_turno]);
+        return $stmt->fetch(\PDO::FETCH_ASSOC);
     }
 }
