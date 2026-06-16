@@ -4,7 +4,6 @@ require '../controllers/PacienteController.php';
 require '../config/helpers.php';
 $titulo = 'Mis turnos — MediTurnos';
 ?>
-
 <!DOCTYPE html>
 <html lang="es">
 

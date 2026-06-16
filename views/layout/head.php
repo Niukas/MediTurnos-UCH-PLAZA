@@ -1,4 +1,14 @@
 <head>
+    <script>
+        // 1. Apagamos la pantalla al instante (antes de que el body exista)
+        document.documentElement.style.visibility = 'hidden';
+
+        // 2. Prendemos la pantalla SOLO cuando el CSS y todo el HTML terminó de cargar
+        window.addEventListener('load', function() {
+            document.documentElement.style.visibility = '';
+            document.body.classList.add('animate-fadeIn'); // Le da un toque suave al aparecer
+        });
+    </script>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title><?= $titulo ?? 'MediTurnos — Plataforma Médica' ?></title>
@@ -14,7 +24,9 @@
     <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
     <script src="https://cdn.jsdelivr.net/npm/flatpickr/dist/l10n/es.js"></script>
 
-    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preload" href="/mediturnos/views/layout/tailwind.css" as="style">
+
+    <link rel="stylesheet" href="/mediturnos/views/layout/tailwind.css">
     <script>
         tailwind.config = {
             theme: {
@@ -35,6 +47,7 @@
     </script>
 
     <style>
+
         .animate-fadeIn {
             animation: fadeIn 0.4s ease-out forwards;
         }

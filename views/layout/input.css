@@ -1,0 +1,12 @@
+@import "tailwindcss";
+
+@source "./views";
+@source "./public";
+@source "./controllers";
+
+@theme {
+  --color-charcoal: #2D3748;
+  --color-slate: #64748B;
+  --color-lightblue: #E0F2FE;
+  --color-ghost: #F8FAFC;
+}

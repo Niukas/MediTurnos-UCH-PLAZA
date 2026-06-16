@@ -5,7 +5,6 @@ require_once 'layout/menuMedico.php';
 require_once '../config/helpers.php';
 $titulo = 'Buscar Paciente — MediTurnos';
 ?>
-
 <!DOCTYPE html>
 <html lang="es">
 
@@ -13,7 +12,7 @@ $titulo = 'Buscar Paciente — MediTurnos';
 
 <body class="bg-[#F8FAFC] font-sans text-charcoal min-h-screen flex flex-col">
 
-    <main class="flex-grow p-6 sm:p-10 max-w-5xl mx-auto w-full animate-fadeIn">
+    <main class="flex-grow p-6 sm:p-10 max-w-5xl mx-auto w-full">
 
         <div class="mb-8">
             <div class="inline-flex items-center gap-2 px-2.5 py-1 rounded-md bg-white border border-gray-200 text-slate text-[0.65rem] font-bold uppercase tracking-widest mb-3 shadow-sm">

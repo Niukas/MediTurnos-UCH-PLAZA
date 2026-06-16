@@ -5,7 +5,6 @@ require 'layout/menuMedico.php';
 require '../config/helpers.php';
 $titulo = 'Mis turnos — MediTurnos';
 ?>
-
 <!DOCTYPE html>
 <html lang="es">
 
@@ -13,7 +12,7 @@ $titulo = 'Mis turnos — MediTurnos';
 
 <body class="bg-[#F8FAFC] font-sans text-charcoal min-h-screen flex flex-col">
 
-    <main class="flex-grow p-6 sm:p-10 max-w-7xl mx-auto w-full animate-fadeIn">
+    <main class="flex-grow p-6 sm:p-10 max-w-7xl mx-auto w-full">
 
         <div class="mb-8 flex flex-col md:flex-row md:items-end justify-between gap-4">
             <div>

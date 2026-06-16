@@ -4,7 +4,6 @@ require_once '../controllers/PacienteController.php';
 require_once '../config/helpers.php';
 $titulo = 'Agendar Cita — MediTurnos';
 ?>
-
 <!DOCTYPE html>
 <html lang="es">
 

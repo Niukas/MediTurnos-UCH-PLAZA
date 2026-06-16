@@ -3,7 +3,6 @@ require '../controllers/MedicosPublicController.php';
 require '../config/helpers.php';
 $titulo = 'Médicos — MediTurnos';
 ?>
-
 <!DOCTYPE html>
 <html lang="es">
 

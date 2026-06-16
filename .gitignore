@@ -1,0 +1,6 @@
+# Dependencias de Node (Tailwind)
+node_modules/
+
+# Archivos de entorno y logs del sistema operativo
+.DS_Store
+*.log

@@ -5,7 +5,6 @@ require_once 'layout/menuMedico.php';
 require_once '../config/helpers.php';
 $titulo = 'Configurar Agenda — MediTurnos';
 ?>
-
 <!DOCTYPE html>
 <html lang="es">
 
