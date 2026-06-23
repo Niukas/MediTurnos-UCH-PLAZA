@@ -16,7 +16,7 @@ class Usuario
     public function getAll($pagina = 1, $porPagina = 20)
     {
         $offset = ($pagina - 1) * $porPagina;
-        $sql = "SELECT * FROM vista_usuarios LIMIT :limite OFFSET :offset";
+        $sql = "SELECT * FROM vista_usuarios WHERE activo = 1 LIMIT :limite OFFSET :offset";
         $stmt = $this->db->prepare($sql);
         $stmt->bindValue(':limite', $porPagina, PDO::PARAM_INT);
         $stmt->bindValue(':offset', $offset,    PDO::PARAM_INT);
@@ -26,7 +26,7 @@ class Usuario
 
     public function getTotalUsuarios()
     {
-        $sql  = "SELECT COUNT(*) FROM Usuario";
+        $sql  = "SELECT COUNT(*) FROM Usuario WHERE activo = 1";
         $stmt = $this->db->prepare($sql);
         $stmt->execute();
         return $stmt->fetchColumn();
@@ -36,26 +36,19 @@ class Usuario
     public function login(string $email, string $password)
     {
         try {
-
-            $sql  = "SELECT u.id_usuario,
-            u.password,
-            u.nombre,
-            u.email,
-            r.nombre AS rol
-            FROM   Usuario u
-            JOIN   Rol r ON u.id_rol = r.id_rol
-            WHERE  u.email = :email
-            LIMIT  1";
-
+            $sql  = "SELECT u.id_usuario, u.password, u.nombre, u.email, r.nombre AS rol
+                 FROM Usuario u
+                 JOIN Rol r ON u.id_rol = r.id_rol
+                 WHERE u.email = :email AND u.activo = 1
+                 LIMIT 1";
             $stmt = $this->db->prepare($sql);
             $stmt->execute([':email' => $email]);
             $usuario = $stmt->fetch();
 
             if ($usuario && password_verify($password, $usuario['password'])) {
                 return $usuario;
-            } else {
-                return false;
             }
+            return false;
         } catch (\Throwable $th) {
             error_log($th->getMessage());
             return false;
@@ -131,7 +124,7 @@ class Usuario
     public function eliminar(int $id_usuario)
     {
         try {
-            $sql  = "DELETE FROM Usuario WHERE id_usuario = :id_usuario";
+            $sql  = "UPDATE Usuario SET activo = 0 WHERE id_usuario = :id_usuario";
             $stmt = $this->db->prepare($sql);
             $stmt->execute([':id_usuario' => $id_usuario]);
             return true;

@@ -168,11 +168,11 @@ $titulo = 'Gestión de Usuarios — MediTurnos';
                                         </button>
 
                                         <form method="POST" action="dashboardAdminUsuarios.php" class="m-0 shrink-0"
-                                            onsubmit="return confirm('ALERTA CRÍTICA: ¿Seguro que deseas eliminar permanentemente esta cuenta de usuario? Se revocarán todos los accesos.')">
+                                            onsubmit="return confirm('ALERTA CRÍTICA: ¿Seguro que deseas dar de baja permanentemente esta cuenta de usuario? Se revocarán todos los accesos.')">
                                             <input type="hidden" name="accion" value="eliminarUsuario">
                                             <input type="hidden" name="id_usuario" value="<?= $u['id_usuario'] ?>">
                                             <button type="submit" class="bg-rose-50 border border-rose-200 text-rose-600 hover:bg-rose-100 hover:text-rose-800 px-3 py-1.5 rounded-lg text-xs font-bold transition-all shadow-sm shrink-0">
-                                                Eliminar
+                                                Baja
                                             </button>
                                         </form>
                                     </div>

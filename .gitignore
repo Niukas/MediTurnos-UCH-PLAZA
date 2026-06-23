@@ -4,3 +4,5 @@ node_modules/
 # Archivos de entorno y logs del sistema operativo
 .DS_Store
 *.log
+.DS_Store
+views/.DS_Store
