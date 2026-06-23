@@ -29,6 +29,8 @@ $titulo = 'Configurar Agenda — MediTurnos';
         $mensajes = [
             'agregado'          => ['bg' => 'bg-emerald-500/10', 'border' => 'border-emerald-500/20', 'text' => 'text-emerald-700', 'texto' => 'Nuevo bloque horario agregado a tu agenda.', 'icon' => 'M5 13l4 4L19 7'],
             'eliminado'         => ['bg' => 'bg-amber-500/10',   'border' => 'border-amber-500/20',   'text' => 'text-amber-700',   'texto' => 'Bloque horario eliminado correctamente.', 'icon' => 'M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16'],
+            'bloqueado'         => ['bg' => 'bg-emerald-500/10', 'border' => 'border-emerald-500/20', 'text' => 'text-emerald-700', 'texto' => 'Día bloqueado correctamente.', 'icon' => 'M5 13l4 4L19 7'],
+            'desbloqueado'      => ['bg' => 'bg-emerald-500/10', 'border' => 'border-emerald-500/20', 'text' => 'text-emerald-700', 'texto' => 'Día desbloqueado correctamente.', 'icon' => 'M5 13l4 4L19 7'],
             'error'             => ['bg' => 'bg-rose-500/10',    'border' => 'border-rose-500/20',    'text' => 'text-rose-700',    'texto' => 'Hubo un error al guardar los cambios.', 'icon' => 'M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z'],
             'error_hora'        => ['bg' => 'bg-rose-500/10',    'border' => 'border-rose-500/20',    'text' => 'text-rose-700',    'texto' => 'La hora de salida debe ser posterior a la hora de ingreso.', 'icon' => 'M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z'],
             'error_superpuesto' => ['bg' => 'bg-amber-500/10',   'border' => 'border-amber-500/20',   'text' => 'text-amber-800',   'texto' => '¡Atención! La franja horaria que intentás cargar choca con un horario que ya tenés configurado ese día.', 'icon' => 'M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z'],
@@ -191,17 +193,97 @@ $titulo = 'Configurar Agenda — MediTurnos';
             <?php endif; ?>
         </div>
 
+        <!-- BLOQUEOS -->
+        <div class="bg-white rounded-2xl border border-gray-200/80 shadow-sm mt-10 overflow-hidden">
+            <div class="bg-[#F8FAFC] px-6 py-4 border-b border-gray-100 flex items-center justify-between">
+                <h2 class="font-serif text-xl text-charcoal flex items-center gap-2">
+                    <span class="w-2 h-2 rounded-full bg-rose-400 block"></span>
+                    Bloquear días
+                </h2>
+            </div>
+
+            <div class="p-6 grid grid-cols-1 md:grid-cols-2 gap-8">
+
+                <!-- FORMULARIO -->
+                <div>
+                    <p class="text-sm text-slate mb-4">Bloqueá un día para que los pacientes no puedan sacar turnos.</p>
+                    <form method="POST" action="../controllers/MedicoController.php" class="space-y-3">
+                        <input type="hidden" name="accion" value="bloquearDia">
+                        <div>
+                            <label class="block text-xs font-semibold text-slate uppercase tracking-wide mb-1">Fecha a bloquear</label>
+                            <input type="text" id="fecha-bloqueo" name="fecha"
+                                placeholder="Seleccioná una fecha" required
+                                class="w-full px-3 py-2 bg-ghost border border-gray-200 rounded-lg text-sm text-charcoal focus:outline-none focus:border-slate">
+                        </div>
+                        <div>
+                            <label class="block text-xs font-semibold text-slate uppercase tracking-wide mb-1">Motivo (opcional)</label>
+                            <input type="text" name="motivo" placeholder="Ej: Congreso médico, licencia..."
+                                class="w-full px-3 py-2 bg-ghost border border-gray-200 rounded-lg text-sm text-charcoal placeholder-gray-400 focus:outline-none focus:border-slate">
+                        </div>
+                        <button type="submit" class="bg-charcoal hover:bg-slate text-white text-sm font-bold px-4 py-2 rounded-lg transition shadow-sm">
+                            Bloquear día
+                        </button>
+                    </form>
+                </div>
+
+                <!-- LISTADO DE BLOQUEOS -->
+                <div>
+                    <p class="text-sm text-slate mb-4">Días bloqueados próximos:</p>
+                    <?php if (!empty($listadoBloqueos)): ?>
+                        <div class="space-y-2">
+                            <?php foreach ($listadoBloqueos as $b): ?>
+                                <div class="flex items-center justify-between bg-rose-50 border border-rose-100 rounded-xl px-4 py-3">
+                                    <div>
+                                        <div class="text-sm font-bold text-charcoal"><?= date('d/m/Y', strtotime($b['fecha'])) ?></div>
+                                        <div class="text-xs text-slate mt-0.5"><?= h($b['motivo']) ?: 'Sin motivo especificado' ?></div>
+                                    </div>
+                                    <form method="POST" action="../controllers/MedicoController.php"
+                                        onsubmit="return confirm('¿Desbloquear este día?')">
+                                        <input type="hidden" name="accion" value="desbloquearDia">
+                                        <input type="hidden" name="fecha" value="<?= $b['fecha'] ?>">
+                                        <button type="submit" class="text-xs border border-rose-300 text-rose-600 hover:bg-rose-100 px-3 py-1.5 rounded-lg transition font-semibold">
+                                            Desbloquear
+                                        </button>
+                                    </form>
+                                </div>
+                            <?php endforeach; ?>
+                        </div>
+                    <?php else: ?>
+                        <div class="text-sm text-slate bg-ghost rounded-xl px-4 py-6 text-center border border-gray-200">
+                            No tenés días bloqueados próximos.
+                        </div>
+                    <?php endif; ?>
+                </div>
+
+            </div>
+        </div>
+
     </main>
 
     <script>
         document.addEventListener('DOMContentLoaded', function() {
             if (typeof flatpickr !== 'undefined') {
+                // Selector de horarios
                 flatpickr(".flatpickr-time", {
                     enableTime: true,
                     noCalendar: true,
                     dateFormat: "H:i",
                     time_24hr: true,
-                    minuteIncrement: 15 // Saltos de a 15 minutos (opcional, muy util para turnos)
+                    minuteIncrement: 15
+                });
+
+                // Calendario para bloquear días
+                const diasYaBloqueados = <?= json_encode(array_column($listadoBloqueos ?? [], 'fecha')) ?>;
+                flatpickr("#fecha-bloqueo", {
+                    locale: "es",
+                    minDate: "today",
+                    dateFormat: "Y-m-d",
+                    disable: [
+                        ...diasYaBloqueados,
+                        function(date) {
+                            return (date.getDay() === 0 || date.getDay() === 6);
+                        }
+                    ]
                 });
             } else {
                 console.error("Flatpickr no está cargado. Asegurate de que los CDN estén en layout/head.php");

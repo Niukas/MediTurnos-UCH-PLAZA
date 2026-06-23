@@ -61,10 +61,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $resultado = $horario->bloquearDia($matriculaMedico, $fecha, $motivo);
 
         if ($resultado) {
-            header('Location: ../views/panelMedico.php?registro=bloqueado');
+            header('Location: ../views/configurarHorarios.php?registro=bloqueado');
             exit;
         } else {
-            header('Location: ../views/panelMedico.php?registro=error');
+            header('Location: ../views/configurarHorarios.php?registro=error');
             exit;
         }
     }
@@ -74,10 +74,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $resultado = $horario->desbloquearDia($matriculaMedico, $fecha);
 
         if ($resultado) {
-            header('Location: ../views/panelMedico.php?registro=desbloqueado');
+            header('Location: ../views/configurarHorarios.php?registro=desbloqueado');
             exit;
         } else {
-            header('Location: ../views/panelMedico.php?registro=error');
+            header('Location: ../views/configurarHorarios.php?registro=error');
             exit;
         }
     }

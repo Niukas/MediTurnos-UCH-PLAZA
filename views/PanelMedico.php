@@ -31,8 +31,6 @@ $titulo = 'Mis turnos — MediTurnos';
         $mensajes = [
             'exitoso' => ['bg' => 'bg-emerald-500/10', 'border' => 'border-emerald-500/20', 'text' => 'text-emerald-700', 'texto' => 'Turno actualizado correctamente.', 'icon' => 'M5 13l4 4L19 7'],
             'error'   => ['bg' => 'bg-rose-500/10',   'border' => 'border-rose-500/20',   'text' => 'text-rose-700',   'texto' => 'Hubo un error al actualizar el turno.', 'icon' => 'M6 18L18 6M6 6l12 12'],
-            'bloqueado'    => ['bg' => 'bg-emerald-500/10', 'border' => 'border-emerald-500/20', 'text' => 'text-emerald-700', 'texto' => 'Día bloqueado correctamente.',    'icon' => 'M5 13l4 4L19 7'],
-            'desbloqueado' => ['bg' => 'bg-emerald-500/10', 'border' => 'border-emerald-500/20', 'text' => 'text-emerald-700', 'texto' => 'Día desbloqueado correctamente.', 'icon' => 'M5 13l4 4L19 7'],
         ];
         $registro = $_GET['registro'] ?? null;
         if ($registro && isset($mensajes[$registro])): ?>
@@ -236,71 +234,6 @@ $titulo = 'Mis turnos — MediTurnos';
             </div>
         <?php endif; ?>
 
-        <!-- BLOQUEOS -->
-        <div class="bg-white rounded-2xl border border-gray-200/80 shadow-sm mt-10 overflow-hidden">
-            <div class="bg-[#F8FAFC] px-6 py-4 border-b border-gray-100 flex items-center justify-between">
-                <h2 class="font-serif text-xl text-charcoal flex items-center gap-2">
-                    <span class="w-2 h-2 rounded-full bg-rose-400 block"></span>
-                    Bloquear días
-                </h2>
-            </div>
-
-            <div class="p-6 grid grid-cols-1 md:grid-cols-2 gap-8">
-
-                <!-- FORMULARIO -->
-                <div>
-                    <p class="text-sm text-slate mb-4">Bloqueá un día para que los pacientes no puedan sacar turnos.</p>
-                    <form method="POST" action="panelMedico.php" class="space-y-3">
-                        <input type="hidden" name="accion" value="bloquearDia">
-                        <div>
-                            <label class="block text-xs font-semibold text-slate uppercase tracking-wide mb-1">Fecha a bloquear</label>
-                            <input type="text" id="fecha-bloqueo" name="fecha"
-                                placeholder="Seleccioná una fecha" required
-                                class="w-full px-3 py-2 bg-ghost border border-gray-200 rounded-lg text-sm text-charcoal focus:outline-none focus:border-slate">
-                        </div>
-                        <div>
-                            <label class="block text-xs font-semibold text-slate uppercase tracking-wide mb-1">Motivo (opcional)</label>
-                            <input type="text" name="motivo" placeholder="Ej: Congreso médico, licencia..."
-                                class="w-full px-3 py-2 bg-ghost border border-gray-200 rounded-lg text-sm text-charcoal placeholder-gray-400 focus:outline-none focus:border-slate">
-                        </div>
-                        <button type="submit" class="bg-charcoal hover:bg-slate text-white text-sm font-bold px-4 py-2 rounded-lg transition shadow-sm">
-                            Bloquear día
-                        </button>
-                    </form>
-                </div>
-
-                <!-- LISTADO DE BLOQUEOS -->
-                <div>
-                    <p class="text-sm text-slate mb-4">Días bloqueados próximos:</p>
-                    <?php if (!empty($listadoBloqueos)): ?>
-                        <div class="space-y-2">
-                            <?php foreach ($listadoBloqueos as $b): ?>
-                                <div class="flex items-center justify-between bg-rose-50 border border-rose-100 rounded-xl px-4 py-3">
-                                    <div>
-                                        <div class="text-sm font-bold text-charcoal"><?= date('d/m/Y', strtotime($b['fecha'])) ?></div>
-                                        <div class="text-xs text-slate mt-0.5"><?= h($b['motivo']) ?: 'Sin motivo especificado' ?></div>
-                                    </div>
-                                    <form method="POST" action="panelMedico.php"
-                                        onsubmit="return confirm('¿Desbloquear este día?')">
-                                        <input type="hidden" name="accion" value="desbloquearDia">
-                                        <input type="hidden" name="fecha" value="<?= $b['fecha'] ?>">
-                                        <button type="submit" class="text-xs border border-rose-300 text-rose-600 hover:bg-rose-100 px-3 py-1.5 rounded-lg transition font-semibold">
-                                            Desbloquear
-                                        </button>
-                                    </form>
-                                </div>
-                            <?php endforeach; ?>
-                        </div>
-                    <?php else: ?>
-                        <div class="text-sm text-slate bg-ghost rounded-xl px-4 py-6 text-center border border-gray-200">
-                            No tenés días bloqueados próximos.
-                        </div>
-                    <?php endif; ?>
-                </div>
-
-            </div>
-        </div>
-
     </main>
 
     <script>
@@ -315,20 +248,6 @@ $titulo = 'Mis turnos — MediTurnos';
                 this.style.height = 'auto';
                 this.style.height = (this.scrollHeight) + 'px';
             }
-        });
-        // Calendario para bloquear días
-        const diasYaBloqueados = <?= json_encode(array_column($listadoBloqueos ?? [], 'fecha')) ?>;
-
-        flatpickr("#fecha-bloqueo", {
-            locale: "es",
-            minDate: "today",
-            dateFormat: "Y-m-d",
-            disable: [
-                ...diasYaBloqueados, // no puede bloquear lo que ya está bloqueado
-                function(date) {
-                    return (date.getDay() === 0 || date.getDay() === 6); // sin fines de semana
-                }
-            ]
         });
     </script>
 </body>
