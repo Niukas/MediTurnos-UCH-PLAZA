@@ -56,65 +56,59 @@ class Usuario
     }
 
     // Metodo para registrar un usuario
-    public function registrar(array $datos)
+    public function registrar($datos)
     {
-        $passwordHasheada = password_hash($datos['password'], PASSWORD_DEFAULT);
-
         try {
+            // Verificar si el DNI ya existe
+            $sqlCheck  = "SELECT COUNT(*) FROM Paciente WHERE dni = :dni";
+            $stmtCheck = $this->db->prepare($sqlCheck);
+            $stmtCheck->execute([':dni' => $datos['dni']]);
+            if ($stmtCheck->fetchColumn() > 0) {
+                return 'dni_duplicado';
+            }
 
-            // Inicio de Transaccion
+            $passwordHasheada = password_hash($datos['password'], PASSWORD_DEFAULT);
 
             $this->db->beginTransaction();
 
-            // Insertar en la tabla usuario con rol de paciente por default
-
-            $sql1 = "INSERT INTO Paciente (nombre, apellido, email, dni, fecha_nac, telefono)
-                    VALUES (:nombre, :apellido, :email, :dni, :fecha_nac, :telefono)";
+            // INSERT en Paciente con dni como PK directa
+            $sql1 = "INSERT INTO Paciente (dni, nombre, apellido, email, fecha_nac, telefono)
+                 VALUES (:dni, :nombre, :apellido, :email, :fecha_nac, :telefono)";
             $stmt1 = $this->db->prepare($sql1);
             $stmt1->execute([
+                ':dni'       => $datos['dni'],
                 ':nombre'    => $datos['nombre'],
                 ':apellido'  => $datos['apellido'],
                 ':email'     => $datos['email'],
-                ':dni'       => $datos['dni'],
                 ':fecha_nac' => $datos['fecha_nac'],
                 ':telefono'  => $datos['telefono']
             ]);
 
-            // Obtengo el id del usuario que acabo de insertar
-            $idPaciente = $this->db->lastInsertId();
-
-            // Insertar en la tabla de paciente el usuario que acabo de insertar
-
-
-            $sql2 = "INSERT INTO Usuario (nombre, apellido, email, password, id_paciente)
-                    VALUES (:nombre, :apellido, :email, :password, :id_paciente)";
+            // INSERT en Usuario usando el mismo dni (ya no hay lastInsertId)
+            $sql2 = "INSERT INTO Usuario (nombre, apellido, email, password, dni)
+                 VALUES (:nombre, :apellido, :email, :password, :dni)";
             $stmt2 = $this->db->prepare($sql2);
-
-            // se carga un array con todos los parametros
             $stmt2->execute([
-                ':nombre' => $datos['nombre'],
+                ':nombre'   => $datos['nombre'],
                 ':apellido' => $datos['apellido'],
-                ':email' => $datos['email'],
+                ':email'    => $datos['email'],
                 ':password' => $passwordHasheada,
-                ':id_paciente' => $idPaciente
+                ':dni'      => $datos['dni']
             ]);
 
-            // Commit de la transaccion
             $this->db->commit();
             return true;
         } catch (\Throwable $th) {
-
-            // Si la tx falla, se hace un rollback
             $this->db->rollback();
             error_log($th->getMessage());
             return false;
         }
     }
 
-    // Metodo que selecciona el id de paciente segun el usuario que esta logueado
-    public function getIdPaciente(int $id_usuario)
+    // Metodo que selecciona el dni de paciente segun el usuario que esta logueado
+    public function getDni($id_usuario)
     {
-        $sql  = "SELECT id_paciente FROM Usuario WHERE id_usuario = :id_usuario";
+        $sql  = "SELECT dni FROM Usuario WHERE id_usuario = :id_usuario";
         $stmt = $this->db->prepare($sql);
         $stmt->execute([':id_usuario' => $id_usuario]);
         return $stmt->fetchColumn();

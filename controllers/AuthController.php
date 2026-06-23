@@ -95,7 +95,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
         $resultado = $usuario->registrar($datos);
 
-        if ($resultado) {
+        if ($resultado === 'dni_duplicado') {
+            header('Location: ../views/registro.php?error=dni_duplicado');
+            exit;
+        } elseif ($resultado) {
             header('Location: ../views/Login.php?registro=exitoso');
             exit;
         } else {

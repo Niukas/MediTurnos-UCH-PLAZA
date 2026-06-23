@@ -34,19 +34,20 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
         $resultado   = $turno->actualizarEstadoObservacion($idTurno, $estado, $observacion);
 
-        $idPaciente = filter_var($_POST['id_paciente'], FILTER_SANITIZE_NUMBER_INT);
-        $busqueda   = filter_var($_POST['busqueda'], FILTER_SANITIZE_SPECIAL_CHARS);
+        // REEMPLAZO CLAVE: Capturamos DNI en vez de id_paciente para redireccionar limpio
+        $dni      = filter_var($_POST['dni'] ?? '', FILTER_SANITIZE_NUMBER_INT);
+        $busqueda = filter_var($_POST['busqueda'] ?? '', FILTER_SANITIZE_SPECIAL_CHARS);
 
         if ($resultado) {
             if ($origen === 'buscar') {
-                header("Location: ../views/buscarPacienteMedico.php?busqueda=$busqueda&id_paciente=$idPaciente&registro=exitoso");
+                header("Location: ../views/buscarPacienteMedico.php?busqueda=$busqueda&dni=$dni&registro=exitoso");
             } else {
                 header('Location: ../views/panelMedico.php?registro=exitoso');
             }
             exit;
         } else {
             if ($origen === 'buscar') {
-                header("Location: ../views/buscarPacienteMedico.php?busqueda=$busqueda&id_paciente=$idPaciente&registro=error");
+                header("Location: ../views/buscarPacienteMedico.php?busqueda=$busqueda&dni=$dni&registro=error");
             } else {
                 header('Location: ../views/panelMedico.php?registro=error');
             }
@@ -143,11 +144,13 @@ if (SECCION === 'buscarPaciente') {
     if (!empty($busqueda)) {
         $resultados = $paciente->buscar($busqueda);
     }
-    // Si se seleccionó un paciente específico — cargás sus turnos
+
+    // REEMPLAZO CLAVE: Si se seleccionó un paciente específico vía DNI — cargás sus turnos
     $turnosPaciente = [];
-    $idPacienteVer  = filter_var($_GET['id_paciente'] ?? null, FILTER_SANITIZE_NUMBER_INT) ?: null;
-    if ($idPacienteVer) {
-        $turnosPaciente = $turno->getByFiltrosMedico($matriculaMedico, null, 'todos', 1, 100, $idPacienteVer);
+    $dniVer  = filter_var($_GET['dni'] ?? null, FILTER_SANITIZE_NUMBER_INT) ?: null;
+
+    if ($dniVer) {
+        $turnosPaciente = $turno->getByFiltrosMedico($matriculaMedico, null, 'todos', 1, 100, $dniVer);
     }
 }
 

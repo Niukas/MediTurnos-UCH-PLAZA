@@ -17,23 +17,23 @@ require_once '../models/Medico.php';
 require_once '../models/Horario.php';
 require_once '../models/Paciente.php';
 
-$usuario = new Usuario($pdo);
-$turno = new Turno($pdo);
+$usuario      = new Usuario($pdo);
+$turno        = new Turno($pdo);
 $especialidad = new Especialidad($pdo);
 $medico       = new Medico($pdo);
 $horario      = new Horario($pdo);
 $paciente     = new Paciente($pdo);
 
-$idPaciente = $usuario->getIdPaciente($_SESSION['usuario_id']);
+$dni = $usuario->getDni($_SESSION['usuario_id']);
 
 if (defined('SECCION') && SECCION === 'misTurnos') {
     $especialidadFiltro = filter_var($_GET['especialidad'] ?? null, FILTER_SANITIZE_SPECIAL_CHARS) ?: null;
     $periodo            = filter_var($_GET['periodo']      ?? 'todos', FILTER_SANITIZE_SPECIAL_CHARS);
     $paginaActual       = filter_var($_GET['pagina']       ?? 1, FILTER_SANITIZE_NUMBER_INT);
 
-    $totalTurnos        = $turno->getTotalByFiltros($especialidadFiltro, $periodo, $idPaciente);
+    $totalTurnos        = $turno->getTotalByFiltros($especialidadFiltro, $periodo, $dni);
     $totalPaginas       = ceil($totalTurnos / 20);
-    $listadoTurnos      = $turno->getByFiltros($especialidadFiltro, $periodo, $paginaActual, 20, $idPaciente);
+    $listadoTurnos      = $turno->getByFiltros($especialidadFiltro, $periodo, $paginaActual, 20, $dni);
 
     require_once '../models/Pago.php';
     $pagoModel = new Pago($pdo);
@@ -54,7 +54,7 @@ if (defined('SECCION') && SECCION === 'misTurnos') {
 
 if (defined('SECCION') && SECCION === 'sacarTurno') {
     $listadoEspecialidades = $especialidad->getAll();
-    $listadoPlanes         = $paciente->getByPaciente($idPaciente);
+    $listadoPlanes         = $paciente->getByPaciente($dni);
     $listadoMedicos        = [];
     $listadoHorarios       = [];
 
@@ -84,7 +84,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $datos = [
             'fecha'           => filter_var($_POST['fecha']           ?? '', FILTER_SANITIZE_SPECIAL_CHARS),
             'hora_inicio'     => filter_var($_POST['hora_inicio']     ?? '', FILTER_SANITIZE_SPECIAL_CHARS),
-            'id_paciente'     => filter_var($idPaciente,                    FILTER_SANITIZE_NUMBER_INT),
+            'dni'             => $dni,
             'matricula'       => filter_var($_POST['matricula']       ?? '', FILTER_SANITIZE_SPECIAL_CHARS),
             'id_especialidad' => filter_var($_POST['id_especialidad'] ?? 0,  FILTER_SANITIZE_NUMBER_INT),
             'id_consultorio'  => filter_var($_POST['id_consultorio']  ?? 0,  FILTER_SANITIZE_NUMBER_INT),
@@ -126,9 +126,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $pagoModel = new Pago($pdo);
 
             if ($pagoModel->confirmar($id_turno)) {
-                $turno->cambiarEstado($id_turno, 'Confirmado');
+                $turno->cambiarEstado($id_turno, 'confirmado');
 
-                // Redirigimos al panel con un mensaje de éxito
                 header('Location: ../views/Panel.php?pago=exitoso');
                 exit;
             } else {
@@ -140,7 +139,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
     // 3. Procesar la cancelación de turnos
     if ($accion === 'cancelarTurno') {
-        $idTurno = filter_var($_POST['id_turno'] ?? 0, FILTER_SANITIZE_NUMBER_INT);
+        $idTurno   = filter_var($_POST['id_turno'] ?? 0, FILTER_SANITIZE_NUMBER_INT);
         $resultado = $turno->cambiarEstado($idTurno, 'cancelado');
 
         if ($resultado) {
@@ -151,8 +150,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             exit;
         }
     }
-    
-    // Procesar el clic de "Pagar" desde el Panel
+
+    // 4. Procesar el clic de "Pagar" desde el Panel
     if ($accion === 'prepararPago') {
         $id_turno = filter_var($_POST['id_turno'] ?? 0, FILTER_SANITIZE_NUMBER_INT);
 
@@ -163,25 +162,21 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $pagoModel = new Pago($pdo);
             $planModel = new Plan($pdo);
 
-            // 1. Buscamos el turno completo en la DB
             $turnoData = $turno->getById($id_turno);
-            $pagoData = $pagoModel->getByTurno($id_turno);
+            $pagoData  = $pagoModel->getByTurno($id_turno);
 
             if ($turnoData && $pagoData) {
-                // 2. Buscamos el precio base real de esa especialidad
-                $espData = $especialidad->getById((int)$turnoData['id_especialidad']);
+                $espData    = $especialidad->getById((int)$turnoData['id_especialidad']);
                 $precioBase = $espData ? (float)$espData['precio'] : (float)$pagoData['monto'];
 
-                // 3. Buscamos la cobertura del plan usando el Modelo
                 $cobertura = 0;
                 if (!empty($turnoData['id_plan'])) {
-                    $planData = $planModel->getById((int)$turnoData['id_plan']);
+                    $planData  = $planModel->getById((int)$turnoData['id_plan']);
                     $cobertura = $planData ? (float)$planData['porcentaje_cobertura'] : 0;
                 }
 
                 $montoFinal = (float)$pagoData['monto'];
 
-                // 4. Redirigimos a pagarTurno.php con la info fresca de la Base de Datos
                 header('Location: ../views/pagarTurno.php?id_turno=' . $id_turno . '&monto=' . $montoFinal . '&cobertura=' . $cobertura . '&precio_base=' . $precioBase);
                 exit;
             } else {

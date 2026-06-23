@@ -34,6 +34,7 @@
                 'email_invalido' => 'El email no tiene un formato válido.',
                 'password_corta' => 'La contraseña debe tener al menos 6 caracteres.',
                 'dni_invalido'   => 'El DNI ingresado no es válido.',
+                'dni_duplicado'  => 'Ya existe una cuenta registrada con ese DNI.',
             ];
             $error = $_GET['error'] ?? null;
             if ($error && isset($errores[$error])): ?>

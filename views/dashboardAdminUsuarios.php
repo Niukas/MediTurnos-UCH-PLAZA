@@ -59,19 +59,12 @@ $titulo = 'Gestión de Usuarios — MediTurnos';
                         placeholder="Buscar usuario por nombre, apellido o email..."
                         class="w-full pl-11 pr-4 py-3 bg-white border border-gray-200 rounded-xl text-sm text-charcoal placeholder-gray-400 focus:outline-none focus:border-slate focus:ring-2 focus:ring-slate/10 transition-all shadow-sm">
                 </div>
-                <button type="submit"
-                    class="bg-charcoal hover:bg-slate text-white px-6 py-3 rounded-xl text-sm font-bold transition-all shadow-md hover:shadow-lg flex items-center gap-2 shrink-0">
-                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
-                    </svg>
+                <button type="submit" class="bg-charcoal hover:bg-slate text-white px-6 py-3 rounded-xl text-sm font-bold transition-all shadow-md hover:shadow-lg flex items-center gap-2 shrink-0">
                     Buscar
                 </button>
 
                 <?php if (!empty($_GET['busqueda'])): ?>
                     <a href="dashboardAdminUsuarios.php" class="bg-white border border-gray-200 hover:border-charcoal text-slate hover:text-charcoal px-6 py-3 rounded-xl text-sm font-bold transition-all shadow-sm flex items-center gap-2 shrink-0">
-                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
-                        </svg>
                         Limpiar
                     </a>
                 <?php endif; ?>
@@ -91,7 +84,7 @@ $titulo = 'Gestión de Usuarios — MediTurnos';
                 <table class="w-full text-left border-collapse">
                     <thead>
                         <tr class="border-b border-gray-100">
-                            <th class="py-3.5 px-6 text-[0.65rem] font-bold text-slate uppercase tracking-widest bg-white w-20">ID Ref</th>
+                            <th class="py-3.5 px-6 text-[0.65rem] font-bold text-slate uppercase tracking-widest bg-white w-28">DNI / Ref</th>
                             <th class="py-3.5 px-6 text-[0.65rem] font-bold text-slate uppercase tracking-widest bg-white">Titular de Cuenta</th>
                             <th class="py-3.5 px-6 text-[0.65rem] font-bold text-slate uppercase tracking-widest bg-white">Nivel Actual</th>
                             <th class="py-3.5 px-6 text-[0.65rem] font-bold text-slate uppercase tracking-widest bg-white">Modificar Rango</th>
@@ -103,7 +96,11 @@ $titulo = 'Gestión de Usuarios — MediTurnos';
                             <tr class="hover:bg-ghost/30 transition-colors group">
 
                                 <td class="py-4 px-6 text-xs text-slate/70 font-mono align-middle">
-                                    #<?= str_pad($u['id_usuario'], 4, '0', STR_PAD_LEFT) ?>
+                                    <?php if (!empty($u['dni'])): ?>
+                                        <span class="font-bold text-charcoal"><?= h($u['dni']) ?></span>
+                                    <?php else: ?>
+                                        #<?= str_pad($u['id_usuario'], 4, '0', STR_PAD_LEFT) ?>
+                                    <?php endif; ?>
                                 </td>
 
                                 <td class="py-4 px-6 align-middle">
@@ -167,8 +164,7 @@ $titulo = 'Gestión de Usuarios — MediTurnos';
                                             Editar
                                         </button>
 
-                                        <form method="POST" action="dashboardAdminUsuarios.php" class="m-0 shrink-0"
-                                            onsubmit="return confirm('ALERTA CRÍTICA: ¿Seguro que deseas dar de baja permanentemente esta cuenta de usuario? Se revocarán todos los accesos.')">
+                                        <form method="POST" action="dashboardAdminUsuarios.php" class="m-0 shrink-0" onsubmit="return confirm('ALERTA CRÍTICA: ¿Seguro que deseas dar de baja permanentemente esta cuenta de usuario? Se revocarán todos los accesos.')">
                                             <input type="hidden" name="accion" value="eliminarUsuario">
                                             <input type="hidden" name="id_usuario" value="<?= $u['id_usuario'] ?>">
                                             <button type="submit" class="bg-rose-50 border border-rose-200 text-rose-600 hover:bg-rose-100 hover:text-rose-800 px-3 py-1.5 rounded-lg text-xs font-bold transition-all shadow-sm shrink-0">
@@ -181,8 +177,17 @@ $titulo = 'Gestión de Usuarios — MediTurnos';
                                         <h4 class="font-serif text-sm text-charcoal mb-3">Modificar Credenciales</h4>
                                         <form method="POST" action="dashboardAdminUsuarios.php" class="space-y-3 m-0">
                                             <input type="hidden" name="accion" value="editarUsuario">
+
                                             <input type="hidden" name="id_usuario" value="<?= $u['id_usuario'] ?>">
                                             <input type="hidden" name="busqueda" value="<?= h($_GET['busqueda'] ?? '') ?>">
+
+                                            <?php if (!empty($u['dni'])): ?>
+                                                <div>
+                                                    <label class="block text-[0.6rem] font-bold text-slate uppercase mb-1">Doc. Identidad</label>
+                                                    <input type="text" value="<?= h($u['dni']) ?>" readonly disabled
+                                                        class="w-full px-3 py-2 bg-ghost border border-gray-200 rounded-lg text-xs text-slate/70 font-mono cursor-not-allowed">
+                                                </div>
+                                            <?php endif; ?>
 
                                             <div>
                                                 <label class="block text-[0.6rem] font-bold text-slate uppercase mb-1">Nombre</label>
@@ -218,44 +223,9 @@ $titulo = 'Gestión de Usuarios — MediTurnos';
         </div>
 
         <?php if ($totalPaginas > 1): ?>
-            <div class="mt-10 flex justify-center">
-                <nav class="inline-flex items-center gap-1.5 bg-white border border-gray-200/80 rounded-xl p-1.5 shadow-sm">
-
-                    <?php if ($paginaActual > 1): ?>
-                        <a href="?pagina=<?= $paginaActual - 1 ?>" class="flex items-center justify-center px-3 py-1.5 text-xs font-bold text-slate hover:bg-ghost rounded-lg transition-colors">← Ant</a>
-                    <?php endif; ?>
-
-                    <?php
-                    $inicio = max(1, $paginaActual - 2);
-                    $fin    = min($totalPaginas, $paginaActual + 2);
-                    if ($inicio > 1): ?>
-                        <a href="?pagina=1" class="w-8 h-8 flex items-center justify-center text-xs font-bold text-slate hover:bg-ghost rounded-lg transition-colors">1</a>
-                        <?php if ($inicio > 2): ?> <span class="px-1 text-slate/50 text-xs font-bold">...</span> <?php endif; ?>
-                    <?php endif; ?>
-
-                    <?php for ($i = $inicio; $i <= $fin; $i++): ?>
-                        <?php if ($i == $paginaActual): ?>
-                            <span class="w-8 h-8 flex items-center justify-center text-xs font-bold bg-charcoal text-white rounded-lg shadow-sm"><?= $i ?></span>
-                        <?php else: ?>
-                            <a href="?pagina=<?= $i ?>" class="w-8 h-8 flex items-center justify-center text-xs font-bold text-slate hover:bg-ghost rounded-lg transition-colors"><?= $i ?></a>
-                        <?php endif; ?>
-                    <?php endfor; ?>
-
-                    <?php if ($fin < $totalPaginas): ?>
-                        <?php if ($fin < $totalPaginas - 1): ?> <span class="px-1 text-slate/50 text-xs font-bold">...</span> <?php endif; ?>
-                        <a href="?pagina=<?= $totalPaginas ?>" class="w-8 h-8 flex items-center justify-center text-xs font-bold text-slate hover:bg-ghost rounded-lg transition-colors"><?= $totalPaginas ?></a>
-                    <?php endif; ?>
-
-                    <?php if ($paginaActual < $totalPaginas): ?>
-                        <a href="?pagina=<?= $paginaActual + 1 ?>" class="flex items-center justify-center px-3 py-1.5 text-xs font-bold text-slate hover:bg-ghost rounded-lg transition-colors">Sig →</a>
-                    <?php endif; ?>
-
-                </nav>
-            </div>
         <?php endif; ?>
 
     </main>
-
 </body>
 
 </html>

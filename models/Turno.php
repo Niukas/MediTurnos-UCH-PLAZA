@@ -31,14 +31,14 @@ class Turno
     }
 
     // metodo para traer los turnos por medio de filtros
-    public function getByFiltros($especialidad = null, $periodo = 'todos', $pagina = 1, $porPagina = 20, $id_paciente = null)
+    public function getByFiltros($especialidad = null, $periodo = 'todos', $pagina = 1, $porPagina = 20, $dni = null)
     {
         $where = [];
         $params = [];
 
-        if ($id_paciente) {
-            $where[] = "id_paciente = :id_paciente";
-            $params[':id_paciente'] = $id_paciente;
+        if ($dni) {
+            $where[] = "dni = :dni";
+            $params[':dni'] = $dni;
         }
 
         if ($especialidad) {
@@ -59,26 +59,23 @@ class Turno
         $sql      = "SELECT * FROM vista_turnos $sqlWhere LIMIT :limite OFFSET :offset";
 
         $stmt = $this->db->prepare($sql);
-
         foreach ($params as $key => $value) {
             $stmt->bindValue($key, $value);
         }
-
         $stmt->bindValue(':limite', $porPagina, PDO::PARAM_INT);
         $stmt->bindValue(':offset', $offset,    PDO::PARAM_INT);
         $stmt->execute();
         return $stmt->fetchAll();
     }
 
-
-    public function getTotalByFiltros($especialidad = null, $periodo = 'todos', $id_paciente = null)
+    public function getTotalByFiltros($especialidad = null, $periodo = 'todos', $dni = null)
     {
-        $where = [];
+        $where  = [];
         $params = [];
 
-        if ($id_paciente) {
-            $where[] = "id_paciente = :id_paciente";
-            $params[':id_paciente'] = $id_paciente;
+        if ($dni) {
+            $where[] = "dni = :dni";
+            $params[':dni'] = $dni;
         }
 
         if ($especialidad) {
@@ -98,11 +95,9 @@ class Turno
         $sql      = "SELECT COUNT(*) FROM vista_turnos $sqlWhere";
 
         $stmt = $this->db->prepare($sql);
-
         foreach ($params as $key => $value) {
             $stmt->bindValue($key, $value);
         }
-
         $stmt->execute();
         return $stmt->fetchColumn();
     }
@@ -134,15 +129,15 @@ class Turno
             $this->db->beginTransaction();
 
             $sql = "CALL sp_crear_turno(
-        :fecha, :hora_inicio, :id_paciente, :matricula,
-        :id_especialidad, :id_consultorio, :id_plan,
-        :nro_afiliado, :observacion, @resultado, @p_id_turno)";
+                    :fecha, :hora_inicio, :dni, :matricula,
+                    :id_especialidad, :id_consultorio, :id_plan,
+                    :nro_afiliado, :observacion, @resultado, @p_id_turno)";
 
             $stmt = $this->db->prepare($sql);
             $stmt->execute([
                 ':fecha'           => $datos['fecha'],
                 ':hora_inicio'     => $datos['hora_inicio'],
-                ':id_paciente'     => $datos['id_paciente'],
+                ':dni'             => $datos['dni'],
                 ':matricula'       => $datos['matricula'],
                 ':id_especialidad' => $datos['id_especialidad'],
                 ':id_consultorio'  => $datos['id_consultorio'],
@@ -156,7 +151,7 @@ class Turno
             $this->db->commit();
 
             if ($resultado['resultado'] == 1) {
-                return $resultado['id_turno']; // devuelve el id
+                return $resultado['id_turno'];
             }
             return false;
         } catch (\Throwable $th) {
@@ -253,9 +248,10 @@ class Turno
         }
     }
 
-    public function getById(int $id_turno) {
+    public function getById(int $id_turno)
+    {
         $sql = "SELECT * FROM Turno WHERE id_turno = :id_turno";
-        $stmt = $this->db->prepare($sql); 
+        $stmt = $this->db->prepare($sql);
         $stmt->execute([':id_turno' => $id_turno]);
         return $stmt->fetch(\PDO::FETCH_ASSOC);
     }

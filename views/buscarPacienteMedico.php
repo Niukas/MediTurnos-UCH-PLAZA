@@ -77,7 +77,7 @@ $titulo = 'Buscar Paciente — MediTurnos';
 
             <?php else: ?>
 
-                <?php if (!isset($_GET['id_paciente'])): ?>
+                <?php if (!isset($_GET['dni'])): ?>
                     <div class="bg-white rounded-2xl border border-gray-200/80 overflow-hidden shadow-sm mb-6">
                         <div class="bg-[#F8FAFC] px-6 py-4 border-b border-gray-100 flex items-center justify-between">
                             <h2 class="font-serif text-lg text-charcoal tracking-tight">Resultados</h2>
@@ -88,7 +88,7 @@ $titulo = 'Buscar Paciente — MediTurnos';
 
                         <div class="divide-y divide-gray-50">
                             <?php foreach ($resultados as $p):
-                                $isSelected = isset($_GET['id_paciente']) && $_GET['id_paciente'] == $p['id_paciente'];
+                                $isSelected = isset($_GET['dni']) && $_GET['dni'] == $p['dni'];
                             ?>
                                 <div class="px-6 py-4 <?= $isSelected ? 'bg-ghost/50' : 'hover:bg-ghost/30' ?> transition-colors">
 
@@ -115,7 +115,7 @@ $titulo = 'Buscar Paciente — MediTurnos';
                                         </div>
 
                                         <div class="flex items-center gap-2 shrink-0">
-                                            <a href="?busqueda=<?= h($_GET['busqueda']) ?>&id_paciente=<?= $p['id_paciente'] ?>"
+                                            <a href="?busqueda=<?= h($_GET['busqueda']) ?>&dni=<?= h($p['dni']) ?>"
                                                 class="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-bold transition-all <?= $isSelected ? 'bg-charcoal text-white shadow-sm' : 'bg-white border border-gray-200 text-slate hover:border-charcoal hover:text-charcoal' ?>">
                                                 <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
@@ -140,7 +140,7 @@ $titulo = 'Buscar Paciente — MediTurnos';
                     </div>
                 <?php endif; ?>
 
-                <?php if (isset($_GET['id_paciente'])): ?>
+                <?php if (isset($_GET['dni'])): ?>
                     <?php if (!empty($turnosPaciente)):
                         $turnosPorEspecialidad = [];
                         foreach ($turnosPaciente as $t) {
@@ -215,7 +215,8 @@ $titulo = 'Buscar Paciente — MediTurnos';
                                                                     <input type="hidden" name="accion" value="cambiarEstado">
                                                                     <input type="hidden" name="origen" value="buscar">
                                                                     <input type="hidden" name="id_turno" value="<?= $t['id_turno'] ?>">
-                                                                    <input type="hidden" name="id_paciente" value="<?= h($_GET['id_paciente']) ?>">
+
+                                                                    <input type="hidden" name="dni" value="<?= h($_GET['dni']) ?>">
                                                                     <input type="hidden" name="busqueda" value="<?= h($_GET['busqueda']) ?>">
 
                                                                     <textarea name="observacion" rows="2" placeholder="Escriba sus observaciones clínicas, síntomas o evolución del paciente..."

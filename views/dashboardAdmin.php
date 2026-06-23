@@ -129,27 +129,27 @@ $totalesConsolidados = array_sum($stats);
 
             <div class="lg:col-span-5 space-y-4 flex flex-col justify-between">
 
-                <?php if (isset($medicoConMasTurnos)): ?>
+                <?php if (!empty($medicoConMasTurnos)): ?>
                     <div class="bg-white rounded-2xl border border-gray-200/80 p-5 shadow-sm flex items-center gap-4 flex-1">
                         <div class="w-12 h-12 rounded-xl bg-charcoal text-white flex items-center justify-center font-serif text-lg">🏆</div>
                         <div>
                             <span class="text-[0.62rem] font-bold text-slate uppercase tracking-widest block mb-0.5">Médico con Mayor Demanda</span>
-                            <h4 class="text-base font-bold text-charcoal">Dr/a. <?= h($medicoConMasTurnos['nombre']) . ' ' . h($medicoConMasTurnos['apellido']) ?></h4>
+                            <h4 class="text-base font-bold text-charcoal">Dr/a. <?= h($medicoConMasTurnos['nombre'] ?? '') . ' ' . h($medicoConMasTurnos['apellido'] ?? '') ?></h4>
                             <div class="text-xs text-slate mt-1">
-                                Actividad: <strong class="text-charcoal font-mono"><?= $medicoConMasTurnos['total_turnos'] ?></strong> consultas asignadas.
+                                Actividad: <strong class="text-charcoal font-mono"><?= $medicoConMasTurnos['total_turnos'] ?? 0 ?></strong> consultas asignadas.
                             </div>
                         </div>
                     </div>
                 <?php endif; ?>
 
-                <?php if (isset($especialidadDemandada)): ?>
+                <?php if (!empty($especialidadDemandada)): ?>
                     <div class="bg-white rounded-2xl border border-gray-200/80 p-5 shadow-sm flex items-center gap-4 flex-1">
                         <div class="w-12 h-12 rounded-xl bg-lightblue/40 text-charcoal flex items-center justify-center text-lg">📈</div>
                         <div>
                             <span class="text-[0.62rem] font-bold text-slate uppercase tracking-widest block mb-0.5">Especialidad Líder</span>
-                            <h4 class="text-base font-bold text-charcoal"><?= h($especialidadDemandada['nombre']) ?></h4>
+                            <h4 class="text-base font-bold text-charcoal"><?= h($especialidadDemandada['nombre'] ?? '') ?></h4>
                             <div class="text-xs text-slate mt-1">
-                                Reservas: <strong class="text-charcoal font-mono"><?= h($especialidadDemandada['total_turnos']) ?></strong> asignaciones active.
+                                Reservas: <strong class="text-charcoal font-mono"><?= h($especialidadDemandada['total_turnos'] ?? 0) ?></strong> asignaciones activas.
                             </div>
                         </div>
                     </div>

@@ -66,10 +66,10 @@ class Stats
 
     /**
      * Metodo que trae los turnos por estado y su cantidad
-     *  pendiente  → 3
-     *  confirmado → 5
-     *  cancelado  → 1
-     *  realizado  → 12
+     * pendiente  → 3
+     * confirmado → 5
+     * cancelado  → 1
+     * realizado  → 12
      */
     public function getTurnosPorEstado()
     {
@@ -135,8 +135,8 @@ class Stats
     public function getPacientesSinTurnos()
     {
         $sql = "SELECT COUNT(*) FROM Paciente
-            WHERE id_paciente NOT IN (
-                SELECT DISTINCT id_paciente FROM Turno
+            WHERE dni NOT IN (
+                SELECT DISTINCT dni FROM Turno
                 WHERE estado != 'cancelado'
             )";
         $stmt = $this->db->prepare($sql);

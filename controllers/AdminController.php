@@ -21,27 +21,27 @@ require_once '../models/Turno.php';
 require_once '../models/Paciente.php';
 
 // Instanciar las clases
-$stats = new Stats($pdo);
-$rol = new Rol($pdo);
-$usuario = new Usuario($pdo);
-$medico = new Medico($pdo);
+$stats        = new Stats($pdo);
+$rol          = new Rol($pdo);
+$usuario      = new Usuario($pdo);
+$medico       = new Medico($pdo);
 $especialidad = new Especialidad($pdo);
-$turno = new Turno($pdo);
-$paciente = new Paciente($pdo);
+$turno        = new Turno($pdo);
+$paciente     = new Paciente($pdo);
 
 $listadoRoles = $rol->getAll();
 
 // llamado a metodos de estadisticas
 
 if (defined('SECCION') && SECCION === 'stats') {
-    $pacientesTotales = $stats->getTotalPacientes();
-    $medicosTotales   = $stats->getTotalMedicos();
-    $turnosHoy        = $stats->getTurnosHoy();
-    $turnosPorEstado  = $stats->getTurnosPorEstado();
-    $medicoConMasTurnos = $stats->getMedicoMasTurnos();
+    $pacientesTotales       = $stats->getTotalPacientes();
+    $medicosTotales         = $stats->getTotalMedicos();
+    $turnosHoy              = $stats->getTurnosHoy();
+    $turnosPorEstado        = $stats->getTurnosPorEstado();
+    $medicoConMasTurnos     = $stats->getMedicoMasTurnos();
     $listadoObraSocialTurnos = $stats->getTurnosPorObraSocial();
-    $especialidadDemandada = $stats->getEspecialidadMasDemandada();
-    $pacientesSinTurno = $stats->getPacientesSinTurnos();
+    $especialidadDemandada  = $stats->getEspecialidadMasDemandada();
+    $pacientesSinTurno      = $stats->getPacientesSinTurnos();
 }
 
 // Dashboard Usuarios
@@ -50,12 +50,10 @@ if (defined('SECCION') && SECCION === 'usuarios') {
     $busqueda = filter_var($_GET['busqueda'] ?? '', FILTER_SANITIZE_SPECIAL_CHARS);
 
     if (!empty($busqueda)) {
-        // Modo búsqueda: mostramos solo las coincidencias
         $listadoUsuarios = $usuario->buscar($busqueda);
         $totalPaginas = 1;
         $paginaActual = 1;
     } else {
-        // Flujo normal: mostramos todos paginados
         $paginaActual  = filter_var($_GET['pagina'] ?? 1, FILTER_SANITIZE_NUMBER_INT);
         $totalUsuarios = $usuario->getTotalUsuarios();
         $totalPaginas  = ceil($totalUsuarios / 20);
@@ -85,8 +83,8 @@ if (defined('SECCION') && SECCION === 'turnos') {
 // Buscar Pacientes
 
 if (defined('SECCION') && SECCION === 'buscarPaciente') {
-    $busqueda      = filter_var($_GET['busqueda'] ?? '', FILTER_SANITIZE_SPECIAL_CHARS);
-    $resultados    = [];
+    $busqueda   = filter_var($_GET['busqueda'] ?? '', FILTER_SANITIZE_SPECIAL_CHARS);
+    $resultados = [];
 
     if (!empty($busqueda)) {
         $resultados = $paciente->buscar($busqueda);
@@ -94,9 +92,9 @@ if (defined('SECCION') && SECCION === 'buscarPaciente') {
 
     // Si se seleccionó un paciente específico — cargás sus turnos
     $turnosPaciente = [];
-    $idPacienteVer  = filter_var($_GET['id_paciente'] ?? null, FILTER_SANITIZE_NUMBER_INT) ?: null;
-    if ($idPacienteVer) {
-        $turnosPaciente = $turno->getByFiltros(null, 'todos', 1, 100, $idPacienteVer);
+    $dniVer = filter_var($_GET['dni'] ?? null, FILTER_SANITIZE_NUMBER_INT) ?: null;
+    if ($dniVer) {
+        $turnosPaciente = $turno->getByFiltros(null, 'todos', 1, 100, $dniVer);
     }
 }
 
@@ -233,11 +231,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     // POST — Editar paciente
     if ($accion === 'editarPaciente') {
         $datos = [
-            'id_paciente' => filter_var($_POST['id_paciente'] ?? 0,  FILTER_SANITIZE_NUMBER_INT),
-            'nombre'      => filter_var($_POST['nombre']      ?? '', FILTER_SANITIZE_SPECIAL_CHARS),
-            'apellido'    => filter_var($_POST['apellido']    ?? '', FILTER_SANITIZE_SPECIAL_CHARS),
-            'telefono'    => filter_var($_POST['telefono']    ?? '', FILTER_SANITIZE_SPECIAL_CHARS),
-            'email'       => filter_var($_POST['email']       ?? '', FILTER_SANITIZE_EMAIL),
+            'dni'      => filter_var($_POST['dni']      ?? 0,  FILTER_SANITIZE_NUMBER_INT),
+            'nombre'   => filter_var($_POST['nombre']   ?? '', FILTER_SANITIZE_SPECIAL_CHARS),
+            'apellido' => filter_var($_POST['apellido'] ?? '', FILTER_SANITIZE_SPECIAL_CHARS),
+            'telefono' => filter_var($_POST['telefono'] ?? '', FILTER_SANITIZE_SPECIAL_CHARS),
+            'email'    => filter_var($_POST['email']    ?? '', FILTER_SANITIZE_EMAIL),
         ];
         $resultado = $paciente->editar($datos);
         $redirect  = $_POST['busqueda'] ?? '';

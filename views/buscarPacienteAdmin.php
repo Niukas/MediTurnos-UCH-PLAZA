@@ -77,7 +77,7 @@ $titulo = 'Buscar Paciente (Admin) — MediTurnos';
 
             <?php else: ?>
 
-                <?php if (!isset($_GET['id_paciente'])): ?>
+                <?php if (!isset($_GET['dni'])): ?>
                     <div class="bg-white rounded-2xl border border-gray-200/80 overflow-hidden shadow-sm mb-6">
                         <div class="bg-[#F8FAFC] px-6 py-4 border-b border-gray-100 flex items-center justify-between">
                             <h2 class="font-serif text-lg text-charcoal tracking-tight">Resultados de Búsqueda</h2>
@@ -88,7 +88,8 @@ $titulo = 'Buscar Paciente (Admin) — MediTurnos';
 
                         <div class="divide-y divide-gray-50">
                             <?php foreach ($resultados as $p):
-                                $isSelected = isset($_GET['id_paciente']) && $_GET['id_paciente'] == $p['id_paciente'];
+                                // Validamos la selección usando el DNI
+                                $isSelected = isset($_GET['dni']) && $_GET['dni'] == $p['dni'];
                             ?>
                                 <div class="px-6 py-4 <?= $isSelected ? 'bg-ghost/50' : 'hover:bg-ghost/30' ?> transition-colors">
 
@@ -115,14 +116,14 @@ $titulo = 'Buscar Paciente (Admin) — MediTurnos';
                                         </div>
 
                                         <div class="flex items-center gap-2 shrink-0">
-                                            <a href="?busqueda=<?= h($_GET['busqueda']) ?>&id_paciente=<?= $p['id_paciente'] ?>"
+                                            <a href="?busqueda=<?= h($_GET['busqueda']) ?>&dni=<?= h($p['dni']) ?>"
                                                 class="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-bold transition-all bg-white border border-gray-200 text-slate hover:border-charcoal hover:text-charcoal shadow-sm">
                                                 <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
                                                 </svg>
                                                 Ver Agenda Global
                                             </a>
-                                            <button onclick="document.getElementById('editar-<?= $p['id_paciente'] ?>').classList.toggle('hidden')"
+                                            <button onclick="document.getElementById('editar-<?= h($p['dni']) ?>').classList.toggle('hidden')"
                                                 class="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-bold bg-white border border-gray-200 text-slate hover:border-charcoal hover:text-charcoal transition-all">
                                                 <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path>
@@ -132,34 +133,42 @@ $titulo = 'Buscar Paciente (Admin) — MediTurnos';
                                         </div>
                                     </div>
 
-                                    <div id="editar-<?= $p['id_paciente'] ?>" class="hidden mt-4 p-4 bg-white border border-gray-200 rounded-xl">
+                                    <div id="editar-<?= h($p['dni']) ?>" class="hidden mt-4 p-4 bg-white border border-gray-200 rounded-xl">
                                         <h4 class="font-serif text-sm text-charcoal mb-3">Modificar datos del paciente</h4>
                                         <form method="POST" action="../controllers/AdminController.php" class="grid grid-cols-2 md:grid-cols-4 gap-3">
                                             <input type="hidden" name="accion" value="editarPaciente">
-                                            <input type="hidden" name="id_paciente" value="<?= $p['id_paciente'] ?>">
+
+                                            <input type="hidden" name="dni" value="<?= h($p['dni']) ?>">
                                             <input type="hidden" name="busqueda" value="<?= h($_GET['busqueda']) ?>">
+
+                                            <div>
+                                                <label class="block text-[0.6rem] font-bold text-slate uppercase mb-1">Doc. Identidad</label>
+                                                <input type="text" value="<?= h($p['dni']) ?>" disabled
+                                                    class="w-full px-3 py-2 bg-ghost border border-gray-200 rounded-lg text-xs text-slate/70 font-mono cursor-not-allowed">
+                                            </div>
+
                                             <div>
                                                 <label class="block text-[0.6rem] font-bold text-slate uppercase mb-1">Nombre</label>
                                                 <input type="text" name="nombre" value="<?= h($p['nombre']) ?>" required
-                                                    class="w-full px-3 py-2 bg-ghost border border-gray-200 rounded-lg text-xs text-charcoal focus:outline-none focus:border-slate">
+                                                    class="w-full px-3 py-2 bg-ghost/50 border border-gray-200 rounded-lg text-xs text-charcoal focus:outline-none focus:border-slate">
                                             </div>
                                             <div>
                                                 <label class="block text-[0.6rem] font-bold text-slate uppercase mb-1">Apellido</label>
                                                 <input type="text" name="apellido" value="<?= h($p['apellido']) ?>" required
-                                                    class="w-full px-3 py-2 bg-ghost border border-gray-200 rounded-lg text-xs text-charcoal focus:outline-none focus:border-slate">
+                                                    class="w-full px-3 py-2 bg-ghost/50 border border-gray-200 rounded-lg text-xs text-charcoal focus:outline-none focus:border-slate">
                                             </div>
                                             <div>
                                                 <label class="block text-[0.6rem] font-bold text-slate uppercase mb-1">Teléfono</label>
                                                 <input type="text" name="telefono" value="<?= h($p['telefono']) ?>"
-                                                    class="w-full px-3 py-2 bg-ghost border border-gray-200 rounded-lg text-xs text-charcoal focus:outline-none focus:border-slate">
+                                                    class="w-full px-3 py-2 bg-ghost/50 border border-gray-200 rounded-lg text-xs text-charcoal focus:outline-none focus:border-slate">
                                             </div>
                                             <div>
                                                 <label class="block text-[0.6rem] font-bold text-slate uppercase mb-1">Email</label>
                                                 <input type="email" name="email" value="<?= h($p['email']) ?>"
-                                                    class="w-full px-3 py-2 bg-ghost border border-gray-200 rounded-lg text-xs text-charcoal focus:outline-none focus:border-slate">
+                                                    class="w-full px-3 py-2 bg-ghost/50 border border-gray-200 rounded-lg text-xs text-charcoal focus:outline-none focus:border-slate">
                                             </div>
-                                            <div class="col-span-2 md:col-span-4 flex gap-2 justify-end mt-1">
-                                                <button type="button" onclick="document.getElementById('editar-<?= $p['id_paciente'] ?>').classList.add('hidden')"
+                                            <div class="col-span-2 md:col-span-3 flex gap-2 justify-end mt-1">
+                                                <button type="button" onclick="document.getElementById('editar-<?= h($p['dni']) ?>').classList.add('hidden')"
                                                     class="text-xs font-semibold text-slate hover:text-charcoal transition-colors px-3 py-1.5">
                                                     Cancelar
                                                 </button>
@@ -186,12 +195,12 @@ $titulo = 'Buscar Paciente (Admin) — MediTurnos';
                     </div>
                 <?php endif; ?>
 
-                <?php if (isset($_GET['id_paciente'])): ?>
+                <?php if (isset($_GET['dni'])): ?>
                     <?php if (!empty($turnosPaciente)): ?>
                         <div class="bg-white rounded-2xl border border-gray-200/80 overflow-hidden shadow-sm">
                             <div class="bg-[#F8FAFC] px-6 py-4 border-b border-gray-100">
                                 <h2 class="font-serif text-lg text-charcoal tracking-tight">Historial Completo de Turnos</h2>
-                                <p class="text-xs text-slate mt-0.5">Auditoría de citas registradas para todas las especialidades y profesionales.</p>
+                                <p class="text-xs text-slate mt-0.5">Auditoría de citas registradas para todas las especialidades y profesionales del paciente (DNI <?= h($_GET['dni']) ?>).</p>
                             </div>
 
                             <div class="overflow-x-auto">
@@ -209,7 +218,7 @@ $titulo = 'Buscar Paciente (Admin) — MediTurnos';
                                             <tr class="hover:bg-[#F8FAFC]/50 transition-colors">
                                                 <td class="py-4 px-6">
                                                     <div class="text-sm font-bold text-charcoal"><?= date('d/m/Y', strtotime($t['fecha'])) ?></div>
-                                                    <div class="text-xs text-slate font-mono mt-0.5"><?= substr($t['hora_inicio'], 0, 5) ?> hs</div>
+                                                    <div class="text-xs text-slate font-mono mt-0.5"><?= isset($t['hora_inicio']) ? substr($t['hora_inicio'], 0, 5) : '00:00' ?> hs</div>
                                                 </td>
                                                 <td class="py-4 px-6">
                                                     <div class="text-sm text-charcoal font-medium">Dr/a. <?= h($t['medico_nombre']) . ' ' . h($t['medico_apellido']) ?></div>
@@ -222,7 +231,7 @@ $titulo = 'Buscar Paciente (Admin) — MediTurnos';
                                                 </td>
                                                 <td class="py-4 px-6">
                                                     <?php
-                                                    $estadoConfig = match ($t['estado']) {
+                                                    $estadoConfig = match (strtolower($t['estado'])) {
                                                         'pendiente'  => 'bg-amber-50 text-amber-700 border-amber-200',
                                                         'confirmado' => 'bg-emerald-50 text-emerald-700 border-emerald-200',
                                                         'cancelado'  => 'bg-rose-50 text-rose-700 border-rose-200',
