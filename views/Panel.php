@@ -55,7 +55,7 @@ $titulo = 'Mis turnos — MediTurnos';
                     foreach ($periodos as $valor => $label):
                         $isActive = ($periodo === $valor);
                     ?>
-                        <a href="?periodo=<?= $valor ?>&especialidad=<?= $especialidadFiltro ?>"
+                        <a href="?periodo=<?= $valor ?>&especialidad=<?= $especialidadFiltro ?? '' ?>"
                             class="flex-1 sm:flex-none text-center px-4 py-1.5 text-xs font-semibold rounded-lg transition-all duration-200 <?= $isActive ? 'bg-white text-charcoal shadow-sm border border-gray-200/50' : 'text-slate hover:text-charcoal hover:bg-gray-50' ?>">
                             <?= $label ?>
                         </a>
@@ -120,9 +120,9 @@ $titulo = 'Mis turnos — MediTurnos';
                                 <tbody class="divide-y divide-gray-50">
                                     <?php foreach ($turnos as $t): ?>
                                         <tr class="hover:bg-[#F8FAFC]/80 transition-colors group">
-                                            <td class="py-4 px-6 text-xs text-slate/70 font-mono">#<?= $t['id_turno'] ?></td>
+                                            <td class="py-4 px-6 text-xs text-slate/70 font-mono align-top pt-5">#<?= $t['id_turno'] ?></td>
 
-                                            <td class="py-4 px-6">
+                                            <td class="py-4 px-6 align-top pt-5">
                                                 <div class="text-sm text-charcoal font-bold"><?= date('d/m/Y', strtotime($t['fecha'])) ?></div>
                                                 <div class="text-xs text-slate mt-0.5 flex items-center gap-1">
                                                     <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -132,18 +132,25 @@ $titulo = 'Mis turnos — MediTurnos';
                                                 </div>
                                             </td>
 
-                                            <td class="py-4 px-6">
+                                            <td class="py-4 px-6 align-top pt-5">
                                                 <div class="flex items-center gap-3">
                                                     <div class="w-8 h-8 rounded-full bg-gradient-to-tr from-lightblue to-slate text-white flex items-center justify-center font-bold text-xs shrink-0 shadow-sm">
                                                         <?= substr(h($t['medico_nombre']), 0, 1) . substr(h($t['medico_apellido']), 0, 1) ?>
                                                     </div>
-                                                    <div class="text-sm font-medium text-charcoal">
-                                                        Dr/a. <?= h($t['medico_nombre']) . ' ' . h($t['medico_apellido']) ?>
+                                                    <div>
+                                                        <div class="text-sm font-medium text-charcoal">
+                                                            Dr/a. <?= h($t['medico_nombre']) . ' ' . h($t['medico_apellido']) ?>
+                                                        </div>
+                                                        <?php if (!empty($t['observacion']) && $t['estado'] === 'cancelado'): ?>
+                                                            <div class="text-[0.65rem] text-rose-600 mt-1 max-w-[200px] leading-relaxed italic">
+                                                                "<?= h($t['observacion']) ?>"
+                                                            </div>
+                                                        <?php endif; ?>
                                                     </div>
                                                 </div>
                                             </td>
 
-                                            <td class="py-4 px-6 text-sm">
+                                            <td class="py-4 px-6 text-sm align-top pt-5">
                                                 <?php
                                                 $estadoConfig = match ($t['estado']) {
                                                     'pendiente'  => ['bg' => 'bg-amber-50', 'text' => 'text-amber-700', 'border' => 'border-amber-200', 'dot' => 'bg-amber-500'],
@@ -159,7 +166,7 @@ $titulo = 'Mis turnos — MediTurnos';
                                                 </div>
                                             </td>
 
-                                            <td class="py-4 px-6 text-right">
+                                            <td class="py-4 px-6 text-right align-top pt-5">
                                                 <div class="flex items-center justify-end gap-2">
 
                                                     <?php if (isset($t['estado_pago']) && $t['estado_pago'] === 'pendiente' && $t['estado'] !== 'cancelado'): ?>
@@ -191,9 +198,17 @@ $titulo = 'Mis turnos — MediTurnos';
                                                                 Cancelar
                                                             </button>
                                                         </form>
-                                                    <?php endif; ?>
 
-                                                    <?php if (!($t['estado'] === 'pendiente' || $t['estado'] === 'confirmado') && (!isset($t['estado_pago']) || $t['estado_pago'] === 'pendiente')): ?>
+                                                    <?php elseif ($t['estado'] === 'cancelado'): ?>
+                                                        <a href="SacarTurno.php?id_especialidad=<?= h($t['id_especialidad']) ?>&matricula=<?= h($t['matricula']) ?>&reagendar=true"
+                                                            class="bg-white border border-gray-200 text-charcoal hover:border-charcoal hover:bg-ghost px-3 py-1.5 rounded-lg text-xs font-bold transition-all shadow-sm flex items-center gap-1.5">
+                                                            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path>
+                                                            </svg>
+                                                            Reagendar
+                                                        </a>
+
+                                                    <?php else: ?>
                                                         <span class="text-gray-300 font-bold block text-center mr-2">—</span>
                                                     <?php endif; ?>
 
@@ -213,9 +228,8 @@ $titulo = 'Mis turnos — MediTurnos';
         <?php if ($totalPaginas > 1): ?>
             <div class="mt-10 flex justify-center">
                 <nav class="inline-flex items-center gap-1.5 bg-white border border-gray-200/80 rounded-xl p-1.5 shadow-sm">
-
                     <?php if ($paginaActual > 1): ?>
-                        <a href="?pagina=<?= $paginaActual - 1 ?>&periodo=<?= $periodo ?>&especialidad=<?= $especialidadFiltro ?>"
+                        <a href="?pagina=<?= $paginaActual - 1 ?>&periodo=<?= $periodo ?>&especialidad=<?= $especialidadFiltro ?? '' ?>"
                             class="flex items-center justify-center px-3 py-1.5 text-xs font-bold text-slate hover:bg-ghost rounded-lg transition-colors">
                             <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path>
@@ -229,26 +243,16 @@ $titulo = 'Mis turnos — MediTurnos';
                     $fin    = min($totalPaginas, $paginaActual + 2);
                     ?>
 
-                    <?php if ($inicio > 1): ?>
-                        <a href="?pagina=1&periodo=<?= $periodo ?>&especialidad=<?= $especialidadFiltro ?>" class="w-8 h-8 flex items-center justify-center text-xs font-bold text-slate hover:bg-ghost rounded-lg transition-colors">1</a>
-                        <?php if ($inicio > 2): ?> <span class="px-1 text-slate/50 text-xs font-bold">...</span> <?php endif; ?>
-                    <?php endif; ?>
-
                     <?php for ($i = $inicio; $i <= $fin; $i++): ?>
                         <?php if ($i == $paginaActual): ?>
                             <span class="w-8 h-8 flex items-center justify-center text-xs font-bold bg-charcoal text-white rounded-lg shadow-sm"><?= $i ?></span>
                         <?php else: ?>
-                            <a href="?pagina=<?= $i ?>&periodo=<?= $periodo ?>&especialidad=<?= $especialidadFiltro ?>" class="w-8 h-8 flex items-center justify-center text-xs font-bold text-slate hover:bg-ghost rounded-lg transition-colors"><?= $i ?></a>
+                            <a href="?pagina=<?= $i ?>&periodo=<?= $periodo ?>&especialidad=<?= $especialidadFiltro ?? '' ?>" class="w-8 h-8 flex items-center justify-center text-xs font-bold text-slate hover:bg-ghost rounded-lg transition-colors"><?= $i ?></a>
                         <?php endif; ?>
                     <?php endfor; ?>
 
-                    <?php if ($fin < $totalPaginas): ?>
-                        <?php if ($fin < $totalPaginas - 1): ?> <span class="px-1 text-slate/50 text-xs font-bold">...</span> <?php endif; ?>
-                        <a href="?pagina=<?= $totalPaginas ?>&periodo=<?= $periodo ?>&especialidad=<?= $especialidadFiltro ?>" class="w-8 h-8 flex items-center justify-center text-xs font-bold text-slate hover:bg-ghost rounded-lg transition-colors"><?= $totalPaginas ?></a>
-                    <?php endif; ?>
-
                     <?php if ($paginaActual < $totalPaginas): ?>
-                        <a href="?pagina=<?= $paginaActual + 1 ?>&periodo=<?= $periodo ?>&especialidad=<?= $especialidadFiltro ?>"
+                        <a href="?pagina=<?= $paginaActual + 1 ?>&periodo=<?= $periodo ?>&especialidad=<?= $especialidadFiltro ?? '' ?>"
                             class="flex items-center justify-center px-3 py-1.5 text-xs font-bold text-slate hover:bg-ghost rounded-lg transition-colors">
                             Sig
                             <svg class="w-4 h-4 ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -256,7 +260,6 @@ $titulo = 'Mis turnos — MediTurnos';
                             </svg>
                         </a>
                     <?php endif; ?>
-
                 </nav>
             </div>
         <?php endif; ?>

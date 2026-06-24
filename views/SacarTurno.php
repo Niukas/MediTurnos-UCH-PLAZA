@@ -21,7 +21,12 @@ $titulo = 'Agendar Cita — MediTurnos';
 
         <div class="w-full max-w-2xl bg-white rounded-2xl border border-gray-200 p-6 sm:p-8 shadow-[0_4px_25px_rgba(0,0,0,0.02)]">
 
-            <div class="text-center border-b border-gray-100 pb-5 mb-6">
+            <div class="text-center border-b border-gray-100 pb-5 mb-6 relative">
+                <?php if (isset($_GET['reagendar']) && $_GET['reagendar'] == 'true'): ?>
+                    <span class="absolute -top-3 left-1/2 -translate-x-1/2 bg-charcoal text-white text-[0.65rem] font-bold uppercase tracking-widest px-3 py-1 rounded-full shadow-md animate-pulse">
+                        Reagendando cita
+                    </span>
+                <?php endif; ?>
                 <h1 class="font-serif text-2xl sm:text-3xl text-charcoal tracking-tight mb-1">Agendar un Turno</h1>
                 <p class="text-slate text-xs sm:text-sm">Completá los pasos secuenciales para confirmar tu cita médica.</p>
             </div>
@@ -44,6 +49,10 @@ $titulo = 'Agendar Cita — MediTurnos';
             <div class="mb-5">
                 <label class="block text-[0.65rem] font-bold text-slate uppercase tracking-widest mb-2">1. Especialidad Médica</label>
                 <form method="GET" action="" class="m-0">
+                    <?php if (isset($_GET['reagendar'])): ?>
+                        <input type="hidden" name="reagendar" value="true">
+                    <?php endif; ?>
+
                     <div class="relative">
                         <select name="id_especialidad" onchange="this.form.submit()"
                             class="w-full px-4 py-2.5 bg-ghost/50 border border-gray-200 rounded-xl text-sm text-charcoal font-medium focus:outline-none focus:border-slate focus:bg-white transition-all cursor-pointer appearance-none">
@@ -69,6 +78,9 @@ $titulo = 'Agendar Cita — MediTurnos';
                     <label class="block text-[0.65rem] font-bold text-slate uppercase tracking-widest mb-3">2. Profesional Asignado</label>
                     <form method="GET" action="" class="m-0 space-y-2.5">
                         <input type="hidden" name="id_especialidad" value="<?= h($_GET['id_especialidad']) ?>">
+                        <?php if (isset($_GET['reagendar'])): ?>
+                            <input type="hidden" name="reagendar" value="true">
+                        <?php endif; ?>
 
                         <?php foreach ($listadoMedicos as $m):
                             $isSelected = isset($_GET['matricula']) && $_GET['matricula'] == $m['matricula'];

@@ -58,9 +58,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     if ($accion === 'bloquearDia') {
         $fecha     = filter_var($_POST['fecha']  ?? '', FILTER_SANITIZE_SPECIAL_CHARS);
         $motivo    = filter_var($_POST['motivo'] ?? '', FILTER_SANITIZE_SPECIAL_CHARS) ?: null;
+
+        // 1. Bloqueamos el día en la tabla de bloqueos/horarios
         $resultado = $horario->bloquearDia($matriculaMedico, $fecha, $motivo);
 
         if ($resultado) {
+            // 2. Si se bloqueó con éxito, cancelamos todos los turnos afectados
+            $turno->cancelarTurnosPorBloqueo($matriculaMedico, $fecha, $motivo);
+
             header('Location: ../views/configurarHorarios.php?registro=bloqueado');
             exit;
         } else {

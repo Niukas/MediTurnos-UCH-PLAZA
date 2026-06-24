@@ -255,4 +255,31 @@ class Turno
         $stmt->execute([':id_turno' => $id_turno]);
         return $stmt->fetch(\PDO::FETCH_ASSOC);
     }
+
+    // Metodo para cancelar masivamente los turnos cuando un médico bloquea su agenda
+    public function cancelarTurnosPorBloqueo($matricula, $fecha, $motivo)
+    {
+        try {
+            // Armamos un mensaje para que el paciente lo vea en su panel
+            $obs_medico = $motivo ? " Motivo: " . $motivo . "." : "";
+            $mensaje_cancelacion = "Turno cancelado por el profesional." . $obs_medico . " Por favor, vuelva a agendar su cita desde la sección 'Agendar Cita'.";
+
+            $sql = "UPDATE Turno 
+                    SET estado = 'cancelado', 
+                        observacion = :observacion 
+                    WHERE matricula = :matricula 
+                    AND fecha = :fecha 
+                    AND estado IN ('pendiente', 'confirmado')";
+
+            $stmt = $this->db->prepare($sql);
+            return $stmt->execute([
+                ':observacion' => $mensaje_cancelacion,
+                ':matricula'   => $matricula,
+                ':fecha'       => $fecha
+            ]);
+        } catch (\Throwable $th) {
+            error_log($th->getMessage());
+            return false;
+        }
+    }
 }
