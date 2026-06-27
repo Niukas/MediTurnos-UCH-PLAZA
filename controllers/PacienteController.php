@@ -25,6 +25,7 @@ $horario      = new Horario($pdo);
 $paciente     = new Paciente($pdo);
 
 $dni = $usuario->getDni($_SESSION['usuario_id']);
+error_log("DEBUG: Usuario ID: " . $_SESSION['usuario_id'] . ", DNI obtenido: " . var_export($dni, true));
 
 if (defined('SECCION') && SECCION === 'misTurnos') {
     $especialidadFiltro = filter_var($_GET['especialidad'] ?? null, FILTER_SANITIZE_SPECIAL_CHARS) ?: null;
@@ -58,9 +59,31 @@ if (defined('SECCION') && SECCION === 'sacarTurno') {
     $listadoMedicos        = [];
     $listadoHorarios       = [];
 
+
+    $todosLosMedicos       = $medico->getAll();
+    $especialidadesDelMedico = [];
+
     $idEspecialidad = filter_var($_GET['id_especialidad'] ?? null, FILTER_SANITIZE_NUMBER_INT) ?: null;
     $matricula      = filter_var($_GET['matricula']       ?? null, FILTER_SANITIZE_SPECIAL_CHARS) ?: null;
     $fecha          = filter_var($_GET['fecha']           ?? null, FILTER_SANITIZE_SPECIAL_CHARS) ?: null;
+
+
+    if ($matricula && !$idEspecialidad) {
+        $sqlEsp = "SELECT e.id_especialidad, e.nombre, e.duracion_turno_min 
+                   FROM Medico_Especialidad me
+                   JOIN Especialidad e ON me.id_especialidad = e.id_especialidad
+                   WHERE me.matricula = :matricula";
+        $stmtEsp = $pdo->prepare($sqlEsp);
+        $stmtEsp->execute([':matricula' => $matricula]);
+        $especialidadesDelMedico = $stmtEsp->fetchAll();
+
+        // Si el médico atiende una sola especialidad, autocompletamos y recargamos
+        if (count($especialidadesDelMedico) === 1) {
+            $idAuto = $especialidadesDelMedico[0]['id_especialidad'];
+            header("Location: SacarTurno.php?id_especialidad=$idAuto&matricula=$matricula");
+            exit;
+        }
+    }
 
     if ($idEspecialidad) {
         $listadoMedicos = $medico->getByEspecialidad($idEspecialidad);
@@ -81,6 +104,16 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
     // 1. Procesar la creación de un turno nuevo
     if ($accion === 'crearTurno') {
+
+        if (empty($dni)) {
+            error_log("DEBUG: Intento de crear turno sin DNI para usuario ID: " . $_SESSION['usuario_id']);
+            header('Location: ../views/SacarTurno.php?registro=error');
+            exit;
+        }
+
+        // Obtenemos el ID del plan. Si es "Particular", llegará un 0.
+        $idPlan = filter_var($_POST['id_plan'] ?? 0,  FILTER_SANITIZE_NUMBER_INT);
+
         $datos = [
             'fecha'           => filter_var($_POST['fecha']           ?? '', FILTER_SANITIZE_SPECIAL_CHARS),
             'hora_inicio'     => filter_var($_POST['hora_inicio']     ?? '', FILTER_SANITIZE_SPECIAL_CHARS),
@@ -88,8 +121,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             'matricula'       => filter_var($_POST['matricula']       ?? '', FILTER_SANITIZE_SPECIAL_CHARS),
             'id_especialidad' => filter_var($_POST['id_especialidad'] ?? 0,  FILTER_SANITIZE_NUMBER_INT),
             'id_consultorio'  => filter_var($_POST['id_consultorio']  ?? 0,  FILTER_SANITIZE_NUMBER_INT),
-            'id_plan'         => filter_var($_POST['id_plan']         ?? 0,  FILTER_SANITIZE_NUMBER_INT),
-            'nro_afiliado'    => filter_var($_POST['nro_afiliado']    ?? '', FILTER_SANITIZE_SPECIAL_CHARS),
+
+            'id_plan'         => ($idPlan > 0) ? $idPlan : null,
+            'nro_afiliado'    => ($idPlan > 0) ? filter_var($_POST['nro_afiliado'] ?? '', FILTER_SANITIZE_SPECIAL_CHARS) : null,
+
             'observacion'     => filter_var($_POST['observacion']     ?? '', FILTER_SANITIZE_SPECIAL_CHARS) ?: null,
         ];
 
@@ -103,16 +138,25 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $plan = new Plan($pdo);
 
             $espData  = $especialidad->getById((int)$datos['id_especialidad']);
-            $planData = $plan->getById((int)$datos['id_plan']);
-
             $precioBase  = $espData['precio'];
-            $cobertura   = $planData['porcentaje_cobertura'];
+
+            // Verificamos si eligió "Particular" o una Obra Social real
+            if (!empty($datos['id_plan'])) {
+                $planData = $plan->getById((int)$datos['id_plan']);
+                $cobertura = $planData ? $planData['porcentaje_cobertura'] : 0;
+            } else {
+                $cobertura = 0;
+            }
+
             $descuento   = $precioBase * ($cobertura / 100);
             $montofinal  = $precioBase - $descuento;
 
             $pago->crear((int)$resultado, $montofinal);
 
             header('Location: ../views/pagarTurno.php?id_turno=' . $resultado . '&monto=' . $montofinal . '&cobertura=' . $cobertura . '&precio_base=' . $precioBase);
+            exit;
+        } else {
+            header('Location: ../views/SacarTurno.php?registro=error');
             exit;
         }
     }

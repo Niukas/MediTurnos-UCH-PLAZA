@@ -46,8 +46,10 @@
         }
     </script>
 
-    <style>
+    <link href="https://cdn.jsdelivr.net/npm/tom-select@2.2.2/dist/css/tom-select.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/tom-select@2.2.2/dist/js/tom-select.complete.min.js"></script>
 
+    <style>
         .animate-fadeIn {
             animation: fadeIn 0.4s ease-out forwards;
         }
@@ -102,6 +104,48 @@
         svg[class*="w-"],
         svg[class*="h-"] {
             visibility: visible !important;
+        }
+
+        .ts-wrapper.single .ts-control {
+            background-color: #F8FAFC;
+            border: 1px solid #E5E7EB;
+            border-radius: 0.75rem;
+            padding: 0.75rem 1rem;
+            font-size: 0.875rem;
+            font-weight: 500;
+            color: #2F4550;
+            box-shadow: none;
+            transition: all 0.2s;
+            cursor: text;
+        }
+
+        .ts-wrapper.single.focus .ts-control {
+            background-color: #ffffff;
+            border-color: #586F7C;
+            box-shadow: 0 0 0 3px rgba(88, 111, 124, 0.1);
+        }
+
+        .ts-dropdown {
+            background-color: #ffffff;
+            border-radius: 0.75rem;
+            border: 1px solid #E5E7EB;
+            box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+            margin-top: 0.25rem;
+            z-index: 9999;
+        }
+
+        .ts-dropdown .option {
+            padding: 0.75rem 1rem;
+            font-size: 0.875rem;
+            color: #2F4550;
+        }
+
+        .ts-dropdown .option.active,
+        .ts-dropdown .option:hover {
+            background-color: #F8FAFC;
+            color: #2F4550;
+            font-weight: 600;
         }
     </style>
 </head>

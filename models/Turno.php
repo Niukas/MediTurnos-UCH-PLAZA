@@ -123,40 +123,65 @@ class Turno
     }
 
     // Metodo de creacion de un turno
-    public function crear(array $datos)
+    public function crear($datos)
     {
         try {
+            // 1. Iniciamos la transacción (tx) que tenías originalmente
             $this->db->beginTransaction();
 
             $sql = "CALL sp_crear_turno(
-                    :fecha, :hora_inicio, :dni, :matricula,
-                    :id_especialidad, :id_consultorio, :id_plan,
-                    :nro_afiliado, :observacion, @resultado, @p_id_turno)";
+                :fecha, 
+                :hora_inicio, 
+                :dni, 
+                :matricula, 
+                :id_especialidad, 
+                :id_consultorio, 
+                :id_plan, 
+                :nro_afiliado, 
+                :observacion, 
+                @p_resultado, 
+                @p_id_turno
+            )";
 
             $stmt = $this->db->prepare($sql);
-            $stmt->execute([
-                ':fecha'           => $datos['fecha'],
-                ':hora_inicio'     => $datos['hora_inicio'],
-                ':dni'             => $datos['dni'],
-                ':matricula'       => $datos['matricula'],
-                ':id_especialidad' => $datos['id_especialidad'],
-                ':id_consultorio'  => $datos['id_consultorio'],
-                ':id_plan'         => $datos['id_plan'],
-                ':nro_afiliado'    => $datos['nro_afiliado'],
-                ':observacion'     => $datos['observacion'] ?? null
-            ]);
 
-            $resultado = $this->db->query("SELECT @resultado AS resultado, @p_id_turno AS id_turno")->fetch();
+            // Bindeamos explícitamente para asegurarnos de que el NULL se envíe bien si es Particular
+            $stmt->bindValue(':fecha',           $datos['fecha']);
+            $stmt->bindValue(':hora_inicio',     $datos['hora_inicio']);
+            $stmt->bindValue(':dni',             $datos['dni'], PDO::PARAM_INT);
+            $stmt->bindValue(':matricula',       $datos['matricula']);
+            $stmt->bindValue(':id_especialidad', $datos['id_especialidad'], PDO::PARAM_INT);
+            $stmt->bindValue(':id_consultorio',  $datos['id_consultorio'], PDO::PARAM_INT);
+            $stmt->bindValue(':id_plan',         $datos['id_plan'], is_null($datos['id_plan']) ? PDO::PARAM_NULL : PDO::PARAM_INT);
+            $stmt->bindValue(':nro_afiliado',    $datos['nro_afiliado'], is_null($datos['nro_afiliado']) ? PDO::PARAM_NULL : PDO::PARAM_STR);
+            $stmt->bindValue(':observacion',     $datos['observacion']);
 
-            $this->db->commit();
+            $stmt->execute();
 
-            if ($resultado['resultado'] == 1) {
-                return $resultado['id_turno'];
+            // FIX VITAL: Liberar el cursor. Si no hacemos esto, el próximo SELECT hace explotar a PDO (Commands out of sync)
+            $stmt->closeCursor();
+
+            // 2. Traemos las variables OUT de MySQL
+            $stmtOut = $this->db->query("SELECT @p_resultado AS resultado, @p_id_turno AS id_turno");
+            $res = $stmtOut->fetch(PDO::FETCH_ASSOC);
+
+            // 3. Evaluamos qué nos respondió el Procedure
+            if ($res && $res['resultado'] == 1) {
+                // Todo salió bien, impactamos la base de datos
+                $this->db->commit();
+                return $res['id_turno'];
+            } else {
+                // El turno ya existía o hubo conflicto lógico en el SP
+                $this->db->rollBack();
+                return false;
             }
-            return false;
         } catch (\Throwable $th) {
-            $this->db->rollBack();
-            error_log($th->getMessage());
+            var_dump($th);
+            exit;
+            if ($this->db->inTransaction()) {
+                $this->db->rollBack();
+            }
+            error_log("Error en Turno->crear(): " . $th->getMessage());
             return false;
         }
     }
