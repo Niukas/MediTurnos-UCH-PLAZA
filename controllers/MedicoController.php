@@ -177,4 +177,13 @@ if (SECCION === 'configurarHorarios') {
     $sqlCons = "SELECT id_consultorio, numero, piso FROM Consultorio ORDER BY numero ASC";
     $stmtCons = $pdo->query($sqlCons);
     $listadoConsultorios = $stmtCons->fetchAll();
+
+    // Traer ocupación de consultorios (de OTROS médicos) para filtrar en el front
+    $sqlBusy = "SELECT dia_semana, id_consultorio FROM Horario_Atencion WHERE matricula != :matricula";
+    $stmtBusy = $pdo->prepare($sqlBusy);
+    $stmtBusy->execute([':matricula' => $matriculaMedico]);
+    $ocupacionConsultorios = [];
+    foreach ($stmtBusy->fetchAll() as $row) {
+        $ocupacionConsultorios[$row['dia_semana']][] = $row['id_consultorio'];
+    }
 }

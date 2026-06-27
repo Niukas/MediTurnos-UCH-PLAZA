@@ -165,18 +165,20 @@ class Horario
     {
         try {
             // Verificamos si ya existe un horario que se superponga ese mismo día
-            // La fórmula de superposición es: (InicioA < FinB) AND (FinA > InicioB)
+            // 1. Que el mismo médico no tenga otro horario en ese momento
+            // 2. Que el consultorio no esté ocupado por otro horario en ese momento
             $sqlCheck = "SELECT COUNT(*) FROM Horario_Atencion 
-                         WHERE matricula = :matricula 
-                         AND dia_semana = :dia_semana 
-                         AND (hora_inicio < :hora_fin AND hora_fin > :hora_inicio)";
+                         WHERE dia_semana = :dia_semana 
+                         AND (hora_inicio < :hora_fin AND hora_fin > :hora_inicio)
+                         AND (matricula = :matricula OR id_consultorio = :id_consultorio)";
                          
             $stmtCheck = $this->db->prepare($sqlCheck);
             $stmtCheck->execute([
-                ':matricula'   => $datos['matricula'],
-                ':dia_semana'  => $datos['dia_semana'],
-                ':hora_inicio' => $datos['hora_inicio'],
-                ':hora_fin'    => $datos['hora_fin']
+                ':matricula'      => $datos['matricula'],
+                ':id_consultorio' => $datos['id_consultorio'],
+                ':dia_semana'     => $datos['dia_semana'],
+                ':hora_inicio'    => $datos['hora_inicio'],
+                ':hora_fin'       => $datos['hora_fin']
             ]);
 
             // Si encuentra al menos 1 registro que se pise, aborta y avisa

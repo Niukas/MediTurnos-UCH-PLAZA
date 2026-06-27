@@ -285,6 +285,25 @@ $titulo = 'Configurar Agenda — MediTurnos';
                         }
                     ]
                 });
+
+                // Filtrar consultorios por día
+                const ocupacion = <?= json_encode($ocupacionConsultorios ?? []) ?>;
+                const selectDia = document.querySelector('select[name="dia_semana"]');
+                const selectCons = document.querySelector('select[name="id_consultorio"]');
+                const todasLasOpciones = Array.from(selectCons.options);
+
+                selectDia.addEventListener('change', function() {
+                    const dia = this.value;
+                    const ocupadosEnDia = ocupacion[dia] || [];
+                    
+                    // Restaurar todas las opciones
+                    selectCons.innerHTML = '';
+                    todasLasOpciones.forEach(option => {
+                        if (option.value === "" || !ocupadosEnDia.includes(parseInt(option.value))) {
+                            selectCons.appendChild(option);
+                        }
+                    });
+                });
             } else {
                 console.error("Flatpickr no está cargado. Asegurate de que los CDN estén en layout/head.php");
             }
