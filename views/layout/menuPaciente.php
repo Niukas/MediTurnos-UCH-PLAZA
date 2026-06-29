@@ -21,6 +21,11 @@
             Sacar Turno
         </a>
 
+        <a href="misPlanes.php"
+            class="hidden md:inline-block text-[0.85rem] uppercase tracking-wider transition-colors px-3 py-2 rounded-lg <?= SECCION === 'misPlanes' ? 'bg-ghost text-charcoal font-bold' : 'font-medium text-slate hover:text-charcoal hover:bg-ghost' ?>">
+            Mis Planes
+        </a>
+
         <form method="POST" action="../controllers/AuthController.php" class="m-0 sm:ml-2">
             <input type="hidden" name="accion" value="logout">
             <button type="submit" class="bg-charcoal hover:bg-slate text-white px-4 sm:px-5 py-2 rounded-xl font-sans text-[0.85rem] font-bold tracking-wide transition-colors flex items-center gap-2 shadow-sm">

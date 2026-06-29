@@ -26,6 +26,23 @@ class Paciente
         return $stmt->fetchAll();
     }
 
+    public function asignarPlan($dni, $id_plan, $nro_afiliado)
+    {
+        try {
+            $sql = "INSERT INTO Paciente_Plan (dni, id_plan, nro_afiliado, fecha_alta)
+                    VALUES (:dni, :id_plan, :nro_afiliado, NOW())";
+            $stmt = $this->db->prepare($sql);
+            return $stmt->execute([
+                ':dni'          => $dni,
+                ':id_plan'      => $id_plan,
+                ':nro_afiliado' => $nro_afiliado
+            ]);
+        } catch (\Throwable $th) {
+            error_log("Error en Paciente->asignarPlan(): " . $th->getMessage());
+            return false;
+        }
+    }
+
     // Metodo para buscar por nombre, apellido o dni
     public function buscar(string $busqueda)
     {

@@ -53,6 +53,15 @@ if (defined('SECCION') && SECCION === 'misTurnos') {
     }
 }
 
+if (defined('SECCION') && SECCION === 'misPlanes') {
+    require_once '../models/Plan.php';
+    $planModel = new Plan($pdo);
+    $misPlanes = $paciente->getByPaciente($dni);
+    $listadoPlanesDisponibles = $planModel->getAll();
+    $listadoObraSociales = $planModel->getAllObraSociales();
+    error_log("DEBUG misPlanes: " . var_export($listadoPlanesDisponibles, true));
+}
+
 if (defined('SECCION') && SECCION === 'sacarTurno') {
     $listadoEspecialidades = $especialidad->getAll();
     $listadoPlanes         = $paciente->getByPaciente($dni);
@@ -228,5 +237,22 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 exit;
             }
         }
+    }
+
+    // 5. Asignar un nuevo plan al paciente
+    if ($accion === 'asignarPlan') {
+        $id_plan      = filter_var($_POST['id_plan']      ?? 0, FILTER_SANITIZE_NUMBER_INT);
+        $nro_afiliado = filter_var($_POST['nro_afiliado'] ?? '', FILTER_SANITIZE_SPECIAL_CHARS);
+
+        if ($id_plan && $nro_afiliado && !empty($dni)) {
+            if ($paciente->asignarPlan($dni, $id_plan, $nro_afiliado)) {
+                header('Location: ../views/misPlanes.php?registro=exitoso');
+            } else {
+                header('Location: ../views/misPlanes.php?registro=error');
+            }
+        } else {
+            header('Location: ../views/misPlanes.php?registro=error');
+        }
+        exit;
     }
 }
