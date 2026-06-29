@@ -106,4 +106,56 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             exit;
         }
     }
+     if ($accion === 'recuperar') {
+        $email = filter_var($_POST['email'] ?? '', FILTER_SANITIZE_EMAIL);
+        $dni = filter_var($_POST['dni'] ?? '', FILTER_SANITIZE_NUMBER_INT);
+
+        if (empty($email) || empty($dni)) {
+            header('Location: ../views/Recuperar.php?error=datos_invalidos');
+            exit;
+        }
+
+        $resultado = $usuario->verificarIdentidad($email, $dni);
+
+        if ($resultado) {
+            $_SESSION['usuario_id_para_reset'] = $resultado['id_usuario'];
+            header('Location: ../views/Reset.php');
+            exit;
+        } else {
+            header('Location: ../views/Recuperar.php?error=no_coincide');
+            exit;
+        }
+    }
+
+    if ($accion === 'reset') {
+        if (!isset($_SESSION['usuario_id_para_reset'])) {
+            header('Location: ../views/Login.php');
+            exit;
+        }
+
+        $password = $_POST['password'] ?? '';
+        $password_confirm = $_POST['password_confirm'] ?? '';
+
+        if (strlen($password) < 6) {
+            header('Location: ../views/Reset.php?error=password_corta');
+            exit;
+        }
+
+        if ($password !== $password_confirm) {
+            header('Location: ../views/Reset.php?error=no_coinciden');
+            exit;
+        }
+
+        $id_usuario = $_SESSION['usuario_id_para_reset'];
+        $resultado = $usuario->resetearPassword($id_usuario, $password);
+
+        if ($resultado) {
+            unset($_SESSION['usuario_id_para_reset']);
+            header('Location: ../views/Login.php?exito=password_actualizada');
+            exit;
+        } else {
+            header('Location: ../views/Reset.php?error=desconocido');
+            exit;
+        }
+    }
 }

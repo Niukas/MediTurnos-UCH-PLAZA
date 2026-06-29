@@ -33,9 +33,11 @@
                 'errorLogin' => ['bg' => 'bg-red-500/10',   'border' => 'border-red-500/20',   'text' => 'text-red-700',   'texto' => 'Usuario o contraseña incorrectos.'],
                 'error'      => ['bg' => 'bg-red-500/10',   'border' => 'border-red-500/20',   'text' => 'text-red-700',   'texto' => 'Hubo un error en el registro, intentá de nuevo.'],
                 'registro'   => ['bg' => 'bg-green-500/10', 'border' => 'border-green-500/20', 'text' => 'text-green-700', 'texto' => 'Cuenta creada con éxito. Ya podés iniciar sesión.'],
+                'password_actualizada'   => ['bg' => 'bg-green-500/10', 'border' => 'border-green-500/20', 'text' => 'text-green-700', 'texto' => 'Contraseña actualizada con éxito. Ya podés iniciar sesión.'],
+
             ];
-            foreach ($mensajes as $key => $msg):
-                if (isset($_GET[$key])): ?>
+                        foreach ($mensajes as $key => $msg):
+                if (isset($_GET[$key]) || (isset($_GET['exito']) && $key === 'password_actualizada')): ?>
                     <div class="<?= $msg['bg'] ?> <?= $msg['border'] ?> border rounded-xl px-4 py-3 mb-6 text-xs font-medium <?= $msg['text'] ?> flex items-center gap-2.5 animate-fadeIn">
                         <svg class="w-4 h-4 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
@@ -64,7 +66,7 @@
                 <div>
                     <div class="flex justify-between items-center mb-1.5">
                         <label class="block text-[0.7rem] font-bold text-slate uppercase tracking-widest">Contraseña</label>
-                        <a class="text-[0.75rem] font-medium text-slate/70 hover:text-charcoal transition-colors underline cursor-pointer">¿La olvidaste?</a>
+                        <a href="Recuperar.php" class="text-[0.75rem] font-medium text-slate/70 hover:text-charcoal transition-colors underline cursor-pointer">¿La olvidaste?</a>
                     </div>
                     <div class="relative">
                         <div class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-slate/50">

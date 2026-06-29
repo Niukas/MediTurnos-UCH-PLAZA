@@ -195,4 +195,37 @@ class Usuario
         $stmt->execute([':busqueda' => '%' . $busqueda . '%']);
         return $stmt->fetchAll();
     }
+
+
+    public function verificarIdentidad(string $email, string $dni)
+    {
+        try {
+            $sql = "SELECT id_usuario FROM Usuario WHERE email = :email AND dni = :dni AND activo = 1 LIMIT 1";
+            $stmt = $this->db->prepare($sql);
+            $stmt->execute([':email' => $email, ':dni' => $dni]);
+            $usuario = $stmt->fetch();
+
+            return $usuario ?: false;
+        } catch (\Throwable $th) {
+            error_log($th->getMessage());
+            return false;
+        }
+    }
+
+    public function resetearPassword(int $id_usuario, string $password)
+    {
+        try {
+            $passwordHasheada = password_hash($password, PASSWORD_DEFAULT);
+            $sql = "UPDATE Usuario SET password = :password WHERE id_usuario = :id_usuario";
+            $stmt = $this->db->prepare($sql);
+            $stmt->execute([
+                ':password'   => $passwordHasheada,
+                ':id_usuario' => $id_usuario
+            ]);
+            return true;
+        } catch (\Throwable $th) {
+            error_log($th->getMessage());
+            return false;
+        }
+    }
 }
