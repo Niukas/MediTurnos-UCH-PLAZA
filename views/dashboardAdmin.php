@@ -31,123 +31,77 @@ $totalesConsolidados = array_sum($stats);
             <p class="text-slate text-sm">Monitoreá el volumen de pacientes, actividad del staff médico y distribución de coberturas.</p>
         </div>
 
+        <!-- Fila 1: Stats Principales -->
         <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5 mb-8">
-
             <div class="bg-white border border-gray-200/80 rounded-2xl p-6 shadow-sm flex items-center justify-between group">
                 <div>
                     <span class="text-[0.65rem] font-bold text-slate uppercase tracking-widest block mb-1">Pacientes Totales</span>
-                    <span class="font-serif text-3xl text-charcoal tracking-tight block font-bold">
-                        <?= $pacientesTotales ?? (isset($usuariosTotales) ? $usuariosTotales : 0) ?>
-                    </span>
+                    <span class="font-serif text-3xl text-charcoal tracking-tight block font-bold"><?= $pacientesTotales ?? 0 ?></span>
                 </div>
                 <div class="w-12 h-12 rounded-xl bg-ghost flex items-center justify-center text-slate">
-                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"></path>
-                    </svg>
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"></path></svg>
                 </div>
             </div>
-
             <div class="bg-white border border-gray-200/80 rounded-2xl p-6 shadow-sm flex items-center justify-between group">
                 <div>
                     <span class="text-[0.65rem] font-bold text-slate uppercase tracking-widest block mb-1">Cuerpo Médico</span>
-                    <span class="font-serif text-3xl text-charcoal tracking-tight block font-bold">
-                        <?= $medicosTotales ?? 0 ?>
-                    </span>
+                    <span class="font-serif text-3xl text-charcoal tracking-tight block font-bold"><?= $medicosTotales ?? 0 ?></span>
                 </div>
                 <div class="w-12 h-12 rounded-xl bg-ghost flex items-center justify-center text-slate">
-                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"></path>
-                    </svg>
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"></path></svg>
                 </div>
             </div>
-
             <div class="bg-white border border-gray-200/80 rounded-2xl p-6 shadow-sm flex items-center justify-between group">
                 <div>
                     <span class="text-[0.65rem] font-bold text-slate uppercase tracking-widest block mb-1">Gestión de Turnos</span>
-                    <span class="font-serif text-3xl text-charcoal tracking-tight block font-bold">
-                        <?= $totalesConsolidados ?>
-                    </span>
+                    <span class="font-serif text-3xl text-charcoal tracking-tight block font-bold"><?= $totalesConsolidados ?></span>
                 </div>
                 <div class="w-12 h-12 rounded-xl bg-ghost flex items-center justify-center text-slate">
-                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
-                    </svg>
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path></svg>
                 </div>
             </div>
-
             <div class="bg-white border border-gray-200/80 rounded-2xl p-6 shadow-sm flex items-center justify-between group">
                 <div>
                     <span class="text-[0.65rem] font-bold text-slate uppercase tracking-widest block mb-1">Citas Confirmadas</span>
-                    <span class="font-serif text-3xl text-[#10b981] tracking-tight block font-bold">
-                        <?= $stats['confirmado'] ?? 0 ?>
-                    </span>
+                    <span class="font-serif text-3xl text-[#10b981] tracking-tight block font-bold"><?= $stats['confirmado'] ?? 0 ?></span>
                 </div>
                 <div class="w-12 h-12 rounded-xl bg-emerald-50 text-emerald-600">
-                    <svg class="w-6 h-6 mx-auto mt-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
-                    </svg>
+                    <svg class="w-6 h-6 mx-auto mt-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
                 </div>
             </div>
-
         </div>
 
-        <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 mb-8">
-            <div class="bg-white rounded-2xl border border-gray-200/80 p-6 shadow-sm lg:col-span-7 flex flex-col justify-between">
-                <div>
-                    <h3 class="font-serif text-xl text-charcoal tracking-tight mb-1">Volumen de turnos por estado</h3>
-                    <p class="text-xs text-slate mb-5">Estado operacional de las reservas consolidadas.</p>
-                </div>
-                <div class="space-y-4">
-                    <?php foreach ($turnosPorEstado as $e):
-                        $estadoKey = strtolower($e['estado']);
-                        $colorData = match ($estadoKey) {
-                            'pendiente'  => ['bg' => 'bg-amber-500', 'light' => 'bg-amber-50', 'text' => 'text-amber-700', 'border' => 'border-amber-200'],
-                            'confirmado' => ['bg' => 'bg-emerald-500', 'light' => 'bg-emerald-50', 'text' => 'text-emerald-700', 'border' => 'border-emerald-200'],
-                            'cancelado'  => ['bg' => 'bg-rose-500', 'light' => 'bg-rose-50', 'text' => 'text-rose-700', 'border' => 'border-rose-200'],
-                            'realizado'  => ['bg' => 'bg-blue-500', 'light' => 'bg-blue-50', 'text' => 'text-blue-700', 'border' => 'border-blue-200'],
-                            default      => ['bg' => 'bg-slate-500', 'light' => 'bg-gray-50', 'text' => 'text-gray-700', 'border' => 'border-gray-200']
-                        };
-                        $porcentaje = $totalesConsolidados > 0 ? ($e['total'] / $totalesConsolidados) * 100 : 0;
-                    ?>
-                        <div>
-                            <div class="flex justify-between items-center mb-1.5 text-xs font-bold">
-                                <span class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded border <?= $colorData['light'] ?> <?= $colorData['border'] ?> <?= $colorData['text'] ?> uppercase tracking-wider text-[0.65rem]"><?= ucfirst(h($e['estado'])) ?></span>
-                                <span class="text-charcoal font-mono text-sm"><?= $e['total'] ?></span>
-                            </div>
-                            <div class="w-full h-2 bg-ghost rounded-full overflow-hidden">
-                                <div class="h-full <?= $colorData['bg'] ?> rounded-full transition-all" style="width: <?= $porcentaje ?>%"></div>
-                            </div>
+        <!-- Fila 2: Volumen de Turnos -->
+        <div class="bg-white rounded-2xl border border-gray-200/80 p-6 shadow-sm mb-8">
+            <h3 class="font-serif text-xl text-charcoal tracking-tight mb-1">Volumen de turnos por estado</h3>
+            <p class="text-xs text-slate mb-5">Estado operacional de las reservas consolidadas.</p>
+            <div class="space-y-4">
+                <?php foreach ($turnosPorEstado as $e):
+                    $estadoKey = strtolower($e['estado']);
+                    $colorData = match ($estadoKey) {
+                        'pendiente'  => ['bg' => 'bg-amber-500', 'light' => 'bg-amber-50', 'text' => 'text-amber-700', 'border' => 'border-amber-200'],
+                        'confirmado' => ['bg' => 'bg-emerald-500', 'light' => 'bg-emerald-50', 'text' => 'text-emerald-700', 'border' => 'border-emerald-200'],
+                        'cancelado'  => ['bg' => 'bg-rose-500', 'light' => 'bg-rose-50', 'text' => 'text-rose-700', 'border' => 'border-rose-200'],
+                        'realizado'  => ['bg' => 'bg-blue-500', 'light' => 'bg-blue-50', 'text' => 'text-blue-700', 'border' => 'border-blue-200'],
+                        default      => ['bg' => 'bg-slate-500', 'light' => 'bg-gray-50', 'text' => 'text-gray-700', 'border' => 'border-gray-200']
+                    };
+                    $porcentaje = $totalesConsolidados > 0 ? ($e['total'] / $totalesConsolidados) * 100 : 0;
+                ?>
+                    <div>
+                        <div class="flex justify-between items-center mb-1.5 text-xs font-bold">
+                            <span class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded border <?= $colorData['light'] ?> <?= $colorData['border'] ?> <?= $colorData['text'] ?> uppercase tracking-wider text-[0.65rem]"><?= ucfirst(h($e['estado'])) ?></span>
+                            <span class="text-charcoal font-mono text-sm"><?= $e['total'] ?></span>
                         </div>
-                    <?php endforeach; ?>
-                </div>
-            </div>
-            <div class="bg-white rounded-2xl border border-gray-200/80 p-6 shadow-sm lg:col-span-5">
-                <h3 class="font-serif text-xl text-charcoal tracking-tight mb-1">Actividad Reciente</h3>
-                <p class="text-xs text-slate mb-5">Últimos cambios de estado en los turnos.</p>
-                <div class="space-y-4 max-h-[300px] overflow-y-auto pr-2 custom-scrollbar">
-                    <?php if (empty($listadoActividad)): ?>
-                        <p class="text-sm text-slate italic">No hay actividad reciente para mostrar.</p>
-                    <?php else: ?>
-                        <?php foreach ($listadoActividad as $act): ?>
-                            <div class="flex gap-3">
-                                <div class="w-8 h-8 rounded-full bg-ghost text-slate flex items-center justify-center shrink-0 mt-1">
-                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path></svg>
-                                </div>
-                                <div>
-                                    <p class="text-sm font-bold text-charcoal leading-tight">Turno de <?= h($act['paciente_nombre'] . ' ' . $act['paciente_apellido']) ?></p>
-                                    <p class="text-xs text-slate mt-1">
-                                        Estado cambió de <strong class="font-bold uppercase"><?= h($act['estado_anterior']) ?></strong> a <strong class="font-bold uppercase"><?= h($act['estado_nuevo']) ?></strong>.
-                                    </p>
-                                    <p class="text-[0.7rem] text-slate/70 mt-1 font-mono"><?= date('d/m/Y H:i', strtotime($act['fecha_cambio'])) ?> hs</p>
-                                </div>
-                            </div>
-                        <?php endforeach; ?>
-                    <?php endif; ?>
-                </div>
+                        <div class="w-full h-2 bg-ghost rounded-full overflow-hidden">
+                            <div class="h-full <?= $colorData['bg'] ?> rounded-full transition-all" style="width: <?= $porcentaje ?>%"></div>
+                        </div>
+                    </div>
+                <?php endforeach; ?>
             </div>
         </div>
 
-        <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 mb-8">
+        <!-- Fila 3: Stats Secundarias y Coberturas -->
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 mb-8 lg:items-start">
             <div class="lg:col-span-5 space-y-4 flex flex-col">
                 <?php if (!empty($medicoConMasTurnos)): ?>
                     <div class="bg-white rounded-2xl border border-gray-200/80 p-5 shadow-sm flex items-center gap-4 flex-1">
@@ -177,8 +131,7 @@ $totalesConsolidados = array_sum($stats);
                     <h3 class="font-serif text-lg text-charcoal tracking-tight">Distribución por cobertura médica</h3>
                     <p class="text-xs text-slate mt-0.5">Mapeo del total de turnos procesados por prestadora u obra social.</p>
                 </div>
-
-                <div class="overflow-x-auto max-h-[300px] custom-scrollbar">
+                <div class="overflow-y-auto max-h-[300px] custom-scrollbar">
                     <table class="w-full text-left border-collapse">
                         <thead>
                             <tr class="bg-white border-b border-gray-100 sticky top-0">
@@ -202,8 +155,33 @@ $totalesConsolidados = array_sum($stats);
             </div>
             <?php endif; ?>
         </div>
+        
+        <!-- Fila 4: Actividad Reciente -->
+        <div class="bg-white rounded-2xl border border-gray-200/80 p-6 shadow-sm mb-8">
+            <h3 class="font-serif text-xl text-charcoal tracking-tight mb-1">Actividad Reciente</h3>
+            <p class="text-xs text-slate mb-5">Últimos cambios de estado en los turnos.</p>
+            <div class="space-y-4 max-h-[350px] overflow-y-auto pr-2 custom-scrollbar">
+                <?php if (empty($listadoActividad)): ?>
+                    <p class="text-sm text-slate italic py-4 text-center">No hay actividad reciente para mostrar.</p>
+                <?php else: ?>
+                    <?php foreach ($listadoActividad as $act): ?>
+                        <div class="flex gap-3 py-2 border-b border-gray-50 last:border-0">
+                            <div class="w-8 h-8 rounded-full bg-ghost text-slate flex items-center justify-center shrink-0 mt-1">
+                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path></svg>
+                            </div>
+                            <div>
+                                <p class="text-sm font-bold text-charcoal leading-tight">Turno de <?= h($act['paciente_nombre'] . ' ' . $act['paciente_apellido']) ?></p>
+                                <p class="text-xs text-slate mt-1">
+                                    Estado cambió de <strong class="font-bold uppercase"><?= h($act['estado_anterior']) ?></strong> a <strong class="font-bold uppercase"><?= h($act['estado_nuevo']) ?></strong>.
+                                </p>
+                                <p class="text-[0.7rem] text-slate/70 mt-1 font-mono"><?= date('d/m/Y H:i', strtotime($act['fecha_cambio'])) ?> hs</p>
+                            </div>
+                        </div>
+                    <?php endforeach; ?>
+                <?php endif; ?>
+            </div>
+        </div>
 
     </main>
 </body>
-
 </html>
