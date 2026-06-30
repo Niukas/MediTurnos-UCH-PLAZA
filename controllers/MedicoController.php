@@ -136,11 +136,23 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 }
 
 if (SECCION === 'misTurnos') {
-    $periodo      = filter_var($_GET['periodo'] ?? 'dia', FILTER_SANITIZE_SPECIAL_CHARS);
+    // Recoger todos los filtros del GET
+    $q = filter_var($_GET['q'] ?? null, FILTER_SANITIZE_SPECIAL_CHARS);
+    $estado = filter_var($_GET['estado'] ?? null, FILTER_SANITIZE_SPECIAL_CHARS);
+    $periodo = filter_var($_GET['periodo'] ?? 'dia', FILTER_SANITIZE_SPECIAL_CHARS);
     $paginaActual = filter_var($_GET['pagina']  ?? 1,     FILTER_SANITIZE_NUMBER_INT);
-    $totalTurnos  = $turno->getTotalByFiltrosMedico($matriculaMedico, null, $periodo);
+    
+    // Construir un array de filtros para pasar al modelo
+    $filtros = [
+        'q' => $q,
+        'estado' => $estado,
+        'periodo' => $periodo,
+        'matricula' => $matriculaMedico
+    ];
+
+    $totalTurnos  = $turno->getTotalByFiltros($filtros);
     $totalPaginas = ceil($totalTurnos / 20);
-    $listadoTurnos = $turno->getByFiltrosMedico($matriculaMedico, null, $periodo, $paginaActual);
+    $listadoTurnos = $turno->getByFiltros($filtros, $paginaActual);
 }
 
 if (SECCION === 'buscarPaciente') {
@@ -155,7 +167,11 @@ if (SECCION === 'buscarPaciente') {
     $dniVer  = filter_var($_GET['dni'] ?? null, FILTER_SANITIZE_NUMBER_INT) ?: null;
 
     if ($dniVer) {
-        $turnosPaciente = $turno->getByFiltrosMedico($matriculaMedico, null, 'todos', 1, 100, $dniVer);
+        $filtros = [
+            'dni' => $dniVer,
+            'matricula' => $matriculaMedico
+        ];
+        $turnosPaciente = $turno->getByFiltros($filtros, 1, 100);
     }
 }
 

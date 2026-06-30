@@ -26,34 +26,57 @@ $titulo = 'Gestión de Turnos — MediTurnos';
         </div>
 
         <div class="bg-white rounded-2xl border border-gray-200/80 p-5 mb-8 shadow-sm">
-            <form method="GET" action="" class="m-0 flex flex-wrap items-center gap-4">
-                <div class="flex items-center gap-3 w-full sm:w-auto">
-                    <span class="text-[0.65rem] font-bold text-slate uppercase tracking-widest hidden md:block">Especialidad:</span>
-                    <div class="relative w-full sm:w-64">
-                        <select name="especialidad" onchange="this.form.submit()"
-                            class="w-full pl-4 pr-8 py-2 bg-[#F8FAFC] border border-gray-200/80 rounded-xl text-sm font-semibold text-charcoal focus:outline-none focus:border-slate appearance-none cursor-pointer transition-colors shadow-sm">
-                            <option value="">Todas las especialidades</option>
-                            <?php
-                            // Verificamos que el listado de especialidades exista antes del loop
-                            if (!empty($listadoEspecialidad)):
-                                foreach ($listadoEspecialidad as $e):
-                                    // Adaptá si tu controlador filtra por ID (ej: $e['id_especialidad']) o por nombre
-                                    $valorFiltro = $e['nombre'] ?? $e['id_especialidad'];
-                                    $estaSeleccionado = (isset($_GET['especialidad']) && $_GET['especialidad'] == $valorFiltro) ? 'selected' : '';
-                            ?>
-                                    <option value="<?= h($valorFiltro) ?>" <?= $estaSeleccionado ?>>
-                                        <?= h($e['nombre']) ?>
-                                    </option>
-                            <?php
-                                endforeach;
-                            endif;
-                            ?>
+            <form method="GET" action="" class="m-0 flex flex-col sm:flex-row items-center gap-4">
+                
+                <!-- Search Input -->
+                <div class="relative w-full sm:flex-1">
+                    <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-slate/50">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
+                    </div>
+                    <input type="search" name="q" placeholder="Buscar por paciente, médico..." value="<?= h($_GET['q'] ?? '') ?>"
+                        class="w-full pl-10 pr-4 py-2 bg-[#F8FAFC] border border-gray-200/80 rounded-xl text-sm font-medium text-charcoal placeholder-gray-400 focus:outline-none focus:border-slate shadow-sm transition-colors">
+                </div>
+
+                <div class="flex flex-col sm:flex-row items-center gap-4 w-full sm:w-auto">
+                    <!-- Specialty Filter -->
+                    <div class="relative w-full sm:w-48">
+                        <select name="especialidad" class="w-full pl-4 pr-8 py-2 bg-[#F8FAFC] border border-gray-200/80 rounded-xl text-sm font-semibold text-charcoal focus:outline-none focus:border-slate appearance-none cursor-pointer transition-colors shadow-sm">
+                            <option value="">Especialidad</option>
+                            <?php foreach ($listadoEspecialidad as $e): ?>
+                                <option value="<?= h($e['nombre']) ?>" <?= (($_GET['especialidad'] ?? '') == $e['nombre']) ? 'selected' : '' ?>>
+                                    <?= h($e['nombre']) ?>
+                                </option>
+                            <?php endforeach; ?>
                         </select>
-                        <div class="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none text-slate">
-                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
-                            </svg>
-                        </div>
+                        <div class="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none text-slate/50"><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg></div>
+                    </div>
+
+                    <!-- Status Filter -->
+                    <div class="relative w-full sm:w-48">
+                        <select name="estado" class="w-full pl-4 pr-8 py-2 bg-[#F8FAFC] border border-gray-200/80 rounded-xl text-sm font-semibold text-charcoal focus:outline-none focus:border-slate appearance-none cursor-pointer transition-colors shadow-sm">
+                            <option value="">Estado</option>
+                            <?php foreach (['pendiente', 'confirmado', 'realizado', 'cancelado'] as $estado): ?>
+                                <option value="<?= $estado ?>" <?= (($_GET['estado'] ?? '') == $estado) ? 'selected' : '' ?>><?= ucfirst($estado) ?></option>
+                            <?php endforeach; ?>
+                        </select>
+                        <div class="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none text-slate/50"><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg></div>
+                    </div>
+                    
+                    <!-- Submit Button -->
+                    <button type="submit" class="w-full sm:w-auto bg-charcoal hover:bg-slate text-white font-bold py-2 px-6 rounded-xl text-sm transition-all duration-200 shadow-md hover:shadow-lg">
+                        Filtrar
+                    </button>
+                    <?php
+                    $filtrosAplicados = !empty($_GET['q']) || !empty($_GET['especialidad']) || !empty($_GET['estado']);
+                    if ($filtrosAplicados):
+                    ?>
+                    <a href="dashboardAdminTurnos.php" class="w-full sm:w-auto text-center bg-white hover:bg-gray-100 text-slate font-bold py-2 px-6 rounded-xl text-sm transition-all duration-200 border border-gray-200 shadow-sm">
+                        Limpiar
+                    </a>
+                    <?php endif; ?>
+                </div>
+            </form>
+        </div>
                     </div>
                 </div>
             </form>

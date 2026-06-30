@@ -28,13 +28,24 @@ $dni = $usuario->getDni($_SESSION['usuario_id']);
 error_log("DEBUG: Usuario ID: " . $_SESSION['usuario_id'] . ", DNI obtenido: " . var_export($dni, true));
 
 if (defined('SECCION') && SECCION === 'misTurnos') {
-    $especialidadFiltro = filter_var($_GET['especialidad'] ?? null, FILTER_SANITIZE_SPECIAL_CHARS) ?: null;
-    $periodo            = filter_var($_GET['periodo']      ?? 'todos', FILTER_SANITIZE_SPECIAL_CHARS);
-    $paginaActual       = filter_var($_GET['pagina']       ?? 1, FILTER_SANITIZE_NUMBER_INT);
+    $listadoEspecialidades = $especialidad->getAll();
+    $q = filter_var($_GET['q'] ?? null, FILTER_SANITIZE_SPECIAL_CHARS);
+    $estado = filter_var($_GET['estado'] ?? null, FILTER_SANITIZE_SPECIAL_CHARS);
+    $especialidadFiltro = filter_var($_GET['especialidad'] ?? null, FILTER_SANITIZE_SPECIAL_CHARS);
+    $periodo = filter_var($_GET['periodo'] ?? 'todos', FILTER_SANITIZE_SPECIAL_CHARS);
+    $paginaActual = filter_var($_GET['pagina'] ?? 1, FILTER_SANITIZE_NUMBER_INT);
 
-    $totalTurnos        = $turno->getTotalByFiltros($especialidadFiltro, $periodo, $dni);
-    $totalPaginas       = ceil($totalTurnos / 20);
-    $listadoTurnos      = $turno->getByFiltros($especialidadFiltro, $periodo, $paginaActual, 20, $dni);
+    $filtros = [
+        'q' => $q,
+        'estado' => $estado,
+        'especialidad' => $especialidadFiltro,
+        'periodo' => $periodo,
+        'dni' => $dni
+    ];
+
+    $totalTurnos = $turno->getTotalByFiltros($filtros);
+    $totalPaginas = ceil($totalTurnos / 20);
+    $listadoTurnos = $turno->getByFiltros($filtros, $paginaActual, 20);
 
     require_once '../models/Pago.php';
     $pagoModel = new Pago($pdo);

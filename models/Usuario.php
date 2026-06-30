@@ -13,21 +13,49 @@ class Usuario
     }
 
     // Metodo para traer todos los usuarios y unida con la tabla de Rol
-    public function getAll($pagina = 1, $porPagina = 20)
+    public function getAll($filtros = [], $pagina = 1, $porPagina = 20)
     {
+        $where = ['activo = 1'];
+        $params = [];
+
+        if (!empty($filtros['rol'])) {
+            $where[] = 'rol = :rol';
+            $params[':rol'] = $filtros['rol'];
+        }
+
+        $sqlWhere = 'WHERE ' . implode(' AND ', $where);
         $offset = ($pagina - 1) * $porPagina;
-        $sql = "SELECT * FROM vista_usuarios WHERE activo = 1 LIMIT :limite OFFSET :offset";
+        $sql = "SELECT * FROM vista_usuarios $sqlWhere LIMIT :limite OFFSET :offset";
+        
         $stmt = $this->db->prepare($sql);
         $stmt->bindValue(':limite', $porPagina, PDO::PARAM_INT);
-        $stmt->bindValue(':offset', $offset,    PDO::PARAM_INT);
+        $stmt->bindValue(':offset', $offset, PDO::PARAM_INT);
+        foreach ($params as $key => $value) {
+            $stmt->bindValue($key, $value);
+        }
+
         $stmt->execute();
         return $stmt->fetchAll();
     }
 
-    public function getTotalUsuarios()
+    public function getTotalUsuarios($filtros = [])
     {
-        $sql  = "SELECT COUNT(*) FROM Usuario WHERE activo = 1";
+        $where = ['activo = 1'];
+        $params = [];
+
+        if (!empty($filtros['rol'])) {
+            $where[] = 'rol = :rol';
+            $params[':rol'] = $filtros['rol'];
+        }
+
+        $sqlWhere = 'WHERE ' . implode(' AND ', $where);
+        $sql  = "SELECT COUNT(*) FROM vista_usuarios $sqlWhere";
+        
         $stmt = $this->db->prepare($sql);
+        foreach ($params as $key => $value) {
+            $stmt->bindValue($key, $value);
+        }
+        
         $stmt->execute();
         return $stmt->fetchColumn();
     }
@@ -181,18 +209,30 @@ class Usuario
     }
 
     // Método para buscar usuarios por nombre, apellido, email o nombre completo
-    public function buscar(string $busqueda)
+    public function buscar($filtros = [])
     {
-        $sql = "SELECT * FROM vista_usuarios 
-                WHERE nombre LIKE :busqueda 
-                OR apellido LIKE :busqueda 
-                OR email LIKE :busqueda 
-                OR CONCAT(nombre, ' ', apellido) LIKE :busqueda
-                OR CONCAT(apellido, ' ', nombre) LIKE :busqueda
-                ORDER BY apellido ASC";
+        $where = ['activo = 1'];
+        $params = [];
+
+        if (!empty($filtros['busqueda'])) {
+            $where[] = "(nombre LIKE :busqueda OR apellido LIKE :busqueda OR email LIKE :busqueda OR CONCAT(nombre, ' ', apellido) LIKE :busqueda OR CONCAT(apellido, ' ', nombre) LIKE :busqueda)";
+            $params[':busqueda'] = '%' . $filtros['busqueda'] . '%';
+        }
+
+        if (!empty($filtros['rol'])) {
+            $where[] = 'rol = :rol';
+            $params[':rol'] = $filtros['rol'];
+        }
+
+        $sqlWhere = 'WHERE ' . implode(' AND ', $where);
+        $sql = "SELECT * FROM vista_usuarios $sqlWhere ORDER BY apellido ASC";
 
         $stmt = $this->db->prepare($sql);
-        $stmt->execute([':busqueda' => '%' . $busqueda . '%']);
+        foreach ($params as $key => $value) {
+            $stmt->bindValue($key, $value);
+        }
+        
+        $stmt->execute();
         return $stmt->fetchAll();
     }
 

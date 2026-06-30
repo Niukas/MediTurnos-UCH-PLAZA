@@ -44,25 +44,56 @@ $titulo = 'Mis turnos — MediTurnos';
             </div>
         <?php endif; ?>
 
-        <div class="bg-white rounded-2xl border border-gray-200/80 p-4 mb-8 shadow-sm flex flex-col md:flex-row items-start md:items-center justify-between gap-4 relative z-10">
-            <div class="flex items-center gap-3 w-full md:w-auto">
+        <div class="bg-white rounded-2xl border border-gray-200/80 p-5 mb-8 shadow-sm relative z-10">
+            <form method="GET" action="" class="m-0 flex flex-col sm:flex-row items-center gap-4">
+                
+                <div class="relative w-full sm:flex-1">
+                    <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-slate/50">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
+                    </div>
+                    <input type="search" name="q" placeholder="Buscar por paciente..." value="<?= h($_GET['q'] ?? '') ?>"
+                        class="w-full pl-10 pr-4 py-2 bg-[#F8FAFC] border border-gray-200/80 rounded-xl text-sm font-medium text-charcoal placeholder-gray-400 focus:outline-none focus:border-slate shadow-sm transition-colors">
+                </div>
+
+                <div class="flex flex-col sm:flex-row items-center gap-4 w-full sm:w-auto">
+                    <div class="relative w-full sm:w-48">
+                        <select name="estado" class="w-full pl-4 pr-8 py-2 bg-[#F8FAFC] border border-gray-200/80 rounded-xl text-sm font-semibold text-charcoal focus:outline-none focus:border-slate appearance-none cursor-pointer transition-colors shadow-sm">
+                            <option value="">Todos los estados</option>
+                            <?php foreach (['pendiente', 'confirmado', 'realizado', 'cancelado'] as $estado): ?>
+                                <option value="<?= $estado ?>" <?= (($_GET['estado'] ?? '') == $estado) ? 'selected' : '' ?>><?= ucfirst($estado) ?></option>
+                            <?php endforeach; ?>
+                        </select>
+                        <div class="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none text-slate/50"><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg></div>
+                    </div>
+                    
+                    <button type="submit" class="w-full sm:w-auto bg-charcoal hover:bg-slate text-white font-bold py-2 px-6 rounded-xl text-sm transition-all duration-200 shadow-md hover:shadow-lg">
+                        Filtrar
+                    </button>
+                    <?php
+                    $filtrosAplicados = !empty($_GET['q']) || !empty($_GET['estado']);
+                    if ($filtrosAplicados):
+                    ?>
+                    <a href="PanelMedico.php" class="w-full sm:w-auto text-center bg-white hover:bg-gray-100 text-slate font-bold py-2 px-6 rounded-xl text-sm transition-all duration-200 border border-gray-200 shadow-sm">
+                        Limpiar
+                    </a>
+                    <?php endif; ?>
+                </div>
+            </form>
+            <div class="flex items-center gap-3 w-full md:w-auto mt-4">
                 <span class="text-[0.7rem] font-bold text-slate uppercase tracking-widest hidden sm:block">Período de vista:</span>
                 <div class="flex bg-[#F8FAFC] rounded-xl p-1 border border-gray-200/60 w-full sm:w-auto overflow-x-auto">
                     <?php
                     $periodos = ['dia' => 'Hoy', 'semana' => 'Semana', 'mes' => 'Mes', 'todos' => 'Histórico'];
                     foreach ($periodos as $valor => $label):
                         $isActive = ($periodo === $valor);
+                        $queryParams = http_build_query(array_merge($_GET, ['periodo' => $valor, 'pagina' => 1]));
                     ?>
-                        <a href="?periodo=<?= $valor ?>"
+                        <a href="?<?= $queryParams ?>"
                             class="flex-1 sm:flex-none text-center px-4 py-1.5 text-xs font-semibold rounded-lg transition-all duration-200 <?= $isActive ? 'bg-charcoal text-white shadow-sm' : 'text-slate hover:text-charcoal hover:bg-white' ?>">
                             <?= $label ?>
                         </a>
                     <?php endforeach; ?>
                 </div>
-            </div>
-
-            <div class="text-[0.8rem] text-slate font-medium px-2 md:px-0">
-                <span class="bg-ghost px-2.5 py-1 rounded-md border border-gray-200 mr-1 text-charcoal font-bold"><?= $totalTurnos ?></span> citas agendadas
             </div>
         </div>
 

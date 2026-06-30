@@ -49,26 +49,35 @@ $titulo = 'Gestión de Usuarios — MediTurnos';
 
         <form method="GET" action="" class="mb-6">
             <div class="flex gap-3">
-                <div class="relative flex-1">
-                    <div class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none text-slate">
-                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
-                        </svg>
-                    </div>
-                    <input type="text" name="busqueda" value="<?= h($_GET['busqueda'] ?? '') ?>"
-                        placeholder="Buscar usuario por nombre, apellido o email..."
-                        class="w-full pl-11 pr-4 py-3 bg-white border border-gray-200 rounded-xl text-sm text-charcoal placeholder-gray-400 focus:outline-none focus:border-slate focus:ring-2 focus:ring-slate/10 transition-all shadow-sm">
+                 <div class="relative flex-1">
+                     <div class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none text-slate">
+                         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
+                         </svg>
+                     </div>
+                     <input type="text" name="busqueda" value="<?= h($_GET['busqueda'] ?? '') ?>"
+                         placeholder="Buscar usuario por nombre, apellido o email..."
+                         class="w-full pl-11 pr-4 py-3 bg-white border border-gray-200 rounded-xl text-sm text-charcoal placeholder-gray-400 focus:outline-none focus:border-slate focus:ring-2 focus:ring-slate/10 transition-all shadow-sm">
+                 </div>
+                 <div class="relative">
+                    <select name="rol" class="w-full pl-4 pr-8 py-3 bg-white border border-gray-200 rounded-xl text-sm font-semibold text-charcoal focus:outline-none focus:border-slate appearance-none cursor-pointer transition-colors shadow-sm">
+                        <option value="">Todos los roles</option>
+                        <option value="admin" <?= (($_GET['rol'] ?? '') == 'admin') ? 'selected' : '' ?>>Admin</option>
+                        <option value="medico" <?= (($_GET['rol'] ?? '') == 'medico') ? 'selected' : '' ?>>Médico</option>
+                        <option value="paciente" <?= (($_GET['rol'] ?? '') == 'paciente') ? 'selected' : '' ?>>Paciente</option>
+                    </select>
+                    <div class="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none text-slate"><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg></div>
                 </div>
-                <button type="submit" class="bg-charcoal hover:bg-slate text-white px-6 py-3 rounded-xl text-sm font-bold transition-all shadow-md hover:shadow-lg flex items-center gap-2 shrink-0">
-                    Buscar
-                </button>
+                 <button type="submit" class="bg-charcoal hover:bg-slate text-white px-6 py-3 rounded-xl text-sm font-bold transition-all shadow-md hover:shadow-lg flex items-center gap-2 shrink-0">
+                     Buscar
+                 </button>
 
-                <?php if (!empty($_GET['busqueda'])): ?>
-                    <a href="dashboardAdminUsuarios.php" class="bg-white border border-gray-200 hover:border-charcoal text-slate hover:text-charcoal px-6 py-3 rounded-xl text-sm font-bold transition-all shadow-sm flex items-center gap-2 shrink-0">
-                        Limpiar
-                    </a>
-                <?php endif; ?>
-            </div>
+                <?php if (!empty($_GET['busqueda']) || !empty($_GET['rol'])): ?>
+                     <a href="dashboardAdminUsuarios.php" class="bg-white border border-gray-200 hover:border-charcoal text-slate hover:text-charcoal px-6 py-3 rounded-xl text-sm font-bold transition-all shadow-sm flex items-center gap-2 shrink-0">
+                         Limpiar
+                     </a>
+                 <?php endif; ?>
+             </div>
         </form>
 
         <div class="bg-white rounded-2xl border border-gray-200/80 shadow-sm relative">

@@ -31,19 +31,42 @@ class Turno
     }
 
     // metodo para traer los turnos por medio de filtros
-    public function getByFiltros($especialidad = null, $periodo = 'todos', $pagina = 1, $porPagina = 20, $dni = null)
+    public function getByFiltros($filtros, $pagina = 1, $porPagina = 20)
     {
         $where = [];
         $params = [];
+
+        // Extraer valores del array de filtros
+        $especialidad = $filtros['especialidad'] ?? null;
+        $periodo = $filtros['periodo'] ?? 'todos';
+        $estado = $filtros['estado'] ?? null;
+        $q = $filtros['q'] ?? null;
+        $dni = $filtros['dni'] ?? null;
+        $matricula = $filtros['matricula'] ?? null;
 
         if ($dni) {
             $where[] = "dni = :dni";
             $params[':dni'] = $dni;
         }
 
+        if ($matricula) {
+            $where[] = "matricula = :matricula";
+            $params[':matricula'] = $matricula;
+        }
+
         if ($especialidad) {
             $where[] = "especialidad = :especialidad";
             $params[':especialidad'] = $especialidad;
+        }
+        
+        if ($estado) {
+            $where[] = "estado = :estado";
+            $params[':estado'] = $estado;
+        }
+
+        if ($q) {
+            $where[] = "(paciente_nombre LIKE :q OR paciente_apellido LIKE :q OR medico_nombre LIKE :q OR medico_apellido LIKE :q)";
+            $params[':q'] = "%$q%";
         }
 
         if ($periodo === 'dia') {
@@ -56,7 +79,7 @@ class Turno
 
         $sqlWhere = count($where) > 0 ? 'WHERE ' . implode(' AND ', $where) : '';
         $offset   = ($pagina - 1) * $porPagina;
-        $sql      = "SELECT * FROM vista_turnos $sqlWhere LIMIT :limite OFFSET :offset";
+        $sql      = "SELECT * FROM vista_turnos $sqlWhere ORDER BY fecha DESC, hora_inicio DESC LIMIT :limite OFFSET :offset";
 
         $stmt = $this->db->prepare($sql);
         foreach ($params as $key => $value) {
@@ -68,19 +91,42 @@ class Turno
         return $stmt->fetchAll();
     }
 
-    public function getTotalByFiltros($especialidad = null, $periodo = 'todos', $dni = null)
+    public function getTotalByFiltros($filtros)
     {
         $where  = [];
         $params = [];
+
+        // Extraer valores del array de filtros
+        $especialidad = $filtros['especialidad'] ?? null;
+        $periodo = $filtros['periodo'] ?? 'todos';
+        $estado = $filtros['estado'] ?? null;
+        $q = $filtros['q'] ?? null;
+        $dni = $filtros['dni'] ?? null;
+        $matricula = $filtros['matricula'] ?? null;
 
         if ($dni) {
             $where[] = "dni = :dni";
             $params[':dni'] = $dni;
         }
 
+        if ($matricula) {
+            $where[] = "matricula = :matricula";
+            $params[':matricula'] = $matricula;
+        }
+
         if ($especialidad) {
             $where[] = "especialidad = :especialidad";
             $params[':especialidad'] = $especialidad;
+        }
+        
+        if ($estado) {
+            $where[] = "estado = :estado";
+            $params[':estado'] = $estado;
+        }
+
+        if ($q) {
+            $where[] = "(paciente_nombre LIKE :q OR paciente_apellido LIKE :q OR medico_nombre LIKE :q OR medico_apellido LIKE :q)";
+            $params[':q'] = "%$q%";
         }
 
         if ($periodo === 'dia') {
@@ -187,71 +233,7 @@ class Turno
     }
 
 
-    public function getByFiltrosMedico(string $matricula, $especialidad = null, $periodo = 'todos', $pagina = 1, $porPagina = 20, $id_paciente = null)
-    {
-        $where   = ["matricula = :matricula"];
-        $params  = [':matricula' => $matricula];
 
-        if ($id_paciente) {
-            $where[] = "id_paciente = :id_paciente";
-            $params[':id_paciente'] = $id_paciente;
-        }
-
-        if ($especialidad) {
-            $where[] = "especialidad = :especialidad";
-            $params[':especialidad'] = $especialidad;
-        }
-
-        if ($periodo === 'dia') {
-            $where[] = "fecha = CURDATE()";
-        } elseif ($periodo === 'semana') {
-            $where[] = "YEARWEEK(fecha, 1) = YEARWEEK(CURDATE(), 1)";
-        } elseif ($periodo === 'mes') {
-            $where[] = "MONTH(fecha) = MONTH(CURDATE()) AND YEAR(fecha) = YEAR(CURDATE())";
-        }
-
-        $sqlWhere = 'WHERE ' . implode(' AND ', $where);
-        $offset   = ($pagina - 1) * $porPagina;
-        $sql      = "SELECT * FROM vista_turnos $sqlWhere LIMIT :limite OFFSET :offset";
-
-        $stmt = $this->db->prepare($sql);
-        foreach ($params as $key => $value) {
-            $stmt->bindValue($key, $value);
-        }
-        $stmt->bindValue(':limite', $porPagina, PDO::PARAM_INT);
-        $stmt->bindValue(':offset', $offset,    PDO::PARAM_INT);
-        $stmt->execute();
-        return $stmt->fetchAll();
-    }
-
-    public function getTotalByFiltrosMedico($matricula, $especialidad = null, $periodo = 'todos')
-    {
-        $where  = ["matricula = :matricula"];
-        $params = [':matricula' => $matricula];
-
-        if ($especialidad) {
-            $where[] = "especialidad = :especialidad";
-            $params[':especialidad'] = $especialidad;
-        }
-
-        if ($periodo === 'dia') {
-            $where[] = "fecha = CURDATE()";
-        } elseif ($periodo === 'semana') {
-            $where[] = "YEARWEEK(fecha, 1) = YEARWEEK(CURDATE(), 1)";
-        } elseif ($periodo === 'mes') {
-            $where[] = "MONTH(fecha) = MONTH(CURDATE()) AND YEAR(fecha) = YEAR(CURDATE())";
-        }
-
-        $sqlWhere = 'WHERE ' . implode(' AND ', $where);
-        $sql      = "SELECT COUNT(*) FROM vista_turnos $sqlWhere";
-
-        $stmt = $this->db->prepare($sql);
-        foreach ($params as $key => $value) {
-            $stmt->bindValue($key, $value);
-        }
-        $stmt->execute();
-        return $stmt->fetchColumn();
-    }
 
     public function actualizarEstadoObservacion(int $id_turno, string $estado, ?string $observacion)
     {

@@ -9,15 +9,71 @@ class Medico
     }
 
     // Metodo para traer una vista de la db con todos los datos de los medicos
-    public function getAll()
+    public function getAll($filtros = [], $pagina = 1, $porPagina = 20)
     {
-        $sql = "SELECT * FROM vista_medicos";
+        $where = [];
+        $params = [];
+
+        if (!empty($filtros['especialidad'])) {
+            // Usamos LIKE porque 'especialidades' es una lista de texto: "Cardiología, Pediatría"
+            $where[] = 'especialidades LIKE :especialidad';
+            $params[':especialidad'] = '%' . $filtros['especialidad'] . '%';
+        }
+
+        if (!empty($filtros['busqueda'])) {
+            $where[] = '(nombre LIKE :busqueda OR apellido LIKE :busqueda)';
+            $params[':busqueda'] = '%' . $filtros['busqueda'] . '%';
+        }
+        
+        $sqlWhere = count($where) > 0 ? 'WHERE ' . implode(' AND ', $where) : '';
+        
+        $offset = ($pagina - 1) * $porPagina;
+
+        $sql = "SELECT * FROM vista_medicos
+                $sqlWhere
+                ORDER BY apellido, nombre
+                LIMIT :limite OFFSET :offset";
 
         $stmt = $this->db->prepare($sql);
+        $stmt->bindValue(':limite', $porPagina, PDO::PARAM_INT);
+        $stmt->bindValue(':offset', $offset, PDO::PARAM_INT);
+
+        foreach ($params as $key => $value) {
+            $stmt->bindValue($key, $value);
+        }
+
         $stmt->execute();
-        $todosMedicos = $stmt->fetchAll();
-        return $todosMedicos;
+        return $stmt->fetchAll();
     }
+
+    public function getTotalMedicos($filtros = []) {
+        $where = [];
+        $params = [];
+
+        if (!empty($filtros['especialidad'])) {
+            $where[] = 'especialidades LIKE :especialidad';
+            $params[':especialidad'] = '%' . $filtros['especialidad'] . '%';
+        }
+
+        if (!empty($filtros['busqueda'])) {
+            $where[] = '(nombre LIKE :busqueda OR apellido LIKE :busqueda)';
+            $params[':busqueda'] = '%' . $filtros['busqueda'] . '%';
+        }
+
+        $sqlWhere = count($where) > 0 ? 'WHERE ' . implode(' AND ', $where) : '';
+
+        $sql = "SELECT COUNT(*) FROM vista_medicos $sqlWhere";
+        
+        $stmt = $this->db->prepare($sql);
+
+        foreach ($params as $key => $value) {
+            $stmt->bindValue($key, $value);
+        }
+
+        $stmt->execute();
+        return $stmt->fetchColumn();
+    }
+
 
     // Metodo para crear un medico nuevo en la db
     public function crearMedico(array $datos)

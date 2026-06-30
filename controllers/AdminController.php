@@ -47,24 +47,38 @@ if (defined('SECCION') && SECCION === 'stats') {
 // Dashboard Usuarios
 
 if (defined('SECCION') && SECCION === 'usuarios') {
-    $busqueda = filter_var($_GET['busqueda'] ?? '', FILTER_SANITIZE_SPECIAL_CHARS);
+    $busqueda = filter_var($_GET['busqueda'] ?? null, FILTER_SANITIZE_SPECIAL_CHARS);
+    $rol = filter_var($_GET['rol'] ?? null, FILTER_SANITIZE_SPECIAL_CHARS);
 
-    if (!empty($busqueda)) {
-        $listadoUsuarios = $usuario->buscar($busqueda);
-        $totalPaginas = 1;
+    $filtros = [
+        'busqueda' => $busqueda,
+        'rol' => $rol
+    ];
+
+    if (!empty($busqueda) || !empty($rol)) {
+        $listadoUsuarios = $usuario->buscar($filtros);
+        $totalPaginas = 1; // No hay paginación en la búsqueda
         $paginaActual = 1;
     } else {
         $paginaActual  = filter_var($_GET['pagina'] ?? 1, FILTER_SANITIZE_NUMBER_INT);
-        $totalUsuarios = $usuario->getTotalUsuarios();
+        $totalUsuarios = $usuario->getTotalUsuarios($filtros);
         $totalPaginas  = ceil($totalUsuarios / 20);
-        $listadoUsuarios = $usuario->getAll($paginaActual);
+        $listadoUsuarios = $usuario->getAll($filtros, $paginaActual);
     }
 }
 
 // dashboard Medicos
 
 if (defined('SECCION') && SECCION === 'medicos') {
-    $listadoMedicos      = $medico->getAll();
+    $busqueda = filter_var($_GET['busqueda'] ?? null, FILTER_SANITIZE_SPECIAL_CHARS);
+    $especialidadFiltro = filter_var($_GET['especialidad'] ?? null, FILTER_SANITIZE_SPECIAL_CHARS);
+    
+    $filtros = [
+        'busqueda' => $busqueda,
+        'especialidad' => $especialidadFiltro
+    ];
+
+    $listadoMedicos = $medico->getAll($filtros);
     $listadoEspecialidad = $especialidad->getAll();
 }
 
@@ -72,12 +86,25 @@ if (defined('SECCION') && SECCION === 'medicos') {
 
 if (defined('SECCION') && SECCION === 'turnos') {
     $listadoEspecialidad = $especialidad->getAll();
-    $especialidadFiltro = filter_var($_GET['especialidad'] ?? null, FILTER_SANITIZE_SPECIAL_CHARS) ?: null;
-    $periodo            = filter_var($_GET['periodo']      ?? 'todos', FILTER_SANITIZE_SPECIAL_CHARS);
-    $paginaActual       = filter_var($_GET['pagina']       ?? 1, FILTER_SANITIZE_NUMBER_INT);
-    $totalTurnos        = $turno->getTotalByFiltros($especialidadFiltro, $periodo);
-    $totalPaginas       = ceil($totalTurnos / 20);
-    $listadoTurnos      = $turno->getByFiltros($especialidadFiltro, $periodo, $paginaActual);
+    
+    // Recoger todos los filtros del GET
+    $q = filter_var($_GET['q'] ?? null, FILTER_SANITIZE_SPECIAL_CHARS);
+    $especialidadFiltro = filter_var($_GET['especialidad'] ?? null, FILTER_SANITIZE_SPECIAL_CHARS);
+    $estado = filter_var($_GET['estado'] ?? null, FILTER_SANITIZE_SPECIAL_CHARS);
+    $periodo = filter_var($_GET['periodo'] ?? 'todos', FILTER_SANITIZE_SPECIAL_CHARS);
+    $paginaActual = filter_var($_GET['pagina'] ?? 1, FILTER_SANITIZE_NUMBER_INT);
+    
+    // Construir un array de filtros para pasar al modelo
+    $filtros = [
+        'q' => $q,
+        'especialidad' => $especialidadFiltro,
+        'estado' => $estado,
+        'periodo' => $periodo
+    ];
+
+    $totalTurnos = $turno->getTotalByFiltros($filtros);
+    $totalPaginas = ceil($totalTurnos / 20);
+    $listadoTurnos = $turno->getByFiltros($filtros, $paginaActual);
 }
 
 // Buscar Pacientes
@@ -94,7 +121,8 @@ if (defined('SECCION') && SECCION === 'buscarPaciente') {
     $turnosPaciente = [];
     $dniVer = filter_var($_GET['dni'] ?? null, FILTER_SANITIZE_NUMBER_INT) ?: null;
     if ($dniVer) {
-        $turnosPaciente = $turno->getByFiltros(null, 'todos', 1, 100, $dniVer);
+        $filtros = ['dni' => $dniVer];
+        $turnosPaciente = $turno->getByFiltros($filtros, 1, 100);
     }
 }
 
