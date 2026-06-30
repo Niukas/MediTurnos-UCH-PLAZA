@@ -92,13 +92,11 @@ $totalesConsolidados = array_sum($stats);
         </div>
 
         <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 mb-8">
-
             <div class="bg-white rounded-2xl border border-gray-200/80 p-6 shadow-sm lg:col-span-7 flex flex-col justify-between">
                 <div>
                     <h3 class="font-serif text-xl text-charcoal tracking-tight mb-1">Volumen de turnos por estado</h3>
                     <p class="text-xs text-slate mb-5">Estado operacional de las reservas consolidadas.</p>
                 </div>
-
                 <div class="space-y-4">
                     <?php foreach ($turnosPorEstado as $e):
                         $estadoKey = strtolower($e['estado']);
@@ -109,14 +107,11 @@ $totalesConsolidados = array_sum($stats);
                             'realizado'  => ['bg' => 'bg-blue-500', 'light' => 'bg-blue-50', 'text' => 'text-blue-700', 'border' => 'border-blue-200'],
                             default      => ['bg' => 'bg-slate-500', 'light' => 'bg-gray-50', 'text' => 'text-gray-700', 'border' => 'border-gray-200']
                         };
-
                         $porcentaje = $totalesConsolidados > 0 ? ($e['total'] / $totalesConsolidados) * 100 : 0;
                     ?>
                         <div>
                             <div class="flex justify-between items-center mb-1.5 text-xs font-bold">
-                                <span class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded border <?= $colorData['light'] ?> <?= $colorData['border'] ?> <?= $colorData['text'] ?> uppercase tracking-wider text-[0.65rem]">
-                                    <?= ucfirst(h($e['estado'])) ?>
-                                </span>
+                                <span class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded border <?= $colorData['light'] ?> <?= $colorData['border'] ?> <?= $colorData['text'] ?> uppercase tracking-wider text-[0.65rem]"><?= ucfirst(h($e['estado'])) ?></span>
                                 <span class="text-charcoal font-mono text-sm"><?= $e['total'] ?></span>
                             </div>
                             <div class="w-full h-2 bg-ghost rounded-full overflow-hidden">
@@ -126,50 +121,67 @@ $totalesConsolidados = array_sum($stats);
                     <?php endforeach; ?>
                 </div>
             </div>
+            <div class="bg-white rounded-2xl border border-gray-200/80 p-6 shadow-sm lg:col-span-5">
+                <h3 class="font-serif text-xl text-charcoal tracking-tight mb-1">Actividad Reciente</h3>
+                <p class="text-xs text-slate mb-5">Últimos cambios de estado en los turnos.</p>
+                <div class="space-y-4 max-h-[300px] overflow-y-auto pr-2 custom-scrollbar">
+                    <?php if (empty($listadoActividad)): ?>
+                        <p class="text-sm text-slate italic">No hay actividad reciente para mostrar.</p>
+                    <?php else: ?>
+                        <?php foreach ($listadoActividad as $act): ?>
+                            <div class="flex gap-3">
+                                <div class="w-8 h-8 rounded-full bg-ghost text-slate flex items-center justify-center shrink-0 mt-1">
+                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path></svg>
+                                </div>
+                                <div>
+                                    <p class="text-sm font-bold text-charcoal leading-tight">Turno de <?= h($act['paciente_nombre'] . ' ' . $act['paciente_apellido']) ?></p>
+                                    <p class="text-xs text-slate mt-1">
+                                        Estado cambió de <strong class="font-bold uppercase"><?= h($act['estado_anterior']) ?></strong> a <strong class="font-bold uppercase"><?= h($act['estado_nuevo']) ?></strong>.
+                                    </p>
+                                    <p class="text-[0.7rem] text-slate/70 mt-1 font-mono"><?= date('d/m/Y H:i', strtotime($act['fecha_cambio'])) ?> hs</p>
+                                </div>
+                            </div>
+                        <?php endforeach; ?>
+                    <?php endif; ?>
+                </div>
+            </div>
+        </div>
 
-            <div class="lg:col-span-5 space-y-4 flex flex-col justify-between">
-
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 mb-8">
+            <div class="lg:col-span-5 space-y-4 flex flex-col">
                 <?php if (!empty($medicoConMasTurnos)): ?>
                     <div class="bg-white rounded-2xl border border-gray-200/80 p-5 shadow-sm flex items-center gap-4 flex-1">
                         <div class="w-12 h-12 rounded-xl bg-charcoal text-white flex items-center justify-center font-serif text-lg">🏆</div>
                         <div>
                             <span class="text-[0.62rem] font-bold text-slate uppercase tracking-widest block mb-0.5">Médico con Mayor Demanda</span>
                             <h4 class="text-base font-bold text-charcoal">Dr/a. <?= h($medicoConMasTurnos['nombre'] ?? '') . ' ' . h($medicoConMasTurnos['apellido'] ?? '') ?></h4>
-                            <div class="text-xs text-slate mt-1">
-                                Actividad: <strong class="text-charcoal font-mono"><?= $medicoConMasTurnos['total_turnos'] ?? 0 ?></strong> consultas asignadas.
-                            </div>
+                            <div class="text-xs text-slate mt-1">Actividad: <strong class="text-charcoal font-mono"><?= $medicoConMasTurnos['total_turnos'] ?? 0 ?></strong> consultas asignadas.</div>
                         </div>
                     </div>
                 <?php endif; ?>
-
                 <?php if (!empty($especialidadDemandada)): ?>
                     <div class="bg-white rounded-2xl border border-gray-200/80 p-5 shadow-sm flex items-center gap-4 flex-1">
                         <div class="w-12 h-12 rounded-xl bg-lightblue/40 text-charcoal flex items-center justify-center text-lg">📈</div>
                         <div>
                             <span class="text-[0.62rem] font-bold text-slate uppercase tracking-widest block mb-0.5">Especialidad Líder</span>
                             <h4 class="text-base font-bold text-charcoal"><?= h($especialidadDemandada['nombre'] ?? '') ?></h4>
-                            <div class="text-xs text-slate mt-1">
-                                Reservas: <strong class="text-charcoal font-mono"><?= h($especialidadDemandada['total_turnos'] ?? 0) ?></strong> asignaciones activas.
-                            </div>
+                            <div class="text-xs text-slate mt-1">Reservas: <strong class="text-charcoal font-mono"><?= h($especialidadDemandada['total_turnos'] ?? 0) ?></strong> asignaciones activas.</div>
                         </div>
                     </div>
                 <?php endif; ?>
-
             </div>
-
-        </div>
-
-        <?php if (!empty($listadoObraSocialTurnos)): ?>
-            <div class="bg-white rounded-2xl border border-gray-200/80 overflow-hidden shadow-sm">
+            
+            <?php if (!empty($listadoObraSocialTurnos)): ?>
+            <div class="bg-white rounded-2xl border border-gray-200/80 overflow-hidden shadow-sm lg:col-span-7">
                 <div class="bg-ghost/60 px-6 py-4 border-b border-gray-100">
                     <h3 class="font-serif text-lg text-charcoal tracking-tight">Distribución por cobertura médica</h3>
                     <p class="text-xs text-slate mt-0.5">Mapeo del total de turnos procesados por prestadora u obra social.</p>
                 </div>
 
-                <div class="overflow-x-auto">
+                <div class="overflow-x-auto max-h-[300px] custom-scrollbar">
                     <table class="w-full text-left border-collapse">
                         <thead>
-                            <tr class="bg-white border-b border-gray-100">
+                            <tr class="bg-white border-b border-gray-100 sticky top-0">
                                 <th class="py-3.5 px-6 text-[0.65rem] font-bold text-slate uppercase tracking-widest bg-white">Entidad Médica / Obra Social</th>
                                 <th class="py-3.5 px-6 text-[0.65rem] font-bold text-slate uppercase tracking-widest bg-white text-right">Volumen de Turnos</th>
                             </tr>
@@ -181,16 +193,15 @@ $totalesConsolidados = array_sum($stats);
                                         <span class="w-1.5 h-1.5 bg-slate rounded-full"></span>
                                         <?= h($os['obra_social']) ?>
                                     </td>
-                                    <td class="py-4 px-6 text-sm font-mono font-bold text-charcoal text-right">
-                                        <?= $os['total_turnos'] ?>
-                                    </td>
+                                    <td class="py-4 px-6 text-sm font-mono font-bold text-charcoal text-right"><?= $os['total_turnos'] ?></td>
                                 </tr>
                             <?php endforeach; ?>
                         </tbody>
                     </table>
                 </div>
             </div>
-        <?php endif; ?>
+            <?php endif; ?>
+        </div>
 
     </main>
 </body>

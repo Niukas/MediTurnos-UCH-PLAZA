@@ -19,6 +19,7 @@ require_once '../models/Medico.php';
 require_once '../models/Especialidad.php';
 require_once '../models/Turno.php';
 require_once '../models/Paciente.php';
+require_once '../models/HistorialTurno.php';
 
 // Instanciar las clases
 $stats        = new Stats($pdo);
@@ -28,6 +29,7 @@ $medico       = new Medico($pdo);
 $especialidad = new Especialidad($pdo);
 $turno        = new Turno($pdo);
 $paciente     = new Paciente($pdo);
+$historialTurno = new HistorialTurno($pdo);
 
 $listadoRoles = $rol->getAll();
 
@@ -42,6 +44,7 @@ if (defined('SECCION') && SECCION === 'stats') {
     $listadoObraSocialTurnos = $stats->getTurnosPorObraSocial();
     $especialidadDemandada  = $stats->getEspecialidadMasDemandada();
     $pacientesSinTurno      = $stats->getPacientesSinTurnos();
+    $listadoActividad       = $historialTurno->getRecentActivity();
 }
 
 // Dashboard Usuarios

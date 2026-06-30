@@ -165,12 +165,18 @@ $titulo = 'Gestión de Turnos — MediTurnos';
                                                 </div>
                                             </div>
 
-                                            <button type="submit" class="bg-white border border-gray-200 text-slate hover:border-charcoal hover:text-charcoal hover:shadow-sm w-7 h-7 rounded-lg flex items-center justify-center transition-all" title="Guardar estado">
-                                                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
-                                                </svg>
+                                             <button type="submit" class="bg-white border border-gray-200 text-slate hover:border-charcoal hover:text-charcoal hover:shadow-sm w-7 h-7 rounded-lg flex items-center justify-center transition-all" title="Guardar estado">
+                                                 <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+                                                 </svg>
+                                             </button>
+                                             <button type="button" 
+                                                data-id-turno="<?= $t['id_turno'] ?>" 
+                                                class="historial-btn bg-white border border-gray-200 text-slate hover:border-charcoal hover:text-charcoal hover:shadow-sm w-7 h-7 rounded-lg flex items-center justify-center transition-all" 
+                                                title="Ver historial del turno">
+                                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.246 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"></path></svg>
                                             </button>
-                                        </form>
+                                         </form>
                                     </td>
 
                                 </tr>
@@ -183,6 +189,102 @@ $titulo = 'Gestión de Turnos — MediTurnos';
 
     </main>
 
+    <!-- Modal de Historial -->
+    <div id="historial-modal" class="fixed inset-0 bg-black/30 backdrop-blur-sm z-[150] hidden items-center justify-center animate-fadeIn">
+        <div class="bg-white w-full max-w-lg rounded-2xl shadow-lg border border-gray-200/80 p-6 m-4">
+            <div class="flex items-center justify-between mb-4">
+                <h3 class="font-serif text-xl text-charcoal tracking-tight">Historial del Turno <span id="modal-id-turno" class="font-mono text-lg"></span></h3>
+                <button id="close-modal-btn" class="text-slate hover:text-charcoal transition-colors">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+                </button>
+            </div>
+            <div id="modal-body" class="space-y-4 max-h-[60vh] overflow-y-auto pr-2 custom-scrollbar">
+                <!-- Contenido dinámico del historial -->
+            </div>
+        </div>
+    </div>
+
+    <script>
+    document.addEventListener('DOMContentLoaded', () => {
+        const modal = document.getElementById('historial-modal');
+        const closeModalBtn = document.getElementById('close-modal-btn');
+        const modalBody = document.getElementById('modal-body');
+        const modalIdTurno = document.getElementById('modal-id-turno');
+        const historialBtns = document.querySelectorAll('.historial-btn');
+
+        historialBtns.forEach(btn => {
+            btn.addEventListener('click', (e) => {
+                const idTurno = e.currentTarget.dataset.idTurno;
+                modalIdTurno.textContent = `#${idTurno}`;
+                modalBody.innerHTML = '<p class="text-sm text-slate italic py-8 text-center">Cargando historial...</p>';
+                modal.classList.remove('hidden');
+                modal.classList.add('flex');
+
+                fetch(`../api/historial_turno.php?id_turno=${idTurno}`)
+                    .then(response => {
+                        if (!response.ok) {
+                            throw new Error('La respuesta de la red no fue correcta.');
+                        }
+                        return response.json();
+                    })
+                    .then(data => {
+                        if (data.error) {
+                            throw new Error(data.error);
+                        }
+                        renderHistorial(data);
+                    })
+                    .catch(error => {
+                        modalBody.innerHTML = `<p class="text-sm text-red-600 italic py-8 text-center">${error.message}</p>`;
+                    });
+            });
+        });
+
+        function renderHistorial(historial) {
+            if (historial.length === 0) {
+                modalBody.innerHTML = '<p class="text-sm text-slate italic py-8 text-center">No hay historial de cambios para este turno.</p>';
+                return;
+            }
+
+            let content = '';
+            historial.forEach(item => {
+                const fecha = new Date(item.fecha_cambio).toLocaleString('es-AR', {
+                    day: '2-digit', month: '2-digit', year: 'numeric',
+                    hour: '2-digit', minute: '2-digit'
+                });
+
+                content += `
+                    <div class="flex gap-3 text-xs">
+                        <div class="w-8 h-8 flex-shrink-0 mt-1 rounded-full bg-ghost text-slate flex items-center justify-center">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path></svg>
+                        </div>
+                        <div>
+                            <p class="font-bold text-charcoal">
+                                Estado: <span class="font-mono uppercase">${item.estado_anterior || 'CREADO'}</span> → <span class="font-mono uppercase">${item.estado_nuevo}</span>
+                            </p>
+                            <p class="text-slate/80 mt-0.5">
+                                ${fecha} hs
+                            </p>
+                        </div>
+                    </div>`;
+            });
+            modalBody.innerHTML = content;
+        }
+
+        function closeModal() {
+            modal.classList.add('hidden');
+            modal.classList.remove('flex');
+            modalBody.innerHTML = '';
+            modalIdTurno.textContent = '';
+        }
+
+        closeModalBtn.addEventListener('click', closeModal);
+        modal.addEventListener('click', (e) => {
+            if (e.target === modal) {
+                closeModal();
+            }
+        });
+    });
+    </script>
 </body>
 
 </html>
