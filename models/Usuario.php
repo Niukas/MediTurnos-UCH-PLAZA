@@ -23,9 +23,15 @@ class Usuario
             $params[':rol'] = $filtros['rol'];
         }
 
+        if (!empty($filtros['busqueda'])) {
+            $where[] = "(nombre LIKE :busqueda OR apellido LIKE :busqueda OR email LIKE :busqueda OR CONCAT(nombre, ' ', apellido) LIKE :busqueda OR CONCAT(apellido, ' ', nombre) LIKE :busqueda)";
+            $params[':busqueda'] = '%' . $filtros['busqueda'] . '%';
+        }
+
         $sqlWhere = 'WHERE ' . implode(' AND ', $where);
         $offset = ($pagina - 1) * $porPagina;
-        $sql = "SELECT * FROM vista_usuarios $sqlWhere LIMIT :limite OFFSET :offset";
+        
+        $sql = "SELECT * FROM vista_usuarios $sqlWhere ORDER BY apellido ASC LIMIT :limite OFFSET :offset";
         
         $stmt = $this->db->prepare($sql);
         $stmt->bindValue(':limite', $porPagina, PDO::PARAM_INT);
@@ -46,6 +52,11 @@ class Usuario
         if (!empty($filtros['rol'])) {
             $where[] = 'rol = :rol';
             $params[':rol'] = $filtros['rol'];
+        }
+
+        if (!empty($filtros['busqueda'])) {
+            $where[] = "(nombre LIKE :busqueda OR apellido LIKE :busqueda OR email LIKE :busqueda OR CONCAT(nombre, ' ', apellido) LIKE :busqueda OR CONCAT(apellido, ' ', nombre) LIKE :busqueda)";
+            $params[':busqueda'] = '%' . $filtros['busqueda'] . '%';
         }
 
         $sqlWhere = 'WHERE ' . implode(' AND ', $where);
@@ -208,33 +219,7 @@ class Usuario
         return $stmt->fetchColumn();
     }
 
-    // Método para buscar usuarios por nombre, apellido, email o nombre completo
-    public function buscar($filtros = [])
-    {
-        $where = ['activo = 1'];
-        $params = [];
 
-        if (!empty($filtros['busqueda'])) {
-            $where[] = "(nombre LIKE :busqueda OR apellido LIKE :busqueda OR email LIKE :busqueda OR CONCAT(nombre, ' ', apellido) LIKE :busqueda OR CONCAT(apellido, ' ', nombre) LIKE :busqueda)";
-            $params[':busqueda'] = '%' . $filtros['busqueda'] . '%';
-        }
-
-        if (!empty($filtros['rol'])) {
-            $where[] = 'rol = :rol';
-            $params[':rol'] = $filtros['rol'];
-        }
-
-        $sqlWhere = 'WHERE ' . implode(' AND ', $where);
-        $sql = "SELECT * FROM vista_usuarios $sqlWhere ORDER BY apellido ASC";
-
-        $stmt = $this->db->prepare($sql);
-        foreach ($params as $key => $value) {
-            $stmt->bindValue($key, $value);
-        }
-        
-        $stmt->execute();
-        return $stmt->fetchAll();
-    }
 
 
     public function verificarIdentidad(string $email, string $dni)

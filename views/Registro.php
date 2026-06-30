@@ -1,3 +1,8 @@
+<?php
+session_start();
+$old = $_SESSION['old_input'] ?? [];
+unset($_SESSION['old_input']);
+?>
 <!DOCTYPE html>
 <html lang="es">
 
@@ -35,6 +40,7 @@
                 'password_corta' => 'La contraseña debe tener al menos 6 caracteres.',
                 'dni_invalido'   => 'El DNI ingresado no es válido.',
                 'dni_duplicado'  => 'Ya existe una cuenta registrada con ese DNI.',
+                'desconocido'    => 'Ocurrió un error inesperado. Por favor, intentá de nuevo.',
             ];
             $error = $_GET['error'] ?? null;
             if ($error && isset($errores[$error])): ?>
@@ -53,12 +59,12 @@
                     <div>
                         <label class="block text-[0.7rem] font-bold text-slate uppercase tracking-widest mb-1.5">Nombre</label>
                         <input type="text" name="nombre" placeholder="Juan" required
-                            class="w-full px-4 py-2.5 bg-ghost/50 border border-gray-200/80 rounded-xl text-sm text-charcoal placeholder-gray-400 focus:outline-none focus:border-slate focus:bg-white transition-all duration-200">
+                            class="w-full px-4 py-2.5 bg-ghost/50 border border-gray-200/80 rounded-xl text-sm text-charcoal placeholder-gray-400 focus:outline-none focus:border-slate focus:bg-white transition-all duration-200" value="<?= htmlspecialchars($old['nombre'] ?? '') ?>">
                     </div>
                     <div>
                         <label class="block text-[0.7rem] font-bold text-slate uppercase tracking-widest mb-1.5">Apellido</label>
                         <input type="text" name="apellido" placeholder="Pérez" required
-                            class="w-full px-4 py-2.5 bg-ghost/50 border border-gray-200/80 rounded-xl text-sm text-charcoal placeholder-gray-400 focus:outline-none focus:border-slate focus:bg-white transition-all duration-200">
+                            class="w-full px-4 py-2.5 bg-ghost/50 border border-gray-200/80 rounded-xl text-sm text-charcoal placeholder-gray-400 focus:outline-none focus:border-slate focus:bg-white transition-all duration-200" value="<?= htmlspecialchars($old['apellido'] ?? '') ?>">
                     </div>
                 </div>
 
@@ -66,12 +72,12 @@
                     <div>
                         <label class="block text-[0.7rem] font-bold text-slate uppercase tracking-widest mb-1.5">DNI</label>
                         <input type="text" name="dni" placeholder="44444444" required
-                            class="w-full px-4 py-2.5 bg-ghost/50 border border-gray-200/80 rounded-xl text-sm text-charcoal placeholder-gray-400 focus:outline-none focus:border-slate focus:bg-white transition-all duration-200">
+                            class="w-full px-4 py-2.5 bg-ghost/50 border border-gray-200/80 rounded-xl text-sm text-charcoal placeholder-gray-400 focus:outline-none focus:border-slate focus:bg-white transition-all duration-200" value="<?= htmlspecialchars($old['dni'] ?? '') ?>">
                     </div>
                     <div>
                         <label class="block text-[0.7rem] font-bold text-slate uppercase tracking-widest mb-1.5">Fecha de Nacimiento</label>
                         <input type="date" name="fecha_nac" required
-                            class="w-full px-4 py-2.5 bg-ghost/50 border border-gray-200/80 rounded-xl text-sm text-slate focus:outline-none focus:border-slate focus:bg-white transition-all duration-200">
+                            class="w-full px-4 py-2.5 bg-ghost/50 border border-gray-200/80 rounded-xl text-sm text-slate focus:outline-none focus:border-slate focus:bg-white transition-all duration-200" value="<?= htmlspecialchars($old['fecha_nac'] ?? '') ?>">
                     </div>
                 </div>
 
@@ -84,7 +90,7 @@
                             </svg>
                         </div>
                         <input type="text" name="telefono" placeholder="2616859565" required
-                            class="w-full pl-10 pr-4 py-2.5 bg-ghost/50 border border-gray-200/80 rounded-xl text-sm text-charcoal placeholder-gray-400 focus:outline-none focus:border-slate focus:bg-white transition-all duration-200">
+                            class="w-full pl-10 pr-4 py-2.5 bg-ghost/50 border border-gray-200/80 rounded-xl text-sm text-charcoal placeholder-gray-400 focus:outline-none focus:border-slate focus:bg-white transition-all duration-200" value="<?= htmlspecialchars($old['telefono'] ?? '') ?>">
                     </div>
                 </div>
 
@@ -97,7 +103,7 @@
                             </svg>
                         </div>
                         <input type="email" name="email" placeholder="ejemplo@correo.com" required
-                            class="w-full pl-10 pr-4 py-2.5 bg-ghost/50 border border-gray-200/80 rounded-xl text-sm text-charcoal placeholder-gray-400 focus:outline-none focus:border-slate focus:bg-white transition-all duration-200">
+                            class="w-full pl-10 pr-4 py-2.5 bg-ghost/50 border border-gray-200/80 rounded-xl text-sm text-charcoal placeholder-gray-400 focus:outline-none focus:border-slate focus:bg-white transition-all duration-200" value="<?= htmlspecialchars($old['email'] ?? '') ?>">
                     </div>
                 </div>
 

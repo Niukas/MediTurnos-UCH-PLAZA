@@ -232,6 +232,50 @@ $titulo = 'Gestión de Usuarios — MediTurnos';
         </div>
 
         <?php if ($totalPaginas > 1): ?>
+            <div class="mt-6 flex justify-center items-center gap-2 text-sm">
+
+                <?php if ($paginaActual > 1): ?>
+                    <a href="?<?= http_build_query(array_merge($_GET, ['pagina' => $paginaActual - 1])) ?>" class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-white border border-gray-200 text-charcoal font-bold hover:bg-ghost/60 transition-colors shadow-sm">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path></svg>
+                        Anterior
+                    </a>
+                <?php endif; ?>
+
+                <?php
+                $rango = 2;
+                $inicio = max(1, $paginaActual - $rango);
+                $fin = min($totalPaginas, $paginaActual + $rango);
+
+                if ($inicio > 1) {
+                    echo '<a href="?'.http_build_query(array_merge($_GET, ['pagina' => 1])).'" class="w-9 h-9 flex items-center justify-center rounded-lg border font-bold transition-colors shadow-sm bg-white border-gray-200 text-charcoal hover:bg-ghost/60">1</a>';
+                    if ($inicio > 2) {
+                        echo '<span class="px-2">...</span>';
+                    }
+                }
+                
+                for ($i = $inicio; $i <= $fin; $i++): ?>
+                    <a href="?<?= http_build_query(array_merge($_GET, ['pagina' => $i])) ?>" class="w-9 h-9 flex items-center justify-center rounded-lg border font-bold transition-colors shadow-sm <?= $i == $paginaActual ? 'bg-charcoal text-white border-charcoal' : 'bg-white border-gray-200 text-charcoal hover:bg-ghost/60' ?>">
+                        <?= $i ?>
+                    </a>
+                <?php endfor; ?>
+
+                <?php
+                if ($fin < $totalPaginas) {
+                    if ($fin < $totalPaginas - 1) {
+                        echo '<span class="px-2">...</span>';
+                    }
+                    echo '<a href="?'.http_build_query(array_merge($_GET, ['pagina' => $totalPaginas])).'" class="w-9 h-9 flex items-center justify-center rounded-lg border font-bold transition-colors shadow-sm bg-white border-gray-200 text-charcoal hover:bg-ghost/60">'.$totalPaginas.'</a>';
+                }
+                ?>
+
+                <?php if ($paginaActual < $totalPaginas): ?>
+                    <a href="?<?= http_build_query(array_merge($_GET, ['pagina' => $paginaActual + 1])) ?>" class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-white border border-gray-200 text-charcoal font-bold hover:bg-ghost/60 transition-colors shadow-sm">
+                        Siguiente
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path></svg>
+                    </a>
+                <?php endif; ?>
+
+            </div>
         <?php endif; ?>
 
     </main>

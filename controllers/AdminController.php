@@ -52,22 +52,17 @@ if (defined('SECCION') && SECCION === 'stats') {
 if (defined('SECCION') && SECCION === 'usuarios') {
     $busqueda = filter_var($_GET['busqueda'] ?? null, FILTER_SANITIZE_SPECIAL_CHARS);
     $rol = filter_var($_GET['rol'] ?? null, FILTER_SANITIZE_SPECIAL_CHARS);
+    $paginaActual  = filter_var($_GET['pagina'] ?? 1, FILTER_SANITIZE_NUMBER_INT);
 
     $filtros = [
         'busqueda' => $busqueda,
         'rol' => $rol
     ];
-
-    if (!empty($busqueda) || !empty($rol)) {
-        $listadoUsuarios = $usuario->buscar($filtros);
-        $totalPaginas = 1; // No hay paginación en la búsqueda
-        $paginaActual = 1;
-    } else {
-        $paginaActual  = filter_var($_GET['pagina'] ?? 1, FILTER_SANITIZE_NUMBER_INT);
-        $totalUsuarios = $usuario->getTotalUsuarios($filtros);
-        $totalPaginas  = ceil($totalUsuarios / 20);
-        $listadoUsuarios = $usuario->getAll($filtros, $paginaActual);
-    }
+    
+    $porPagina = 50;
+    $totalUsuarios = $usuario->getTotalUsuarios($filtros);
+    $totalPaginas  = ceil($totalUsuarios / $porPagina);
+    $listadoUsuarios = $usuario->getAll($filtros, $paginaActual, $porPagina);
 }
 
 // dashboard Medicos

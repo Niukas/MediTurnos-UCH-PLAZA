@@ -74,21 +74,25 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
         // Validaciones
         if (empty($datos['nombre']) || empty($datos['apellido']) || empty($datos['email']) || empty($datos['password'])) {
+            $_SESSION['old_input'] = $_POST;
             header('Location: ../views/registro.php?error=campos_vacios');
             exit;
         }
 
         if (!filter_var($datos['email'], FILTER_VALIDATE_EMAIL)) {
+            $_SESSION['old_input'] = $_POST;
             header('Location: ../views/registro.php?error=email_invalido');
             exit;
         }
 
         if (strlen($datos['password']) <= 6) {
+            $_SESSION['old_input'] = $_POST;
             header('Location: ../views/registro.php?error=password_corta');
             exit;
         }
 
         if (empty($datos['dni'])) {
+            $_SESSION['old_input'] = $_POST;
             header('Location: ../views/registro.php?error=dni_invalido');
             exit;
         }
@@ -96,13 +100,15 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $resultado = $usuario->registrar($datos);
 
         if ($resultado === 'dni_duplicado') {
+            $_SESSION['old_input'] = $_POST;
             header('Location: ../views/registro.php?error=dni_duplicado');
             exit;
         } elseif ($resultado) {
             header('Location: ../views/Login.php?registro=exitoso');
             exit;
         } else {
-            header('Location: ../views/Login.php?error=1');
+            $_SESSION['old_input'] = $_POST;
+            header('Location: ../views/registro.php?error=desconocido');
             exit;
         }
     }
