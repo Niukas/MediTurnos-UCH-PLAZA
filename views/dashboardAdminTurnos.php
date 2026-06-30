@@ -76,6 +76,23 @@ $titulo = 'Gestión de Turnos — MediTurnos';
                     <?php endif; ?>
                 </div>
             </form>
+            <div class="flex items-center gap-3 w-full md:w-auto mt-4 pt-4 border-t border-gray-100">
+                <span class="text-[0.7rem] font-bold text-slate uppercase tracking-widest hidden sm:block">Período de vista:</span>
+                <div class="flex bg-[#F8FAFC] rounded-xl p-1 border border-gray-200/60 w-full sm:w-auto overflow-x-auto">
+                    <?php
+                    $periodos = ['dia' => 'Hoy', 'semana' => 'Semana', 'mes' => 'Mes', 'todos' => 'Histórico'];
+                    foreach ($periodos as $valor => $label):
+                        $periodoActual = $_GET['periodo'] ?? 'todos';
+                        $isActive = ($periodoActual === $valor);
+                        $queryParams = http_build_query(array_merge($_GET, ['periodo' => $valor, 'pagina' => 1]));
+                    ?>
+                        <a href="?<?= $queryParams ?>"
+                            class="flex-1 sm:flex-none text-center px-4 py-1.5 text-xs font-semibold rounded-lg transition-all duration-200 <?= $isActive ? 'bg-charcoal text-white shadow-sm' : 'text-slate hover:text-charcoal hover:bg-white' ?>">
+                            <?= $label ?>
+                        </a>
+                    <?php endforeach; ?>
+                </div>
+            </div>
         </div>
                     </div>
                 </div>

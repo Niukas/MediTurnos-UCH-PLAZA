@@ -222,8 +222,6 @@ class Turno
                 return false;
             }
         } catch (\Throwable $th) {
-            var_dump($th);
-            exit;
             if ($this->db->inTransaction()) {
                 $this->db->rollBack();
             }
