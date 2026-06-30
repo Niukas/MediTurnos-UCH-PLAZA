@@ -31,7 +31,7 @@
             Turnos
         </a>
 
-        <a href="buscarPacienteAdmin.php"
+        <a href="buscarPaciente.php"
             class="hidden md:inline-block text-[0.85rem] uppercase tracking-wider transition-colors px-3 py-2 rounded-lg <?= SECCION === 'buscarPaciente' ? 'bg-ghost text-charcoal font-bold' : 'font-medium text-slate hover:text-charcoal hover:bg-ghost' ?>">
             Pacientes
         </a>

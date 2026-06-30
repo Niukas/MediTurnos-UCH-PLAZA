@@ -107,24 +107,7 @@ if (defined('SECCION') && SECCION === 'turnos') {
     $listadoTurnos = $turno->getByFiltros($filtros, $paginaActual);
 }
 
-// Buscar Pacientes
 
-if (defined('SECCION') && SECCION === 'buscarPaciente') {
-    $busqueda   = filter_var($_GET['busqueda'] ?? '', FILTER_SANITIZE_SPECIAL_CHARS);
-    $resultados = [];
-
-    if (!empty($busqueda)) {
-        $resultados = $paciente->buscar($busqueda);
-    }
-
-    // Si se seleccionó un paciente específico — cargás sus turnos
-    $turnosPaciente = [];
-    $dniVer = filter_var($_GET['dni'] ?? null, FILTER_SANITIZE_NUMBER_INT) ?: null;
-    if ($dniVer) {
-        $filtros = ['dni' => $dniVer];
-        $turnosPaciente = $turno->getByFiltros($filtros, 1, 100);
-    }
-}
 
 // Accion de formularios
 

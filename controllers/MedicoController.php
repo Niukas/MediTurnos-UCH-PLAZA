@@ -155,25 +155,7 @@ if (SECCION === 'misTurnos') {
     $listadoTurnos = $turno->getByFiltros($filtros, $paginaActual);
 }
 
-if (SECCION === 'buscarPaciente') {
-    $busqueda      = filter_var($_GET['busqueda'] ?? '', FILTER_SANITIZE_SPECIAL_CHARS);
-    $resultados    = [];
-    if (!empty($busqueda)) {
-        $resultados = $paciente->buscar($busqueda);
-    }
 
-    // REEMPLAZO CLAVE: Si se seleccionó un paciente específico vía DNI — cargás sus turnos
-    $turnosPaciente = [];
-    $dniVer  = filter_var($_GET['dni'] ?? null, FILTER_SANITIZE_NUMBER_INT) ?: null;
-
-    if ($dniVer) {
-        $filtros = [
-            'dni' => $dniVer,
-            'matricula' => $matriculaMedico
-        ];
-        $turnosPaciente = $turno->getByFiltros($filtros, 1, 100);
-    }
-}
 
 if (SECCION === 'configurarHorarios') {
 
