@@ -8,21 +8,18 @@ require_once '../models/Especialidad.php';
 $medico       = new Medico($pdo);
 $especialidad = new Especialidad($pdo);
 
-$listadoMedicos      = $medico->getAll();
+// --- Lógica de Filtros ---
+$busqueda = filter_var($_GET['busqueda'] ?? null, FILTER_SANITIZE_SPECIAL_CHARS);
+$especialidadFiltro = filter_var($_GET['especialidad'] ?? null, FILTER_SANITIZE_SPECIAL_CHARS);
+
+$filtros = [
+    'busqueda' => $busqueda,
+    'especialidad' => $especialidadFiltro
+];
+
+// Se obtienen los médicos ya filtrados desde el modelo
+$listadoMedicos = $medico->getAll($filtros);
+
+// Se obtienen todas las especialidades para poblar el dropdown de filtros
 $listadoEspecialidad = $especialidad->getAll();
-
-$especialidadFiltro = $_GET['especialidad'] ?? null;
-
-if ($especialidadFiltro) {
-    $listadoMedicos = array_filter($listadoMedicos, function ($m) use ($especialidadFiltro, $listadoEspecialidad) {
-        $nombreEsp = '';
-        foreach ($listadoEspecialidad as $e) {
-            if ($e['id_especialidad'] == $especialidadFiltro) {
-                $nombreEsp = $e['nombre'];
-                break;
-            }
-        }
-        return str_contains($m['especialidades'] ?? '', $nombreEsp);
-    });
-}
 ?>

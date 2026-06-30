@@ -37,32 +37,40 @@ $titulo = 'Médicos — MediTurnos';
             <p class="text-slate text-sm">Conocé a los profesionales que forman parte de nuestro equipo de salud.</p>
         </div>
 
-        <div class="bg-white rounded-2xl border border-gray-200/80 p-5 mb-8 shadow-sm flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
-            <form method="GET" action="" class="w-full sm:w-auto m-0 flex flex-col sm:flex-row items-start sm:items-center gap-4">
-                <span class="text-[0.65rem] font-bold text-slate uppercase tracking-widest whitespace-nowrap">Filtrar por rama:</span>
-                <div class="relative w-full sm:w-72">
-                    <select name="especialidad" onchange="this.form.submit()"
-                        class="w-full pl-4 pr-8 py-2.5 bg-[#F8FAFC] border border-gray-200/80 rounded-xl text-sm font-semibold text-charcoal focus:outline-none focus:border-slate appearance-none cursor-pointer transition-colors">
-                        <option value="">Todas las especialidades</option>
-                        <?php foreach ($listadoEspecialidad as $e):
-                            $isSelected = (isset($_GET['especialidad']) && $_GET['especialidad'] == $e['id_especialidad']) ? 'selected' : '';
-                        ?>
-                            <option value="<?= h($e['id_especialidad']) ?>" <?= $isSelected ?>>
-                                <?= h($e['nombre']) ?>
-                            </option>
-                        <?php endforeach; ?>
-                    </select>
-                    <div class="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none text-slate">
-                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
-                        </svg>
+        <div class="bg-white rounded-2xl border border-gray-200/80 p-5 mb-8 shadow-sm">
+            <form method="GET" action="" class="m-0 flex flex-col sm:flex-row items-center gap-4">
+                
+                <div class="relative w-full sm:flex-1">
+                    <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-slate/50">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
                     </div>
+                    <input type="search" name="busqueda" placeholder="Buscar por nombre o apellido..." value="<?= h($_GET['busqueda'] ?? '') ?>"
+                        class="w-full pl-10 pr-4 py-2.5 bg-[#F8FAFC] border border-gray-200/80 rounded-xl text-sm font-medium text-charcoal placeholder-gray-400 focus:outline-none focus:border-slate shadow-sm transition-colors">
+                </div>
+
+                <div class="flex flex-col sm:flex-row items-center gap-4 w-full sm:w-auto">
+                    <div class="relative w-full sm:w-48">
+                        <select name="especialidad" class="w-full pl-4 pr-8 py-2.5 bg-[#F8FAFC] border border-gray-200/80 rounded-xl text-sm font-semibold text-charcoal focus:outline-none focus:border-slate appearance-none cursor-pointer transition-colors shadow-sm">
+                            <option value="">Todas las especialidades</option>
+                            <?php foreach ($listadoEspecialidad as $e): ?>
+                                <option value="<?= h($e['nombre']) ?>" <?= (($_GET['especialidad'] ?? '') == $e['nombre']) ? 'selected' : '' ?>>
+                                    <?= h($e['nombre']) ?>
+                                </option>
+                            <?php endforeach; ?>
+                        </select>
+                        <div class="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none text-slate/50"><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg></div>
+                    </div>
+                    
+                    <button type="submit" class="w-full sm:w-auto bg-charcoal hover:bg-slate text-white font-bold py-2.5 px-6 rounded-xl text-sm transition-all duration-200 shadow-md hover:shadow-lg">
+                        Filtrar
+                    </button>
+                    <?php if (!empty($_GET['busqueda']) || !empty($_GET['especialidad'])): ?>
+                    <a href="Medicos.php" class="w-full sm:w-auto text-center bg-white hover:bg-gray-100 text-slate font-bold py-2.5 px-6 rounded-xl text-sm transition-all duration-200 border border-gray-200 shadow-sm">
+                        Limpiar
+                    </a>
+                    <?php endif; ?>
                 </div>
             </form>
-
-            <div class="text-[0.8rem] text-slate font-medium hidden sm:block bg-ghost px-4 py-2 rounded-xl border border-gray-100">
-                Mostrando <strong class="text-charcoal"><?= count($listadoMedicos) ?></strong> profesionales
-            </div>
         </div>
 
         <?php if (empty($listadoMedicos)): ?>
