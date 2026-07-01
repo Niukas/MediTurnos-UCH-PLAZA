@@ -52,11 +52,13 @@ if (defined('SECCION') && SECCION === 'stats') {
 if (defined('SECCION') && SECCION === 'usuarios') {
     $busqueda = filter_var($_GET['busqueda'] ?? null, FILTER_SANITIZE_SPECIAL_CHARS);
     $rol = filter_var($_GET['rol'] ?? null, FILTER_SANITIZE_SPECIAL_CHARS);
+    $status = filter_var($_GET['status'] ?? 'active', FILTER_SANITIZE_SPECIAL_CHARS);
     $paginaActual  = filter_var($_GET['pagina'] ?? 1, FILTER_SANITIZE_NUMBER_INT);
 
     $filtros = [
         'busqueda' => $busqueda,
-        'rol' => $rol
+        'rol' => $rol,
+        'status' => $status
     ];
     
     $porPagina = 50;
@@ -194,6 +196,20 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
         if ($resultado) {
             header('Location: ../views/dashboardAdminUsuarios.php?registro=eliminado');
+            exit;
+        } else {
+            header('Location: ../views/dashboardAdminUsuarios.php?registro=error');
+            exit;
+        }
+    }
+
+    // Reactivar usuario
+    if ($accion === 'reactivarUsuario') {
+        $idUsuario = filter_var($_POST['id_usuario'] ?? 0, FILTER_SANITIZE_NUMBER_INT);
+        $resultado = $usuario->reactivar($idUsuario);
+
+        if ($resultado) {
+            header('Location: ../views/dashboardAdminUsuarios.php?registro=reactivado');
             exit;
         } else {
             header('Location: ../views/dashboardAdminUsuarios.php?registro=error');

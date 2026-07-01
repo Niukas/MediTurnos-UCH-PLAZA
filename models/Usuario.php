@@ -15,7 +15,7 @@ class Usuario
     // Metodo para traer todos los usuarios y unida con la tabla de Rol
     public function getAll($filtros = [], $pagina = 1, $porPagina = 20)
     {
-        $where = ['activo = 1'];
+        $where = [];
         $params = [];
 
         if (!empty($filtros['rol'])) {
@@ -28,7 +28,20 @@ class Usuario
             $params[':busqueda'] = '%' . $filtros['busqueda'] . '%';
         }
 
-        $sqlWhere = 'WHERE ' . implode(' AND ', $where);
+        if (isset($filtros['status'])) {
+            if ($filtros['status'] === 'inactive') {
+                $where[] = 'activo = 0';
+            } elseif ($filtros['status'] === 'all') {
+                // No hay condición de 'activo'
+            } else {
+                $where[] = 'activo = 1';
+            }
+        } else {
+            $where[] = 'activo = 1';
+        }
+
+
+        $sqlWhere = !empty($where) ? 'WHERE ' . implode(' AND ', $where) : '';
         $offset = ($pagina - 1) * $porPagina;
         
         $sql = "SELECT * FROM vista_usuarios $sqlWhere ORDER BY apellido ASC LIMIT :limite OFFSET :offset";
@@ -46,7 +59,7 @@ class Usuario
 
     public function getTotalUsuarios($filtros = [])
     {
-        $where = ['activo = 1'];
+        $where = [];
         $params = [];
 
         if (!empty($filtros['rol'])) {
@@ -59,7 +72,19 @@ class Usuario
             $params[':busqueda'] = '%' . $filtros['busqueda'] . '%';
         }
 
-        $sqlWhere = 'WHERE ' . implode(' AND ', $where);
+        if (isset($filtros['status'])) {
+            if ($filtros['status'] === 'inactive') {
+                $where[] = 'activo = 0';
+            } elseif ($filtros['status'] === 'all') {
+                // No hay condición de 'activo'
+            } else {
+                $where[] = 'activo = 1';
+            }
+        } else {
+            $where[] = 'activo = 1';
+        }
+
+        $sqlWhere = !empty($where) ? 'WHERE ' . implode(' AND ', $where) : '';
         $sql  = "SELECT COUNT(*) FROM vista_usuarios $sqlWhere";
         
         $stmt = $this->db->prepare($sql);
@@ -158,6 +183,19 @@ class Usuario
     {
         try {
             $sql  = "UPDATE Usuario SET activo = 0 WHERE id_usuario = :id_usuario";
+            $stmt = $this->db->prepare($sql);
+            $stmt->execute([':id_usuario' => $id_usuario]);
+            return true;
+        } catch (\Throwable $th) {
+            error_log($th->getMessage());
+            return false;
+        }
+    }
+
+    public function reactivar(int $id_usuario)
+    {
+        try {
+            $sql  = "UPDATE Usuario SET activo = 1 WHERE id_usuario = :id_usuario";
             $stmt = $this->db->prepare($sql);
             $stmt->execute([':id_usuario' => $id_usuario]);
             return true;

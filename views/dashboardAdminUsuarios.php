@@ -29,6 +29,7 @@ $titulo = 'Gestión de Usuarios — MediTurnos';
         <?php
         $mensajes = [
             'rol_actualizado' => ['bg' => 'bg-emerald-500/10', 'border' => 'border-emerald-500/20', 'text' => 'text-emerald-700', 'texto' => 'Rango y privilegios de usuario actualizados correctamente.', 'icon' => 'M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z'],
+            'reactivado'      => ['bg' => 'bg-emerald-500/10', 'border' => 'border-emerald-500/20', 'text' => 'text-emerald-700', 'texto' => 'La cuenta de usuario fue reactivada y sus accesos restaurados.', 'icon' => 'M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z'],
             'editado'         => ['bg' => 'bg-blue-500/10',    'border' => 'border-blue-500/20',    'text' => 'text-blue-700',    'texto' => 'Ficha de usuario modificada correctamente.', 'icon' => 'M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z'],
             'eliminado'       => ['bg' => 'bg-amber-500/10',   'border' => 'border-amber-500/20',   'text' => 'text-amber-700',   'texto' => 'La cuenta de usuario fue revocada y eliminada del sistema.', 'icon' => 'M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16'],
             'error'           => ['bg' => 'bg-rose-500/10',    'border' => 'border-rose-500/20',    'text' => 'text-rose-700',    'texto' => 'Hubo un error interno al procesar la operación.', 'icon' => 'M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z'],
@@ -59,12 +60,20 @@ $titulo = 'Gestión de Usuarios — MediTurnos';
                          placeholder="Buscar usuario por nombre, apellido o email..."
                          class="w-full pl-11 pr-4 py-3 bg-white border border-gray-200 rounded-xl text-sm text-charcoal placeholder-gray-400 focus:outline-none focus:border-slate focus:ring-2 focus:ring-slate/10 transition-all shadow-sm">
                  </div>
-                 <div class="relative">
-                    <select name="rol" class="w-full pl-4 pr-8 py-3 bg-white border border-gray-200 rounded-xl text-sm font-semibold text-charcoal focus:outline-none focus:border-slate appearance-none cursor-pointer transition-colors shadow-sm">
-                        <option value="">Todos los roles</option>
-                        <option value="admin" <?= (($_GET['rol'] ?? '') == 'admin') ? 'selected' : '' ?>>Admin</option>
-                        <option value="medico" <?= (($_GET['rol'] ?? '') == 'medico') ? 'selected' : '' ?>>Médico</option>
-                        <option value="paciente" <?= (($_GET['rol'] ?? '') == 'paciente') ? 'selected' : '' ?>>Paciente</option>
+                <div class="relative">
+                     <select name="rol" class="w-full pl-4 pr-8 py-3 bg-white border border-gray-200 rounded-xl text-sm font-semibold text-charcoal focus:outline-none focus:border-slate appearance-none cursor-pointer transition-colors shadow-sm">
+                         <option value="">Todos los roles</option>
+                         <option value="admin" <?= (($_GET['rol'] ?? '') == 'admin') ? 'selected' : '' ?>>Admin</option>
+                         <option value="medico" <?= (($_GET['rol'] ?? '') == 'medico') ? 'selected' : '' ?>>Médico</option>
+                         <option value="paciente" <?= (($_GET['rol'] ?? '') == 'paciente') ? 'selected' : '' ?>>Paciente</option>
+                     </select>
+                     <div class="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none text-slate"><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg></div>
+                </div>
+                <div class="relative">
+                    <select name="status" class="w-full pl-4 pr-8 py-3 bg-white border border-gray-200 rounded-xl text-sm font-semibold text-charcoal focus:outline-none focus:border-slate appearance-none cursor-pointer transition-colors shadow-sm">
+                        <option value="active" <?= (($_GET['status'] ?? 'active') == 'active') ? 'selected' : '' ?>>Activos</option>
+                        <option value="inactive" <?= (($_GET['status'] ?? '') == 'inactive') ? 'selected' : '' ?>>Inactivos</option>
+                        <option value="all" <?= (($_GET['status'] ?? '') == 'all') ? 'selected' : '' ?>>Todos</option>
                     </select>
                     <div class="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none text-slate"><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg></div>
                 </div>
@@ -72,7 +81,7 @@ $titulo = 'Gestión de Usuarios — MediTurnos';
                      Buscar
                  </button>
 
-                <?php if (!empty($_GET['busqueda']) || !empty($_GET['rol'])): ?>
+                <?php if (!empty($_GET['busqueda']) || !empty($_GET['rol']) || !empty($_GET['status']) && $_GET['status'] !== 'active' ): ?>
                      <a href="dashboardAdminUsuarios.php" class="bg-white border border-gray-200 hover:border-charcoal text-slate hover:text-charcoal px-6 py-3 rounded-xl text-sm font-bold transition-all shadow-sm flex items-center gap-2 shrink-0">
                          Limpiar
                      </a>
@@ -173,13 +182,23 @@ $titulo = 'Gestión de Usuarios — MediTurnos';
                                             Editar
                                         </button>
 
-                                        <form method="POST" action="dashboardAdminUsuarios.php" class="m-0 shrink-0" onsubmit="return confirm('ALERTA CRÍTICA: ¿Seguro que deseas dar de baja permanentemente esta cuenta de usuario? Se revocarán todos los accesos.')">
-                                            <input type="hidden" name="accion" value="eliminarUsuario">
-                                            <input type="hidden" name="id_usuario" value="<?= $u['id_usuario'] ?>">
-                                            <button type="submit" class="bg-rose-50 border border-rose-200 text-rose-600 hover:bg-rose-100 hover:text-rose-800 px-3 py-1.5 rounded-lg text-xs font-bold transition-all shadow-sm shrink-0">
-                                                Baja
-                                            </button>
-                                        </form>
+                                        <?php if ($u['activo'] == 1): ?>
+                                            <form method="POST" action="dashboardAdminUsuarios.php" class="m-0 shrink-0" onsubmit="return confirm('ALERTA CRÍTICA: ¿Seguro que deseas dar de baja permanentemente esta cuenta de usuario? Se revocarán todos los accesos.')">
+                                                <input type="hidden" name="accion" value="eliminarUsuario">
+                                                <input type="hidden" name="id_usuario" value="<?= $u['id_usuario'] ?>">
+                                                <button type="submit" class="bg-rose-50 border border-rose-200 text-rose-600 hover:bg-rose-100 hover:text-rose-800 px-3 py-1.5 rounded-lg text-xs font-bold transition-all shadow-sm shrink-0">
+                                                    Dar de baja
+                                                </button>
+                                            </form>
+                                        <?php else: ?>
+                                            <form method="POST" action="dashboardAdminUsuarios.php" class="m-0 shrink-0" onsubmit="return confirm('¿Seguro que deseas reactivar esta cuenta de usuario?')">
+                                                <input type="hidden" name="accion" value="reactivarUsuario">
+                                                <input type="hidden" name="id_usuario" value="<?= $u['id_usuario'] ?>">
+                                                <button type="submit" class="bg-emerald-50 border border-emerald-200 text-emerald-600 hover:bg-emerald-100 hover:text-emerald-800 px-3 py-1.5 rounded-lg text-xs font-bold transition-all shadow-sm shrink-0">
+                                                    Alta
+                                                </button>
+                                            </form>
+                                        <?php endif; ?>
                                     </div>
 
                                     <div id="editar-<?= $u['id_usuario'] ?>" style="display:none" class="absolute right-6 top-14 w-72 bg-white rounded-2xl shadow-[0_10px_40px_rgba(0,0,0,0.15)] border border-gray-200 z-[9999] p-5 text-left animate-fadeIn before:content-[''] before:absolute before:-top-2 before:right-14 before:w-4 before:h-4 before:bg-white before:border-l before:border-t before:border-gray-200 before:rotate-45">
