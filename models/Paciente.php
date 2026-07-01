@@ -49,8 +49,7 @@ class Paciente
         $sql = "SELECT p.*, u.email
             FROM Paciente p
             LEFT JOIN Usuario u ON u.dni = p.dni
-            WHERE p.nombre   LIKE :busqueda
-            OR p.apellido    LIKE :busqueda
+            WHERE CONCAT(p.nombre, ' ', p.apellido) LIKE :busqueda
             OR p.dni         LIKE :busqueda
             ORDER BY p.apellido ASC";
 
