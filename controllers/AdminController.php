@@ -93,13 +93,24 @@ if (defined('SECCION') && SECCION === 'turnos') {
     $estado = filter_var($_GET['estado'] ?? null, FILTER_SANITIZE_SPECIAL_CHARS);
     $periodo = filter_var($_GET['periodo'] ?? 'todos', FILTER_SANITIZE_SPECIAL_CHARS);
     $paginaActual = filter_var($_GET['pagina'] ?? 1, FILTER_SANITIZE_NUMBER_INT);
+    $fecha = filter_var($_GET['fecha'] ?? null, FILTER_SANITIZE_SPECIAL_CHARS);
+
+    $fecha_desde = null;
+    $fecha_hasta = null;
+    if ($fecha) {
+        $fechas = explode(' a ', $fecha);
+        $fecha_desde = $fechas[0] ?? null;
+        $fecha_hasta = $fechas[1] ?? $fecha_desde; // Si solo hay una fecha, hasta es igual a desde
+    }
     
     // Construir un array de filtros para pasar al modelo
     $filtros = [
         'q' => $q,
         'especialidad' => $especialidadFiltro,
         'estado' => $estado,
-        'periodo' => $periodo
+        'periodo' => $fecha ? null : $periodo, // Anulamos el periodo si se usa el calendario
+        'fecha_desde' => $fecha_desde,
+        'fecha_hasta' => $fecha_hasta,
     ];
 
     $totalTurnos = $turno->getTotalByFiltros($filtros);

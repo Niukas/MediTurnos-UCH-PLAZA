@@ -46,30 +46,38 @@ $titulo = 'Mis turnos — MediTurnos';
         <?php endif; ?>
 
         <div class="bg-white rounded-2xl border border-gray-200/80 p-5 mb-8 shadow-sm">
-            <form method="GET" action="" class="m-0 flex flex-col sm:flex-row items-center gap-4">
-                
-                <div class="relative w-full sm:flex-1">
-                    <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-slate/50">
-                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
+            <form id="filter-form" method="GET" action="" class="m-0 flex flex-col gap-4">
+                <div class="flex flex-col sm:flex-row items-center gap-4">
+                    <div class="relative w-full sm:flex-1">
+                        <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-slate/50">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
+                        </div>
+                        <input type="search" name="q" placeholder="Buscar por médico..." value="<?= h($_GET['q'] ?? '') ?>"
+                            class="w-full pl-10 pr-4 py-2.5 bg-[#F8FAFC] border border-gray-200/80 rounded-xl text-sm font-medium text-charcoal placeholder-gray-400 focus:outline-none focus:border-slate shadow-sm transition-colors">
                     </div>
-                    <input type="search" name="q" placeholder="Buscar por médico..." value="<?= h($_GET['q'] ?? '') ?>"
-                        class="w-full pl-10 pr-4 py-2 bg-[#F8FAFC] border border-gray-200/80 rounded-xl text-sm font-medium text-charcoal placeholder-gray-400 focus:outline-none focus:border-slate shadow-sm transition-colors">
-                </div>
 
-                <div class="flex flex-col sm:flex-row items-center gap-4 w-full sm:w-auto">
-                    <div class="relative w-full sm:w-48">
-                        <select name="especialidad" class="w-full pl-4 pr-8 py-2 bg-[#F8FAFC] border border-gray-200/80 rounded-xl text-sm font-semibold text-charcoal focus:outline-none focus:border-slate appearance-none cursor-pointer transition-colors shadow-sm">
-                            <option value="">Especialidad</option>
+                    <div class="relative w-full sm:w-64">
+                        <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-slate/50">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path></svg>
+                        </div>
+                        <input type="text" id="calendario" name="fecha" value="<?= h($_GET['fecha'] ?? '') ?>" placeholder="Seleccionar un rango..." 
+                            class="w-full pl-10 pr-4 py-2.5 bg-[#F8FAFC] border border-gray-200/80 rounded-xl text-sm font-medium text-charcoal placeholder-gray-400 focus:outline-none focus:border-slate shadow-sm transition-colors cursor-pointer">
+                    </div>
+                </div>
+                
+                <div class="flex flex-col sm:flex-row items-center gap-4">
+                    <div class="relative w-full sm:w-auto flex-1">
+                        <select name="especialidad" class="w-full pl-4 pr-8 py-2.5 bg-[#F8FAFC] border border-gray-200/80 rounded-xl text-sm font-semibold text-charcoal focus:outline-none focus:border-slate appearance-none cursor-pointer transition-colors shadow-sm">
+                            <option value="">Todas las especialidades</option>
                             <?php foreach ($listadoEspecialidades as $e): ?>
-                                <option value="<?= h($e['nombre']) ?>" <?= (($_GET['especialidad'] ?? '') == $e['nombre']) ? 'selected' : '' ?>>
-                                    <?= h($e['nombre']) ?>
-                                </option>
+                                <option value="<?= h($e['nombre']) ?>" <?= (($_GET['especialidad'] ?? '') == $e['nombre']) ? 'selected' : '' ?>><?= h($e['nombre']) ?></option>
                             <?php endforeach; ?>
                         </select>
                         <div class="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none text-slate/50"><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg></div>
                     </div>
-                    <div class="relative w-full sm:w-48">
-                        <select name="estado" class="w-full pl-4 pr-8 py-2 bg-[#F8FAFC] border border-gray-200/80 rounded-xl text-sm font-semibold text-charcoal focus:outline-none focus:border-slate appearance-none cursor-pointer transition-colors shadow-sm">
+
+                    <div class="relative w-full sm:w-auto flex-1">
+                        <select name="estado" class="w-full pl-4 pr-8 py-2.5 bg-[#F8FAFC] border border-gray-200/80 rounded-xl text-sm font-semibold text-charcoal focus:outline-none focus:border-slate appearance-none cursor-pointer transition-colors shadow-sm">
                             <option value="">Todos los estados</option>
                             <?php foreach (['pendiente', 'confirmado', 'realizado', 'cancelado'] as $estado): ?>
                                 <option value="<?= $estado ?>" <?= (($_GET['estado'] ?? '') == $estado) ? 'selected' : '' ?>><?= ucfirst($estado) ?></option>
@@ -77,42 +85,30 @@ $titulo = 'Mis turnos — MediTurnos';
                         </select>
                         <div class="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none text-slate/50"><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg></div>
                     </div>
-                    
-                    <button type="submit" class="w-full sm:w-auto bg-charcoal hover:bg-slate text-white font-bold py-2 px-6 rounded-xl text-sm transition-all duration-200 shadow-md hover:shadow-lg">
-                        Filtrar
-                    </button>
-                    <?php
-                    $filtrosAplicados = !empty($_GET['q']) || !empty($_GET['estado']) || !empty($_GET['especialidad']);
-                    if ($filtrosAplicados):
-                    ?>
-                    <a href="Panel.php" class="w-full sm:w-auto text-center bg-white hover:bg-gray-100 text-slate font-bold py-2 px-6 rounded-xl text-sm transition-all duration-200 border border-gray-200 shadow-sm">
-                        Limpiar
-                    </a>
+                </div>
+
+                <div class="flex items-center gap-4 pt-4 border-t border-gray-100">
+                    <div class="flex-1 flex items-center gap-3">
+                        <span class="text-[0.7rem] font-bold text-slate uppercase tracking-widest hidden sm:block">Períodos:</span>
+                        <div class="flex bg-[#F8FAFC] rounded-xl p-1 border border-gray-200/60 w-full sm:w-auto overflow-x-auto">
+                            <?php
+                            $periodos = ['dia' => 'Hoy', 'semana' => 'Semana', 'mes' => 'Mes', 'todos' => 'Todos'];
+                            foreach ($periodos as $valor => $label):
+                                $periodoActual = $_GET['periodo'] ?? 'todos';
+                                $isDateFilterActive = !empty($_GET['fecha']);
+                                $isActive = !$isDateFilterActive && ($periodoActual === $valor);
+                                $queryParams = http_build_query(array_merge(array_filter($_GET, fn($k) => $k !== 'fecha', ARRAY_FILTER_USE_KEY), ['periodo' => $valor, 'pagina' => 1]));
+                            ?>
+                                <a href="?<?= $queryParams ?>" class="flex-1 sm:flex-none text-center px-4 py-1.5 text-xs font-semibold rounded-lg transition-all duration-200 <?= $isActive ? 'bg-charcoal text-white shadow-sm' : 'text-slate hover:text-charcoal hover:bg-white' ?>"><?= $label ?></a>
+                            <?php endforeach; ?>
+                        </div>
+                    </div>
+                    <button type="submit" class="w-full sm:w-auto bg-charcoal hover:bg-slate text-white font-bold py-2.5 px-6 rounded-xl text-sm transition-all duration-200 shadow-md hover:shadow-lg">Filtrar</button>
+                    <?php if (!empty($_GET['q']) || !empty($_GET['estado']) || !empty($_GET['especialidad']) || !empty($_GET['fecha'])): ?>
+                    <a href="Panel.php" class="w-full sm:w-auto text-center bg-white hover:bg-gray-100 text-slate font-bold py-2.5 px-6 rounded-xl text-sm transition-all duration-200 border border-gray-200 shadow-sm">Limpiar</a>
                     <?php endif; ?>
                 </div>
             </form>
-             <div class="flex items-center gap-3 w-full md:w-auto mt-4">
-                <span class="text-[0.7rem] font-bold text-slate uppercase tracking-widest hidden sm:block">Período:</span>
-                <div class="flex bg-[#F8FAFC] rounded-xl p-1 border border-gray-200/60 w-full sm:w-auto overflow-x-auto">
-                    <?php
-                    $periodos = ['dia' => 'Hoy', 'semana' => 'Semana', 'mes' => 'Mes', 'todos' => 'Todos'];
-                    foreach ($periodos as $valor => $label):
-                        $isActive = ($periodo === $valor);
-                        // Construir query string manteniendo los otros filtros
-                        $queryParams = http_build_query(array_merge($_GET, ['periodo' => $valor, 'pagina' => 1]));
-                    ?>
-                        <a href="?<?= $queryParams ?>"
-                            class="flex-1 sm:flex-none text-center px-4 py-1.5 text-xs font-semibold rounded-lg transition-all duration-200 <?= $isActive ? 'bg-white text-charcoal shadow-sm border border-gray-200/50' : 'text-slate hover:text-charcoal hover:bg-gray-50' ?>">
-                            <?= $label ?>
-                        </a>
-                    <?php endforeach; ?>
-                </div>
-            </div>
-            <div class="text-[0.8rem] text-slate font-medium px-2 md:px-0 mt-4">
-                <span class="bg-ghost px-2.5 py-1 rounded-md border border-gray-200 mr-1 text-charcoal font-bold"><?= $totalTurnos ?></span> turnos en total
-                <span class="mx-2 text-gray-300">|</span>
-                Pág <strong class="text-charcoal"><?= $paginaActual ?></strong> de <strong class="text-charcoal"><?= $totalPaginas ?></strong>
-            </div>
         </div>
 
         <?php
@@ -278,35 +274,23 @@ $titulo = 'Mis turnos — MediTurnos';
             <div class="mt-10 flex justify-center">
                 <nav class="inline-flex items-center gap-1.5 bg-white border border-gray-200/80 rounded-xl p-1.5 shadow-sm">
                     <?php if ($paginaActual > 1): ?>
-                        <a href="?pagina=<?= $paginaActual - 1 ?>&periodo=<?= $periodo ?>&especialidad=<?= $especialidadFiltro ?? '' ?>"
+                        <a href="?<?= http_build_query(array_merge($_GET, ['pagina' => $paginaActual - 1])) ?>"
                             class="flex items-center justify-center px-3 py-1.5 text-xs font-bold text-slate hover:bg-ghost rounded-lg transition-colors">
-                            <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path>
-                            </svg>
                             Ant
                         </a>
                     <?php endif; ?>
 
-                    <?php
-                    $inicio = max(1, $paginaActual - 2);
-                    $fin    = min($totalPaginas, $paginaActual + 2);
-                    ?>
-
-                    <?php for ($i = $inicio; $i <= $fin; $i++): ?>
-                        <?php if ($i == $paginaActual): ?>
-                            <span class="w-8 h-8 flex items-center justify-center text-xs font-bold bg-charcoal text-white rounded-lg shadow-sm"><?= $i ?></span>
-                        <?php else: ?>
-                            <a href="?pagina=<?= $i ?>&periodo=<?= $periodo ?>&especialidad=<?= $especialidadFiltro ?? '' ?>" class="w-8 h-8 flex items-center justify-center text-xs font-bold text-slate hover:bg-ghost rounded-lg transition-colors"><?= $i ?></a>
-                        <?php endif; ?>
+                    <?php for ($i = 1; $i <= $totalPaginas; $i++): ?>
+                        <a href="?<?= http_build_query(array_merge($_GET, ['pagina' => $i])) ?>" 
+                           class="w-8 h-8 flex items-center justify-center text-xs font-bold rounded-lg transition-colors <?= $i == $paginaActual ? 'bg-charcoal text-white shadow-sm' : 'text-slate hover:bg-ghost' ?>">
+                           <?= $i ?>
+                        </a>
                     <?php endfor; ?>
 
                     <?php if ($paginaActual < $totalPaginas): ?>
-                        <a href="?pagina=<?= $paginaActual + 1 ?>&periodo=<?= $periodo ?>&especialidad=<?= $especialidadFiltro ?? '' ?>"
+                        <a href="?<?= http_build_query(array_merge($_GET, ['pagina' => $paginaActual + 1])) ?>"
                             class="flex items-center justify-center px-3 py-1.5 text-xs font-bold text-slate hover:bg-ghost rounded-lg transition-colors">
                             Sig
-                            <svg class="w-4 h-4 ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
-                            </svg>
                         </a>
                     <?php endif; ?>
                 </nav>
@@ -314,7 +298,8 @@ $titulo = 'Mis turnos — MediTurnos';
         <?php endif; ?>
 
     </main>
-
+    
+    <!-- ADDED SCRIPT and MODAL -->
     <!-- Modal de Historial -->
     <div id="historial-modal" class="fixed inset-0 bg-black/30 backdrop-blur-sm z-[150] hidden items-center justify-center animate-fadeIn">
         <div class="bg-white w-full max-w-lg rounded-2xl shadow-lg border border-gray-200/80 p-6 m-4">
@@ -330,6 +315,18 @@ $titulo = 'Mis turnos — MediTurnos';
 
     <script>
     document.addEventListener('DOMContentLoaded', () => {
+        flatpickr("#calendario", {
+            mode: "range",
+            dateFormat: "Y-m-d",
+            locale: "es",
+            onChange: function(selectedDates, dateStr, instance) {
+                const url = new URL(window.location);
+                if (url.searchParams.has('periodo')) {
+                    url.searchParams.delete('periodo');
+                }
+            }
+        });
+
         const modal = document.getElementById('historial-modal');
         const closeModalBtn = document.getElementById('close-modal-btn');
         const modalBody = document.getElementById('modal-body');
@@ -365,7 +362,7 @@ $titulo = 'Mis turnos — MediTurnos';
             let content = historial.map(item => {
                 const fecha = new Date(item.fecha_cambio).toLocaleString('es-AR', { day: '2-digit', month: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit' });
                 return `
-                    <div class="flex gap-3 text-xs">
+                    <div class="flex gap-3 text-xs py-2 border-b border-gray-50 last:border-0">
                         <div class="w-8 h-8 flex-shrink-0 mt-1 rounded-full bg-ghost text-slate flex items-center justify-center">
                             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path></svg>
                         </div>

@@ -34,13 +34,24 @@ if (defined('SECCION') && SECCION === 'misTurnos') {
     $especialidadFiltro = filter_var($_GET['especialidad'] ?? null, FILTER_SANITIZE_SPECIAL_CHARS);
     $periodo = filter_var($_GET['periodo'] ?? 'todos', FILTER_SANITIZE_SPECIAL_CHARS);
     $paginaActual = filter_var($_GET['pagina'] ?? 1, FILTER_SANITIZE_NUMBER_INT);
+    $fecha = filter_var($_GET['fecha'] ?? null, FILTER_SANITIZE_SPECIAL_CHARS);
+
+    $fecha_desde = null;
+    $fecha_hasta = null;
+    if ($fecha) {
+        $fechas = explode(' a ', $fecha);
+        $fecha_desde = $fechas[0] ?? null;
+        $fecha_hasta = $fechas[1] ?? $fecha_desde; 
+    }
 
     $filtros = [
         'q' => $q,
         'estado' => $estado,
         'especialidad' => $especialidadFiltro,
-        'periodo' => $periodo,
-        'dni' => $dni
+        'periodo' => $fecha ? null : $periodo,
+        'dni' => $dni,
+        'fecha_desde' => $fecha_desde,
+        'fecha_hasta' => $fecha_hasta,
     ];
 
     $totalTurnos = $turno->getTotalByFiltros($filtros);

@@ -43,12 +43,14 @@ class Turno
         $q = $filtros['q'] ?? null;
         $dni = $filtros['dni'] ?? null;
         $matricula = $filtros['matricula'] ?? null;
+        $fecha_desde = $filtros['fecha_desde'] ?? null;
+        $fecha_hasta = $filtros['fecha_hasta'] ?? null;
 
         if ($dni) {
             $where[] = "dni = :dni";
             $params[':dni'] = $dni;
         }
-
+        
         if ($matricula) {
             $where[] = "matricula = :matricula";
             $params[':matricula'] = $matricula;
@@ -69,17 +71,24 @@ class Turno
             $params[':q'] = "%$q%";
         }
 
-        if ($periodo === 'dia') {
-            $where[] = "fecha = CURDATE()";
-        } elseif ($periodo === 'semana') {
-            $where[] = "YEARWEEK(fecha, 1) = YEARWEEK(CURDATE(), 1)";
-        } elseif ($periodo === 'mes') {
-            $where[] = "MONTH(fecha) = MONTH(CURDATE()) AND YEAR(fecha) = YEAR(CURDATE())";
+        // El filtro de fecha tiene prioridad sobre el de período
+        if ($fecha_desde && $fecha_hasta) {
+            $where[] = "fecha BETWEEN :fecha_desde AND :fecha_hasta";
+            $params[':fecha_desde'] = $fecha_desde;
+            $params[':fecha_hasta'] = $fecha_hasta;
+        } else {
+            if ($periodo === 'dia') {
+                $where[] = "fecha = CURDATE()";
+            } elseif ($periodo === 'semana') {
+                $where[] = "YEARWEEK(fecha, 1) = YEARWEEK(CURDATE(), 1)";
+            } elseif ($periodo === 'mes') {
+                $where[] = "MONTH(fecha) = MONTH(CURDATE()) AND YEAR(fecha) = YEAR(CURDATE())";
+            }
         }
 
         $sqlWhere = count($where) > 0 ? 'WHERE ' . implode(' AND ', $where) : '';
         $offset   = ($pagina - 1) * $porPagina;
-        $sql      = "SELECT * FROM vista_turnos $sqlWhere ORDER BY fecha DESC, hora_inicio DESC LIMIT :limite OFFSET :offset";
+        $sql      = "SELECT * FROM vista_turnos $sqlWhere ORDER BY fecha ASC, hora_inicio ASC LIMIT :limite OFFSET :offset";
 
         $stmt = $this->db->prepare($sql);
         foreach ($params as $key => $value) {
@@ -103,6 +112,8 @@ class Turno
         $q = $filtros['q'] ?? null;
         $dni = $filtros['dni'] ?? null;
         $matricula = $filtros['matricula'] ?? null;
+        $fecha_desde = $filtros['fecha_desde'] ?? null;
+        $fecha_hasta = $filtros['fecha_hasta'] ?? null;
 
         if ($dni) {
             $where[] = "dni = :dni";
@@ -129,12 +140,19 @@ class Turno
             $params[':q'] = "%$q%";
         }
 
-        if ($periodo === 'dia') {
-            $where[] = "fecha = CURDATE()";
-        } elseif ($periodo === 'semana') {
-            $where[] = "YEARWEEK(fecha, 1) = YEARWEEK(CURDATE(), 1)";
-        } elseif ($periodo === 'mes') {
-            $where[] = "MONTH(fecha) = MONTH(CURDATE()) AND YEAR(fecha) = YEAR(CURDATE())";
+        // El filtro de fecha tiene prioridad sobre el de período
+        if ($fecha_desde && $fecha_hasta) {
+            $where[] = "fecha BETWEEN :fecha_desde AND :fecha_hasta";
+            $params[':fecha_desde'] = $fecha_desde;
+            $params[':fecha_hasta'] = $fecha_hasta;
+        } else {
+            if ($periodo === 'dia') {
+                $where[] = "fecha = CURDATE()";
+            } elseif ($periodo === 'semana') {
+                $where[] = "YEARWEEK(fecha, 1) = YEARWEEK(CURDATE(), 1)";
+            } elseif ($periodo === 'mes') {
+                $where[] = "MONTH(fecha) = MONTH(CURDATE()) AND YEAR(fecha) = YEAR(CURDATE())";
+            }
         }
 
         $sqlWhere = count($where) > 0 ? 'WHERE ' . implode(' AND ', $where) : '';
